@@ -183,6 +183,8 @@ Qt4 (`Containerfile.qt4-legacy`, Ubuntu 14.04):
   `debian/shlibs.local` entry is added to satisfy `dpkg-shlibdeps`.
 - The `.containerignore` in the workspace root limits the build context to
   `ananas-legacy-qdataschema`.
-- Warnings about the unknown `Description-Ru` field and the missing
-  `libananasplugin.so` RPATH are inherited from the project and do not prevent
-  the package from being built.
+- The unknown `Description-Ru` control field is inherited from the project and
+  only produces a warning.
+- The app binaries carry an RPATH to `/usr/lib/ananas/designer` (where
+  `libananasplugin.so` is installed), so the `ananas` engine starts without
+  `LD_LIBRARY_PATH`.

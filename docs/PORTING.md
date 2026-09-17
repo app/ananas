@@ -27,7 +27,8 @@ and an external `libqdataschema`.
 - **Phase 2 (Qt4 → Qt5): done.**
   - `docker/Containerfile.qt5` (Ubuntu 24.04 + Qt 5.15) and
     `scripts/build-qt5.sh` produce `dist/ananas_0.9.6-1_amd64.deb` with Qt5
-    dependencies only (no Qt4 / Qt3Support).
+    dependencies only (no Qt4 / Qt3Support). The app binaries carry an RPATH to
+    `/usr/lib/ananas/designer` (`libananasplugin.so`).
   - `libqdataschema` is ported to Qt5 on the `qt5` branch of
     `ananas-legacy-qdataschema` and installed into the image.
   - `scripts/smoke-qt5.sh`: clean Qt5 build + `ananas-test` 7/7.

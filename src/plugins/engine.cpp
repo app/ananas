@@ -39,9 +39,8 @@
 //#include <qsproject.h>
 //#include <qsscript.h>
 
-#include <QScriptValue>
-#include <QScriptEngine>
-#include <QScriptContext>
+#include <QJSValue>
+#include <QJSEngine>
 
 #include <qdialog.h>
 //--#include <qwidgetfactory.h>
@@ -62,14 +61,6 @@
 #include "acombobox.h"
 
 #include "ametaobject.h"
-
-static QScriptValue
-createObject(QScriptContext *context, QScriptEngine *engine) {
-    QObject *parent = context->argument(0).toQObject();
-    QObject *object = new QObject(parent);
-    return engine->newQObject(object, QScriptEngine::ScriptOwnership);
-}
-
 
 /*!
  *	\~english
@@ -95,44 +86,44 @@ aObjectsFactory::aObjectsFactory( aEngine *e )
         if ( ! db ) return;
 
 
-        QScriptValue ctor = engine->code->newFunction( &createObject);
-
+        // QJSEngine has no native-function constructor hook (QScriptEngine::
+        // newFunction); register the meta objects directly instead.
         engine->code->globalObject().setProperty("QObject",
-                                          engine->code->newQMetaObject(&QObject::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&QObject::staticMetaObject));
         engine->code->globalObject().setProperty("MetaObject",
-                                          engine->code->newQMetaObject(&AMetaObject::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&AMetaObject::staticMetaObject));
         engine->code->globalObject().setProperty("MetaGroup",
-                                          engine->code->newQMetaObject(&AMetaGroup::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&AMetaGroup::staticMetaObject));
         engine->code->globalObject().setProperty("Documents",
-                                          engine->code->newQMetaObject(&AMetaDocuments::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&AMetaDocuments::staticMetaObject));
         engine->code->globalObject().setProperty("Catalogues",
-                                          engine->code->newQMetaObject(&AMetaCatalogues::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&AMetaCatalogues::staticMetaObject));
         engine->code->globalObject().setProperty("MetaInfo",
-                                          engine->code->newQMetaObject(&AMetaInfo::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&AMetaInfo::staticMetaObject));
         engine->code->globalObject().setProperty("MetaGlobal",
-                                          engine->code->newQMetaObject(&AMetaGlobal::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&AMetaGlobal::staticMetaObject));
         engine->code->globalObject().setProperty("PopupMenu",
-                                          engine->code->newQMetaObject(&QMenu::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&QMenu::staticMetaObject));
         engine->code->globalObject().setProperty("Document",
-                                          engine->code->newQMetaObject(&aDocument::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aDocument::staticMetaObject));
         engine->code->globalObject().setProperty("Catalogue",
-                                          engine->code->newQMetaObject(&aCatalogue::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aCatalogue::staticMetaObject));
         engine->code->globalObject().setProperty("CatalogEditor",
-                                          engine->code->newQMetaObject(&wCatalogEditor::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&wCatalogEditor::staticMetaObject));
         engine->code->globalObject().setProperty("Report",
-                                          engine->code->newQMetaObject(&aReport::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aReport::staticMetaObject));
         engine->code->globalObject().setProperty("ARegister",
-                                          engine->code->newQMetaObject(&aARegister::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aARegister::staticMetaObject));
         engine->code->globalObject().setProperty("IRegister",
-                                          engine->code->newQMetaObject(&aIRegister::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aIRegister::staticMetaObject));
         engine->code->globalObject().setProperty("Time",
-                                          engine->code->newQMetaObject(&aTime::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aTime::staticMetaObject));
         engine->code->globalObject().setProperty("DataField",
-                                          engine->code->newQMetaObject(&aDataField::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aDataField::staticMetaObject));
         engine->code->globalObject().setProperty("DocJournal",
-                                          engine->code->newQMetaObject(&aDocJournal::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&aDocJournal::staticMetaObject));
         engine->code->globalObject().setProperty("ComboBox",
-                                          engine->code->newQMetaObject(&AComboBox::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&AComboBox::staticMetaObject));
 
 
 //	registerClass("MetaObject",&AMetaObject::staticMetaObject);
@@ -160,7 +151,7 @@ aObjectsFactory::aObjectsFactory( aEngine *e )
 	for ( int i=0; i<extlist.count(); i++){
 //	    registerClass(extlist[i], AExtensionFactory::metaObject( extlist[i] ));
             engine->code->globalObject().setProperty(extlist[i],
-                                              engine->code->newQMetaObject(AExtensionFactory::metaObject( extlist[i] ), ctor));
+                                              engine->code->newQMetaObject(AExtensionFactory::metaObject( extlist[i] )));
         }
 }
 
@@ -316,9 +307,7 @@ aEngine::init( const QString &rcfile )
         }
 
         md = &db->cfg;
-        code = new QScriptEngine();
-        debugger = new QScriptEngineDebugger();
-        debugger->attachTo(code); //окно дебагера появится при ошибке выполнении скрипта
+        code = new QJSEngine();
 
         //code->addObjectFactory( new QSInputDialogFactory );
         //code->addObjectFactory( new aObjectsFactory( this ) );
@@ -327,21 +316,21 @@ aEngine::init( const QString &rcfile )
         //project.addObject( this );
 
         // Объект sys часто используется для вывода сообщений в окно сообщений
-        QScriptValue ananasEngineObject = code->newQObject(this);
+        QJSValue ananasEngineObject = code->newQObject(this);
         code->globalObject().setProperty("sys", ananasEngineObject);
 
 
         //project.addObject( md );
         // Похоже не используется
-        QScriptValue ananasMetadataObject = code->newQObject(md);
+        QJSValue ananasMetadataObject = code->newQObject(md);
         code->globalObject().setProperty("Metadata", ananasMetadataObject);
 
 //                project.addObject( AMetaData::metadata() );
-        QScriptValue ananasMetadataData = code->newQObject(md);
+        QJSValue ananasMetadataData = code->newQObject(md);
         code->globalObject().setProperty("MetaData", ananasMetadataData);
         mGlobal = md->sText( md->find( md->find( mdc_metadata ), md_globals, 0 ), md_sourcecode );
         if ( ! mGlobal.isEmpty() ) {
-                code->evaluate(sysf+sourcePreprocessor(mGlobal));
+                checkScriptError( code->evaluate(sysf+sourcePreprocessor(mGlobal)), tr("global module") );
         } else {
 //                        printf("Global module is empty\n");
         }
@@ -380,7 +369,7 @@ aEngine::on_systemstart(){
 //	if (project.interpreter()->functions().indexOf("on_systemstart")!=-1) {
 //		project.interpreter()->call("on_systemstart",QVariantList());
 //	}
-        if ( code->globalObject().property("on_systemstart").isValid() ){
+        if ( code->globalObject().property("on_systemstart").isCallable() ){
             code->globalObject().property("on_systemstart").call();
         }
 
@@ -397,13 +386,13 @@ aEngine::on_event( const QString &data )
 //	if (project.interpreter()->functions().indexOf("on_event")!=-1) {
 //		project.interpreter()->call("on_event", QVariantList(lst));
 //	}
-        if ( code->globalObject().property("on_event").isValid() ){
-            QScriptValueList list;
-            list.append(QScriptValue(sender()->objectName()));
-//            list.append( engine->code->newVariant(val));
-            list.append(QScriptValue(data));
+        if ( code->globalObject().property("on_event").isCallable() ){
+            QJSValueList list;
+            list.append(QJSValue(sender()->objectName()));
+//            list.append( engine->code->toScriptValue(val));
+            list.append(QJSValue(data));
             code->globalObject().property("on_event")
-                    .call(QScriptValue(),list);
+                    .call(list);
         }
 
 	emit event( sender()->objectName(), data );
@@ -426,7 +415,7 @@ aEngine::on_systemstop(){
 //	if (project.interpreter()->functions().indexOf("on_systemstop")!=-1) {
 //		project.interpreter()->call("on_systemstop",QVariantList());
 //	}
-        if ( code->globalObject().property("on_systemstop").isValid() ){
+        if ( code->globalObject().property("on_systemstop").isCallable() ){
             code->globalObject().property("on_systemstop").call();
         }
 
@@ -660,7 +649,8 @@ void aEngine::execAction( aCfgItem &act, QObject *context )
 			if ( !aModule.isEmpty() ) {
 //				code->evaluate( sourcePreprocessor(aModule),
 //                                                context, md->attr( act, mda_name ) );
-                                code->evaluate( sourcePreprocessor(aModule));
+                                checkScriptError( code->evaluate( sourcePreprocessor(aModule)),
+                                                  md->attr( act, mda_name ) );
                         }
 			break;
 		case 2:
@@ -852,16 +842,31 @@ aEngine::openEmbedCatalogueEditor(int oid, QWidget* parent,const bool toSelect)
 void
 aEngine::error ( const QString & message, QObject * context, const QString & scriptName, int lineNumber )
 {
-    if (code->uncaughtException().isValid()) {
-        Message( 2, tr("Line:%1 Message:%2 Stack:(%3)")
-                 .arg(lineNumber)
-                 .arg(message)
-                 .arg(code->uncaughtException().toString()) );
+    Q_UNUSED( context );
+    Q_UNUSED( scriptName );
+    Message( 2, tr("Line:%1 Message:%2")
+             .arg(lineNumber)
+             .arg(message)
+             );
+}
+
+
+/*!
+ * \en
+ * \brief Report an uncaught script error returned by QJSEngine::evaluate().
+ * \_en \ru
+ * \brief Сообщает об ошибке скрипта, возвращенной QJSEngine::evaluate().
+ * \_ru
+ */
+void
+aEngine::checkScriptError( const QJSValue &result, const QString &context )
+{
+    if ( !result.isError() ) return;
+
+    if ( context.isEmpty() ) {
+        Message( 2, tr("Script error: %1").arg(result.toString()) );
     } else {
-        Message( 2, tr("Line:%1 Message:%2")
-                 .arg(lineNumber)
-                 .arg(message)
-                 );
+        Message( 2, tr("Script error (%1): %2").arg(context).arg(result.toString()) );
     }
 }
 

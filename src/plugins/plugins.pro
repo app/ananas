@@ -6,8 +6,7 @@ include( ../lib/lib.pri )
 include ( ../ananas.pri )
 #load(qsa)
 QT += designer
-QT += script
-QT += scripttools
+QT += qml
 
 TEMPLATE = lib
 shared:CONFIG += dll plugin debug

@@ -13,7 +13,7 @@ HEADERS	+=  \
 TRANSLATES = 
 
 QT += testlib
-QT += script scripttools
+QT += qml
 FORMS	= 
 TEMPLATE	=app
 INCLUDEPATH	+= ../lib ../plugins

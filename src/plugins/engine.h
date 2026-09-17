@@ -36,9 +36,8 @@
 //#include <qsobjectfactory.h>
 //#include <qsproject.h>
 //#include <qsinterpreter.h>
-#include <qscriptengine.h>
-#include <qscriptenginedebugger.h>
-#include <QScriptValue>
+#include <QJSEngine>
+#include <QJSValue>
 #include <QHash>
 
 //Added by qt3to4:
@@ -56,7 +55,7 @@
 
 class aEngine;
 class aWidget;
-class QScriptEngine;
+class QJSEngine;
 
 
 
@@ -138,8 +137,7 @@ public:
  *	ссылка на интерпретатор скрипта.
  *	\~
 */
-        QScriptEngine*	code;
-        QScriptEngineDebugger* debugger;
+        QJSEngine*	code;
 /*!
  *	\~english
  *	link to script project.
@@ -197,6 +195,8 @@ signals:
 	void event( const QString &source, const QString &data );
 
 private:
+	void checkScriptError( const QJSValue &result, const QString &context = QString() );
+
 	QString pr_timer;
 	QString mGlobal;
 	QHash <QString, QVariant> values;

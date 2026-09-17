@@ -43,8 +43,8 @@
 #include <qfile.h>
 #include <qdir.h>
 //#include <qsinterpreter.h>
-#include <QScriptValue>
-#include <QScriptEngine>
+#include <QJSValue>
+#include <QJSEngine>
 
 //--#include <qbutton.h>
 #include <qpushbutton.h>
@@ -355,7 +355,10 @@ aForm::init()
 		if ( !sModule.isEmpty() )
 		{
 //                        engine->project.interpreter()->evaluate(sModule,this );
-                        engine->code->evaluate(sModule);
+                        QJSValue result = engine->code->evaluate(sModule);
+                        if ( result.isError() ) {
+                            aLog::print(aLog::Error, tr("aForm form module script error: %1").arg(result.toString()));
+                        }
 			aLog::print(aLog::Debug, tr("aForm load form module script"));
 //			QStringList lst = engine->project.interpreter()->functions(this);
 //			for(uint i=0; i<lst.count();i++)
@@ -423,7 +426,7 @@ aForm::Show()
 //		{
 //			engine->project.interpreter()->call("on_formstart", QVariantList(), this);
 //		}
-                if ( engine->code->globalObject().property("on_formstart").isValid() ){
+                if ( engine->code->globalObject().property("on_formstart").isCallable() ){
                     engine->code->globalObject().property("on_formstart").call();
                 }
 
@@ -506,20 +509,20 @@ aForm::turn_on(){
  */
 int
 aForm::SignIn(){
-        QScriptValue res;
+        QJSValue res;
 	if ( form && !mainWidget->dataObject()->IsConducted())
 	{
 //		if ( engine->project.interpreter()->functions( this ).indexOf("on_conduct")!=-1)
 //		{
 //			res  = engine->project.interpreter()->call("on_conduct",QVariantList(), this);
 //		}
-                if ( engine->code->globalObject().property("on_conduct").isValid() ){
+                if ( engine->code->globalObject().property("on_conduct").isCallable() ){
                     res = engine->code->globalObject().property("on_conduct").call();
                 }
 
 	}
         // if return false
-        if(res.isValid() && res.toBool() == false )
+        if ( res.isBool() && res.toBool() == false )
         {
                 aLog::print(aLog::Info, tr("aForm conduct: function on_conduct() return false, document not conducted"));
                 return 0;
@@ -1292,7 +1295,7 @@ aForm::on_button(){
 //	{
 //		engine->project.interpreter()->call("on_button",QVariantList()<<sender()->objectName(),this);
 //	}
-        if ( engine->code->globalObject().property("on_button").isValid() ){
+        if ( engine->code->globalObject().property("on_button").isCallable() ){
             engine->code->globalObject().property("on_button").call();
         }
 
@@ -1354,7 +1357,7 @@ aForm::on_form_close(){
 //	if ( engine->project.interpreter()->functions(this).indexOf("on_formstop")!=-1) {
 //		engine->project.interpreter()->call("on_formstop", QVariantList(),this);
 //	}
-        if ( engine->code->globalObject().property("on_formstop").isValid() ){
+        if ( engine->code->globalObject().property("on_formstop").isCallable() ){
             engine->code->globalObject().property("on_formstop").call();
         }
 }
@@ -1409,12 +1412,12 @@ aForm::on_valueChanged( const QString & name, const QVariant & val )
 //		lst << val;
 //		engine->project.interpreter()->call("on_valuechanged",QVariantList(lst), this);
 //	}
-        if ( engine->code->globalObject().property("on_valuechanged").isValid() ){
-            QScriptValueList list;
-            list.append(QScriptValue(name));
-            list.append( engine->code->newVariant(val));
+        if ( engine->code->globalObject().property("on_valuechanged").isCallable() ){
+            QJSValueList list;
+            list.append(QJSValue(name));
+            list.append( engine->code->toScriptValue(val));
             engine->code->globalObject().property("on_valuechanged")
-                    .call(QScriptValue(),list);
+                    .call(list);
         }
 
 }
@@ -1433,13 +1436,13 @@ aForm::on_tabvalueChanged(int row, int col)
 //
 //		engine->project.interpreter()->call("on_tabupdate",QVariantList(lst), this);
 //	}
-        if ( engine->code->globalObject().property("on_tabupdate").isValid() ){
-            QScriptValueList list;
+        if ( engine->code->globalObject().property("on_tabupdate").isCallable() ){
+            QJSValueList list;
             list << row;
             list << col;
             list << sender()->objectName();
             engine->code->globalObject().property("on_tabupdate")
-                    .call(QScriptValue(),list);
+                    .call(list);
         }
 }
 
@@ -1459,11 +1462,11 @@ aForm::on_dbtablerow( QSqlRecord *r )
 //	if ( engine->project.interpreter()->functions(this).indexOf("on_tablerow")!=-1) {
 //		engine->project.interpreter()->call("on_tablerow", QVariantList()<<sender()->objectName(), this);
 //	}
-        if ( engine->code->globalObject().property("on_tablerow").isValid() ){
-            QScriptValueList list;
+        if ( engine->code->globalObject().property("on_tablerow").isCallable() ){
+            QJSValueList list;
             list << sender()->objectName();
             engine->code->globalObject().property("on_tablerow")
-                    .call(QScriptValue(),list);
+                    .call(list);
         }
 }
 
@@ -1476,12 +1479,12 @@ aForm::on_event( const QString &source, const QString &data )
 //	if ( engine->project.interpreter()->functions(this).indexOf("on_event")!=-1) {
 //		engine->project.interpreter()->call("on_event", QVariantList(lst), this);
 //	}
-        if ( engine->code->globalObject().property("on_event").isValid() ){
-            QScriptValueList list;
+        if ( engine->code->globalObject().property("on_event").isCallable() ){
+            QJSValueList list;
             list << source;
             list << data;
             engine->code->globalObject().property("on_event")
-                    .call(QScriptValue(),list);
+                    .call(list);
         }
 }
 
@@ -1508,12 +1511,12 @@ aForm::on_tablerow( qulonglong uid )
 //	if ( engine->project.interpreter()->functions(this).indexOf("on_tabrowselected")!=-1) {
 //		engine->project.interpreter()->call("on_tabrowselected", QVariantList(lst), this);
 //	}
-        if ( engine->code->globalObject().property("on_tabrowselected").isValid() ){
-            QScriptValueList list;
+        if ( engine->code->globalObject().property("on_tabrowselected").isCallable() ){
+            QJSValueList list;
             list << sender()->objectName();
             list << QString("%1").arg(uid);
             engine->code->globalObject().property("on_tabrowselected")
-                    .call(QScriptValue(),list);
+                    .call(list);
         }
 }
 

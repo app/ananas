@@ -3,8 +3,7 @@ TARGET	= ananas-administrator
 include ( ../lib/lib.pri )
 include ( ../plugins/plugins.pri )
 include ( ../ananas.pri )
-QT += script
-QT += scripttools
+QT += qml
 
 
 TEMPLATE	= app

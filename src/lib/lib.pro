@@ -1,8 +1,7 @@
 include(../plugins/plugins.pri)
 include(lib.pri)
 
-QT += script
-QT += scripttools
+QT += qml
 
 
 TARGET = ananas

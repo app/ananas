@@ -2,12 +2,12 @@ Source: ananas
 Section: utils
 Priority: optional
 Maintainer: Andrey Paskal (app) <apaskal@gmail.com>
-Build-Depends: debhelper (>= 5), qtbase5-dev, qtbase5-dev-tools, qttools5-dev, qttools5-dev-tools, qtscript5-dev, libmysqlclient-dev, libqdataschema
+Build-Depends: debhelper (>= 5), qtbase5-dev, qtbase5-dev-tools, qttools5-dev, qttools5-dev-tools, qtdeclarative5-dev, libmysqlclient-dev, libqdataschema
 Standards-Version: 3.7.2
 
 Package: ananas
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, zip, unzip, libqt5widgets5, libqt5sql5, libqt5sql5-mysql, libqt5sql5-psql, libqt5sql5-sqlite, libqt5script5, libqt5scripttools5, libqdataschema
+Depends: ${shlibs:Depends}, ${misc:Depends}, zip, unzip, libqt5widgets5, libqt5sql5, libqt5sql5-mysql, libqt5sql5-psql, libqt5sql5-sqlite, libqdataschema
 Description: Runtime and development environment of Finance Applications
 Description-ru:  Среда разработки и исполнения прикладных решений автоматизации оперативного, бухгалтерского и других видов учета.
  Учет товаров и рассчетов на компьютере.

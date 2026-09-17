@@ -2,7 +2,21 @@
 set -e
 
 WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+REPO="$WORKSPACE_DIR/ananas-legacy-qt4"
 BRANCH="${ANANAS_BRANCH:-qtscript}"
+
+# git archive only exports tracked files: fail fast if a source file exists on
+# disk but is ignored by .gitignore (it would silently be missing from the build).
+MISSING="$(git -C "$REPO" ls-files --others --ignored --exclude-standard \
+    | grep -E '\.(h|hpp|cpp|cc|cxx|pro|pri|ui|qrc)$' \
+    | grep -vE '/(\.moc|\.obj|\.ui)/' \
+    | grep -vE '(^|/)(moc_|qrc_)[^/]*\.cpp$' || true)"
+if [[ -n "$MISSING" ]]; then
+    echo "ERROR: ignored source files would be missing from the build:" >&2
+    echo "$MISSING" >&2
+    echo "Fix .gitignore or 'git add' them before packaging." >&2
+    exit 1
+fi
 
 echo "===> 1. Сборка Podman-образа (Ubuntu 14.04 + Qt4 + QtScript + libqdataschema)..."
 podman build -t ananas-qt4-builder -f "$WORKSPACE_DIR/tools/docker/Containerfile.qt4-legacy" "$WORKSPACE_DIR"

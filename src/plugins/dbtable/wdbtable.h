@@ -31,15 +31,17 @@
 #ifndef WDBTABLE_H
 #define WDBTABLE_H
 
-#include <q3sqlpropertymap.h>
-#include <q3datatable.h>
+#include <QTableWidget>
+#include <QTableWidgetItem>
+#include <QStyledItemDelegate>
+#include <QSqlRecord>
+#include <QSqlIndex>
+#include <QSqlError>
 //Added by qt3to4:
-#include <Q3SqlEditorFactory>
 #include <QContextMenuEvent>
 #include <QFrame>
 #include <QList>
 #include <QPixmap>
-#include <Q3SqlCursor>
 #include <QKeyEvent>
 #include <QEvent>
 #include "acfg.h"
@@ -49,7 +51,10 @@
 
 class aDatabase;
 class wDBTable;
-class Q3DataTable;
+class aDataTable;
+
+/* operation kind for line updates (was QSql::Op, removed in Qt5/6) */
+enum aTableOp { aOpNone = -1, aOpInsert = 0, aOpUpdate = 1, aOpDelete = 2 };
 
 class aSearchWidget : public QFrame
 {
@@ -61,7 +66,6 @@ public:
 public slots:
 	void setText( const QString &t );
 protected:
-//	virtual void keyPressEvent ( QKeyEvent *e );
         bool eventFilter( QObject *obj, QEvent *ev );
 private:
 	QString ftext;
@@ -75,14 +79,14 @@ private:
  * \en	Class for editing documents tables. \_en
  * \ru
  * 	\brief Визуальный класс для редактирования табличных частей документа.
- * 	Наследует QDataTable.
+ * 	Наследует QTableWidget.
  *
  * 	Поддерживает редактирование журнала документов
  * 	и таблицы элементов каталога.
  * \_ru
  *
  */
-class QT_WIDGET_PLUGIN_EXPORT wDBTable : public Q3DataTable
+class QT_WIDGET_PLUGIN_EXPORT wDBTable : public QTableWidget
 {
 	friend class aForm;
 
@@ -94,19 +98,18 @@ class QT_WIDGET_PLUGIN_EXPORT wDBTable : public Q3DataTable
 	Q_PROPERTY( QStringList	DefHeaders READ getDefHeaders WRITE setDefHeaders DESIGNABLE true )
 	Q_PROPERTY( QStringList	ColWidth READ getColWidth WRITE setColWidth DESIGNABLE true )
 	Q_PROPERTY( QStringList	DefIdList READ getDefIdList WRITE setDefIdList DESIGNABLE true )
-//	Q_PROPERTY( bool	openEditor READ getOpenEditor WRITE setOpenEditor STORED true )
 	Q_PROPERTY( QString	editFormName READ getEditFormName WRITE setEditFormName DESIGNABLE true )
 public:
+	enum RefreshMode { RefreshAll = 0, RefreshColumns = 1 };
+
 	aCfg*		md;
 	aDatabase*	db;
 	aEngine*	engine;
-	//char vLoaded;
 	QStringList	list_available_tables;
 	QStringList	fname, hname, colWidth,idList;
 	int		defColWidth;
 	int		tableInd;
 	aCfgItem	tables;
-	Q3SqlCursor*	cur;
 	bool		searchMode;
 	QString		searchString;
 	aSearchWidget	*searchWidget;
@@ -121,13 +124,9 @@ public:
 	int		getTableInd(int id);
 	int		getTableId(int ind);
 
-	//	void 	init( aDatabase *adb );
 	void		init();
 	void		init(aDatabase *adb, aEngine *e = 0 ); // call in ananas engine
 	void		OpenEditor();
-	//QWidget*	createEditor();
-
-	//int 	getDefaultWidth() const {return defColWidth;};
 
 	QStringList	getDefFields()	const;
 	QStringList	getDefHeaders()	const;
@@ -152,14 +151,31 @@ public:
 
 	QString	containerType()	const { return container_type;};
 	void 	setContainerType( QString name)	{ container_type = name; };
+	QString	columnField( int col ) const { return m_columns.value( col ); }
 	QPixmap systemIcon();
 	virtual int Select( ANANAS_UID db_uid );
 	aCfg*	getMd();
+
+	/* compatibility helpers replacing the Q3DataTable API */
+	aDataTable*	sqlCursor() const { return m_table; }
+	void		setSqlCursor( aDataTable *t ) { m_table = t; }
+	int		numCols() const { return columnCount(); }
+	int		numRows() const { return rowCount(); }
+	void		addColumn( const QString &field, const QString &header, int width = 100 );
+	void		removeColumn( int col );
+	void		setFilter( const QString &flt );
+	void		setColumnReadOnly( int col, bool ro );
+	void		setReadOnly( bool ro );
+	bool		isReadOnly() const;
+	QSqlRecord*	currentRecord();
+	void		refresh( int mode = RefreshAll );
+
 public slots:
+	void	refreshAll();
 	QList<int> getBindList();
 	void 	setWFieldEditor();
 	void	setAvailableTables();
-	void 	lineUpdate(QSql::Op mode);
+	void 	lineUpdate(aTableOp mode);
 	void	newFilter(const QString & );
 	void	newDataId(const qulonglong );
 	QVariant Value( const QString &colname );
@@ -169,7 +185,7 @@ public slots:
 	void searchClose();
 
 protected slots:
-	void doubleClickEventHandler(int , int , int, const QPoint& ); //parametrs not used
+	void doubleClickEventHandler(int , int ); //parametrs not used
 	virtual void updateTableCellHandler(int, int);
 signals:
 
@@ -214,65 +230,36 @@ signals:
  *	\~
  */
 	void updateCurr(int row, int col);
-//<<<<<<< wdbtable.h
+	void currentChanged( const QSqlRecord *record );
 
 	//signals from context menu for connecting to wJournal
-	//if container has another type, then do QDataTable context menu
-	//and this signal no emitted
-//=======
-
-/*!
- *	\~english
- *	signals from context menu for connecting to wJournal
- *	if container has another type, then do QDataTable context menu
- *	and this signal no emitted
- *	\~russian
- *	Сигналы от контекстного меню для присоединения к wJournal
- *	Если контейнер другого типа, то вызывается стандартное меню,
- *	и эти сигналы не испускаются.
- *	\~
- *	\see updateRequest(); deleteRequest(); viewRequest();
- *
-*/
-//>>>>>>> 1.45.2.4
 	void insertRequest();
-/*!
- *	\see insertRequest();
-*/
 	void updateRequest();
-/*!
- *	\see insertRequest();
-*/
 	void deleteRequest();
-/*!
- *	\see insertRequest();
-*/
 	void viewRequest();
 	// end
 	void getMd( aCfg ** );
 	void getId( qulonglong * );
 
 private slots:
-	//void select( Q_ULLONG group );
 	void lineChange(int, int);
 	void lineInsert(QSqlRecord*);
 	void updateItem( ANANAS_UID db_uid );
 
 protected:
-	virtual void paintField ( QPainter * p, const QSqlField * field, const QRect & cr, bool selected );
-	QWidget * beginUpdate ( int row, int col, bool replace );
 	virtual bool updateCurrent();
-	void  contentsContextMenuEvent ( QContextMenuEvent * e );
-//	void propertyUpdate(const QString &propName);
+	virtual void contextMenuEvent ( QContextMenuEvent * e );
 	virtual bool deleteCurrent();
-	//virtual QSql::Confirm confirmEdit ( QSql::Op m );
 	virtual void keyPressEvent ( QKeyEvent *e );
 	void EditElement();
-	virtual void activateNextCell();
 	virtual bool beginInsert ();
-	virtual QSql::Confirm confirmEdit( QSql::Op m );
+	virtual bool confirmEdit( aTableOp m );
+	QString	displayValue( const QString & field ) const;
 
 private:
+	QStringList	m_columns;	// db field name per column
+	aDataTable	*m_table;
+	bool		m_populating;
 
 	QPixmap t_doc;
 	QPixmap t_doc_d;
@@ -293,8 +280,6 @@ private:
 	long journalFieldId(long);
 	QString journalFieldName(long);
 	bool inEditMode;
-	//aDBTablePrivate impl;
-//	void updateProp(void);
 	QList<int> listBindings;
 	aCfgItem obj;
         QString vName, vEditFormName;
@@ -307,20 +292,17 @@ private:
  * \en	Class for support custom editor in wDBTable. \_en
  * \ru
  * 	\brief Класс для поддержки собственного редактора поля в wDBTable.
- * 	Наследует QSqlEditorFactory.
+ * 	Наследует QStyledItemDelegate.
  * \_ru
  */
-class aEditorFactory: public Q3SqlEditorFactory
+class aEditorFactory: public QStyledItemDelegate
 {
 public:
-/*!
- * \~english	Constructor
- * \~russian 	Конструктор \~
- */
-	aEditorFactory(QObject * parent = 0, const char * name = 0):Q3SqlEditorFactory(parent/*--,name*/) {};
-	QWidget * createEditor (QWidget * parent, const QSqlField * field);
+	aEditorFactory( wDBTable *table );
+	QWidget * createEditor (QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index) const;
 	void setMd(aCfg *md);
 private:
+	wDBTable *m_table;
 	aCfg * md;
 };
 #endif

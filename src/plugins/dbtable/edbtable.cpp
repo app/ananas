@@ -8,7 +8,6 @@
 #include "wdbtable.h"
 //Added by qt3to4:
 #include <QList>
-#include <Q3SqlFieldInfo>
 
 /*
  *  Constructs a eDBTable as a child of 'parent', with the
@@ -313,10 +312,8 @@ void eDBTable::getData( wDBTable *t )
 QStringList lst;
 QString str, str2;
 int i;
-const Q3SqlFieldInfo *f;
 	if(ComboBoxTable->count())
 	{
-	//	t->setProperty("TableInd", tables[ComboBoxTable->currentItem()].section("\t",0,0).toInt())
 		t->setProperty("TableInd",t->getTableId(ComboBoxTable->currentItem()-1));
 		i=0;
 		while(i<t->numCols())
@@ -324,17 +321,12 @@ const Q3SqlFieldInfo *f;
 			t->removeColumn(0);
 			++i;
 		}
-		t->cur->clear();
 		for(uint j=0; j<ListCol->count(); j++)
 		{
 			ListCol->setCurrentItem(j);
 			str = ListCol->currentText();
 			lst << str;
-			f = new Q3SqlFieldInfo(fname[j]);
-			t->cur->append(*f);
-			t->setSqlCursor(t->cur);
-			t->addColumn(f->name(),str,atoi(cwidth[j].ascii()));
-			t->refresh(Q3DataTable::RefreshColumns);
+			t->addColumn(fname[j],str,cwidth[j].toInt());
 		}
 		t->setProperty("DefHeaders",lst);
 		t->setProperty("DefFields",fname);

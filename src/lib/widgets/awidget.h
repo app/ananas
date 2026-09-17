@@ -29,7 +29,6 @@
 
 #ifndef AWIDGET_H
 #define AWIDGET_H
-#include <q3sqlform.h>
 #include <QToolBar>
 #include <QMainWindow>
 //Added by qt3to4:
@@ -148,7 +147,6 @@ private:
 	QString		vName;
 	int		vId, vFormMode;
 	aCfgItem	obj;
-	Q3SqlForm*	form;
 //	QDict <aSQLTable> dbtables;
 };
 

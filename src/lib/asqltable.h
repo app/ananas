@@ -118,6 +118,9 @@ public:
 	virtual QSqlRecord *primeInsert() ANANAS_DEPRECATED;
 	virtual QSqlRecord *primeUpdate() ANANAS_DEPRECATED;
 	virtual QSqlRecord *primeDelete() ANANAS_DEPRECATED;
+	QSqlRecord	*insertBuffer();
+	QSqlRecord	*updateBuffer();
+	QSqlRecord	*currentRecord();
 	virtual QSqlRecord *editBuffer( bool copy = false );
 	virtual int insert();
 	virtual int update();

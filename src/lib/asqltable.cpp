@@ -621,6 +621,25 @@ aDataTable::editBuffer( bool )
 	return &m_editBuffer;
 }
 
+QSqlRecord *
+aDataTable::insertBuffer()
+{
+	return prepareInsertBuffer();
+}
+
+QSqlRecord *
+aDataTable::updateBuffer()
+{
+	return prepareUpdateBuffer();
+}
+
+QSqlRecord *
+aDataTable::currentRecord()
+{
+	m_editBuffer = m_current;
+	return &m_editBuffer;
+}
+
 int
 aDataTable::insert()
 {

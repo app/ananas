@@ -29,12 +29,9 @@
 **********************************************************************/
 
 #include <qobject.h>
-#include <q3sqlcursor.h>
-#include <q3sqlpropertymap.h>
 #include <qdialog.h>
 #include <qlineedit.h>
 //Added by qt3to4:
-#include <Q3SqlForm>
 #include <QLabel>
 #include <QKeyEvent>
 #include "adatabase.h"
@@ -42,6 +39,7 @@
 #include "wfield.h"
 #include "wdbfield.h"
 #include "wdbtable.h"
+#include "wtable.h"
 #include "aform.h"
 #include "alog.h"
 #include <qapplication.h>
@@ -197,11 +195,6 @@ aWidget::initObject( aDatabase *adb )
 	// Init myself.
 	setInited( true );
 
-	//<для чего?
-	Q3SqlPropertyMap *pm = new Q3SqlPropertyMap();
-	//>
-
-
 	db = adb;
 	md = 0;
 	if ( db )
@@ -218,13 +211,6 @@ aWidget::initObject( aDatabase *adb )
 	{
 		obj = md->find( getId() );
 	}
-
-
-	//<для чего?
-	form = new Q3SqlForm( this );
-	pm->insert("wDBField","value");
-	form->installPropertyMap( pm );
-	//>
 
 
 	if ( obj.isNull() )
@@ -747,10 +733,10 @@ aWidget::Refresh()
 	//--delete l; // delete the list, not the objects
 	//--l=0;
 
-    Q3DataTable* obj2;
 	while ( tit.hasNext() ){
-		obj2 = qobject_cast<Q3DataTable*>(tit.next());
-		obj2->refresh();
+		QObject *o2 = tit.next();
+		if ( o2->inherits("wDBTable") )
+			QMetaObject::invokeMethod( o2, "refreshAll", Qt::DirectConnection );
 	}
 	//--delete tl; // delete the list, not the objects
 
@@ -969,7 +955,8 @@ aWidget::SetReadOnly ( bool status )
 	{
 		//printf("QFrame classname '%s'\n", (const char*) obj->className() );
 		obj = tl.next();
-		if (obj->inherits("QTable")) (( Q3Table * )obj)->setReadOnly(true);
+		QAbstractItemView *view = qobject_cast<QAbstractItemView*>(obj);
+		if ( view ) view->setEditTriggers( QAbstractItemView::NoEditTriggers );
 		//else (( QFrame *)obj)->setDisabled( status );
 	}
 	//--delete l; // delete the list, not the objects

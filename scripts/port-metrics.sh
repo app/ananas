@@ -13,8 +13,11 @@ fi
 
 cd "$REPO"
 
+# The form designer (src/designer) is excluded from the first porting
+# milestone, so it is not counted in the burndown.
 src_files() {
-    find . -path ./.git -prune -o -type f \
+    find . -path ./.git -prune -o -path ./src/designer -prune -o \
+        -type d \( -name .moc -o -name .obj -o -name .ui \) -prune -o -type f \
         \( -name '*.cpp' -o -name '*.h' -o -name '*.ui' -o -name '*.pro' -o -name '*.pri' \) -print
 }
 
@@ -43,7 +46,7 @@ printf '%-42s %8s %8s\n' "Qt3Support / QT3_SUPPORT" \
 printf '%-42s %8s %8s\n' "QT += qt3support" \
     "$(count_files 'qt3support')" "$(count_occurrences 'qt3support')"
 printf '%-42s %8s %8s\n' ".ui files with class=\"Q3...\"" \
-    "$(find . -path ./.git -prune -o -name '*.ui' -print | xargs -r grep -El 'class="Q3' 2>/dev/null | wc -l)" "-"
+    "$(src_files | grep '\.ui$' | xargs -r grep -El 'class="Q3' 2>/dev/null | wc -l)" "-"
 printf '%-42s %8s %8s\n' "QDesigner* identifiers" \
     "$(count_files '\bQDesigner[A-Za-z0-9_]+')" "$(count_occurrences '\bQDesigner[A-Za-z0-9_]+')"
 printf '%-42s %8s %8s\n' "QScript* identifiers" \

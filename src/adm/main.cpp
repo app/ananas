@@ -1,3 +1,4 @@
+#include <QtGlobal>
 #if QT_VERSION<0x040000
     #include <qapplication.h>
 #else

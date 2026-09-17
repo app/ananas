@@ -793,7 +793,7 @@ aForm::Value(const QString &name)
                 res = o->Value( name );
         }
         if ( res.type() != QVariant::Invalid ) return res;
-        else printf("no field %s in data object\n", ( const char *) name );
+        else printf("no field %s in data object\n", name.toLocal8Bit().constData() );
 */
 /*
 	w = findWidget( name );

@@ -48,7 +48,7 @@ void
 AExtExample::PrintMessage( const QString &msg )
 {
     setLastMessage( msg );
-    cfg_message(0, "AExtTest MSG:%s\n", (const char *) msg);
+    cfg_message(0, "AExtTest MSG:%s\n", msg.toLocal8Bit().constData());
 }
 
 void 

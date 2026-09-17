@@ -64,7 +64,7 @@ int idxt, int cw, int tw, int td)
 tablefield *f;
 char s[30];
 
-sprintf(s, "%s %i %i", (const char *)otypes[idxt], tw, td);
+sprintf(s, "%s %i %i", otypes[idxt].toLatin1().constData(), tw, td);
 
 f = tablefield_newsys(Name, s, "");
 tablefield_setheader(f, Header);
@@ -405,7 +405,7 @@ aWidget *wo;
 		if (!t->getDefineCols().isEmpty()) {
 			sl = QStringList::split("\n",t->getDefineCols());
 			for (i = 0; i < sl.count(); i++) {
-				sscanf((const char *)sl[i].section("|",3,3),"%s %d %d", st, &l, &d);
+				sscanf(sl[i].section("|",3,3).toLatin1().constData(),"%s %d %d", st, &l, &d);
 				if (st[0]=='O') ft.sprintf("O %d",l);
 				else ft=st;
 				w = sl[i].section("|",2,2).toInt();
@@ -416,7 +416,7 @@ aWidget *wo;
 					else if (otypes[idxt][0]==ft[0]) break;
 				}
 				printf("set data %i = %s %s %i %i %i\n", i,
-				(const char *)h, (const char *)n, idxt, w, l);
+				h.toLatin1().constData(), n.toLatin1().constData(), idxt, w, l);
 				insertColumn(h,n,idxt,w,l,d);
 			}
 		}

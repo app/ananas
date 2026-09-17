@@ -59,7 +59,7 @@ aField::aField(const QString &name, const QString &type )
 	fSys = true;
 	Name = name;
 //	Type  = type;
-	aType = ( (const char *) type.section(" ",0,0).toUpper() )[0];
+	aType = type.section(" ",0,0).toUpper().at(0).toLatin1();
 	Width = type.section(" ",1,1).toInt();
 	Dec = type.section(" ",2,2).toInt();
 	switch ( aType ){

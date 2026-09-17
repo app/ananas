@@ -50,7 +50,7 @@
 #include <qpushbutton.h>
 //--#include <qfocusdata.h>
 #include <qlabel.h>
-#include <q3mainwindow.h>
+#include <QMainWindow>
 #include <q3datetimeedit.h>
 #include <qstatusbar.h>
 #include <qlineedit.h>
@@ -206,7 +206,7 @@ aForm::initContainer( aWidget *widget, aDatabase *adb ){
 			{
 				aw->init( adb );
 			}
-			if ( form->inherits( "QMainWindow" ) ) aw->createToolBar( ( Q3MainWindow *) form );
+			if ( form->inherits( "QMainWindow" ) ) aw->createToolBar( ( QMainWindow *) form );
 		} else initWidget( ( QWidget *) obj, adb );
 	}
 	it.toFront();
@@ -271,7 +271,7 @@ aForm::init()
 		}
 	}
 	if (form) {
-		Q3MainWindow *mw = new Q3MainWindow( parentWidget, "main form", Qt::WDestructiveClose );
+		QMainWindow *mw = new QMainWindow( parentWidget, "main form", Qt::WDestructiveClose );
   		mw->statusBar()->hide();
 		mw->setCaption( form->caption() );
 
@@ -288,7 +288,7 @@ aForm::init()
 		engine->wl->insert( objid, mw, db_uid );
 		printf("insert new in wl ok\n");
 		if ( form->inherits("QMainWindow" )){
-			((Q3MainWindow *) form)->statusBar()->hide();
+			((QMainWindow *) form)->statusBar()->hide();
 		}
 	    	mainWidget = 0;
 		aCfgItem par = md->parent( md->parent( mdObj ) );

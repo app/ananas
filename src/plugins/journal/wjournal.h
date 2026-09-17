@@ -61,7 +61,7 @@ public:
 	virtual ~wJournal();
 	bool			checkStructure();
 	virtual void		initObject( aDatabase *adb );
-	virtual Q3ToolBar*	createToolBar( Q3MainWindow *parent );
+	virtual QToolBar*	createToolBar( QMainWindow *parent );
 	virtual QDialog*	createEditor( QWidget *parent );
 	virtual QString		displayString();
 	virtual bool		isContainer() { return true; };
@@ -82,7 +82,7 @@ protected slots:
 
 private:
 	QDialog *dSelectType;
-	Q3ToolBar *toolbar;
+	QToolBar *toolbar;
 	Q3DateEdit *date_from, *date_to;
 	qulonglong docUid;
 	int docId;

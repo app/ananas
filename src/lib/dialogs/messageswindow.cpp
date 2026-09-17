@@ -54,21 +54,21 @@ messageproc(int n, const char *msg){
 
 
 MessagesWindow::MessagesWindow( QWidget* parent, Qt::WFlags fl )
-    : Q3DockWindow( parent, "MessagesWindow", fl )
+    : QDockWidget( tr("Messages window"), parent, fl )
 {
-	msgBrowser = new QTextBrowser( this, "msgBrowser" );
-	boxLayout()->addWidget( msgBrowser );
+	setObjectName( "MessagesWindow" );
+	msgBrowser = new QTextBrowser( this );
+	msgBrowser->setObjectName( "msgBrowser" );
+	setWidget( msgBrowser );
 	languageChange();
 	setMinimumSize( QSize( 1, 1 ) );
 	msgBrowser->setMinimumSize( QSize( 1, 1 ) );
 	//--clearWState( WState_Polished );
 	//--setWindowState( WState_Polished );
-	setResizeEnabled( TRUE );
+	setFeatures( QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable );
 	setExpanded(false);
-	setCloseMode( Q3DockWindow::Always );
 	msgBrowser->show();
 	msgwindow = this;
-	connect(msgBrowser, SIGNAL(doubleClicked(int,int)), this, SLOT(on_click()));
 	cfg_messageproc=messageproc;
 }
 
@@ -102,15 +102,15 @@ MessagesWindow::message( int msgtype, const QString &msg)
  */
 void MessagesWindow::languageChange()
 {
-    setCaption( tr( "Messages window" ) );
-    msgBrowser->setText( QString::null );
+    setWindowTitle( tr( "Messages window" ) );
+    msgBrowser->clear();
 }
 
 void
 MessagesWindow::hideEvent ( QHideEvent *e )
 {
 	msgBrowser->clear();
-	Q3DockWindow::hideEvent( e );
+	QDockWidget::hideEvent( e );
 }
 
 
@@ -124,8 +124,8 @@ MessagesWindow::on_click()
 void
 MessagesWindow::setExpanded(bool exp)
 {
-	if(exp) setFixedExtentHeight ( 150 );
-	else setFixedExtentHeight ( 30 );
+	if(exp) setFixedHeight ( 150 );
+	else setFixedHeight ( 30 );
 	expanded = exp;
 	updateGeometry();
 }

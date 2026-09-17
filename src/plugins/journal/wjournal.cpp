@@ -132,11 +132,11 @@ wJournal::checkStructure()
 /*!
  * Create toolbar for Journal.
  */
-Q3ToolBar*
-wJournal::createToolBar( Q3MainWindow * owner )
+QToolBar*
+wJournal::createToolBar( QMainWindow * owner )
 {
 	QAction *a,*b,*c,*d, *e;
-	toolbar = new Q3ToolBar( owner, "JournalTools" );
+	toolbar = new QToolBar( owner, "JournalTools" );
 	a = new QAction(
 	rcIcon("doc_new.png"),
 	tr("New"),

@@ -3,7 +3,7 @@
   <comment></comment>
   <exportmacro></exportmacro>
   <class>eAddObj</class>
-  <widget class="Q3MainWindow" name="eAddObj" >
+  <widget class="QMainWindow" name="eAddObj" >
     <property name="geometry" >
       <rect>
         <x>0</x>

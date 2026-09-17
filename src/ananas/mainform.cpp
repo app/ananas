@@ -30,7 +30,7 @@
 ****************************************************************************/
 #include <qmenubar.h>
 #include <qmessagebox.h>
-#include <q3toolbar.h>
+#include <QToolBar>
 #include <qstatusbar.h>
 #include <qworkspace.h>
 #include <qapplication.h>
@@ -56,19 +56,20 @@ aWindowsList *mainformwl=NULL;
  *
  */
 MainForm::MainForm( QWidget* parent, const char* name, Qt::WFlags fl )
-    : Q3MainWindow( parent, name, fl )
+    : QMainWindow( parent, fl )
 {
 //    QApopupmenu *popup;
     Q3VBox	*vb = new Q3VBox(this);
 
-    setIcon( rcIcon("a-system.png"));
+    setWindowIcon( rcIcon("a-system.png"));
     vb->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
     ws = new QWorkspace( vb );
     wl = new aWindowsList();
     ws->setScrollBarsEnabled( TRUE );
     setCentralWidget( vb );
-    statusBar()->setName("statusbar");
-    if ( !name ) setName( "mainwindow" );
+    statusBar()->setObjectName("statusbar");
+    if ( name ) setObjectName( name );
+    else setObjectName( "mainwindow" );
     //--engine_settings.insertSearchPath( QSettings::Unix, QString(QDir::homeDirPath())+QString("/.ananas"));
     //--engine_settings.insertSearchPath( QSettings::Windows, "/ananasgroup/ananas" );
 
@@ -93,7 +94,7 @@ bool
 MainForm::init()
 {
     MessagesWindow *msgWindow = new MessagesWindow( this );// , WDestructiveClose );
-    moveDockWindow( msgWindow, Qt::DockBottom );
+    addDockWidget( Qt::BottomDockWidgetArea, msgWindow );
     setMessageHandler( true );
     msgWindow->hide();
     if ( !initEngine() ) return false;

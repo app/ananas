@@ -48,7 +48,7 @@
 #include "adatabase.h"
 #include "acfg.h"
 #include "awindowslist.h"
-#include <q3mainwindow.h>
+#include <QMainWindow>
 #include "adatafield.h"
 #include "aobject.h"
 

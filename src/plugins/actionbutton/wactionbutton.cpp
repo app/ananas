@@ -29,7 +29,7 @@
 
 #include "wactionbutton.h"
 #include "eactionbutton.h"
-#include <q3mainwindow.h>
+#include <QMainWindow>
 #include <q3header.h>
 #include <qvariant.h>
 #include "qobject.h"

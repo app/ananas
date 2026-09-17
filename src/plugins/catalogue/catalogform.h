@@ -7,7 +7,7 @@
 #include <Q3VBoxLayout>
 
 
-class CatalogForm : public Q3MainWindow, public Ui::CatalogForm
+class CatalogForm : public QMainWindow, public Ui::CatalogForm
 {
     Q_OBJECT
 

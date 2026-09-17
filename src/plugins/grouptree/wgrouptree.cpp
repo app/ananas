@@ -354,11 +354,11 @@ wGroupTree::findItem( ANANAS_UID id )
 /*!
  * Create toolbar for Journal.
  */
-Q3ToolBar*
-wGroupTree::createToolBar( Q3MainWindow * owner )
+QToolBar*
+wGroupTree::createToolBar( QMainWindow * owner )
 {
 	QAction *a;
-	Q3ToolBar *t = new Q3ToolBar( owner, "GroupTreeTools" );
+	QToolBar *t = new QToolBar( owner, "GroupTreeTools" );
 
 	a = new QAction(
 	rcIcon("doc_new.png"),

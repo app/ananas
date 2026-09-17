@@ -31,7 +31,7 @@
 #include <q3sqlcursor.h>
 #include <q3sqlpropertymap.h>
 //--#include <qfocusdata.h>
-#include <q3toolbar.h>
+#include <QToolBar>
 #include "adatabase.h"
 #include "wreport.h"
 #include "ereport.h"

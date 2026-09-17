@@ -3,7 +3,7 @@
   <comment></comment>
   <exportmacro></exportmacro>
   <class>CatalogForm</class>
-  <widget class="Q3MainWindow" name="CatalogForm" >
+  <widget class="QMainWindow" name="CatalogForm" >
     <property name="geometry" >
       <rect>
         <x>0</x>

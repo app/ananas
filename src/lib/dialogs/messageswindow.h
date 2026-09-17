@@ -34,7 +34,7 @@
 
 #include "ananasglobal.h"
 
-#include <q3dockwindow.h>
+#include <QDockWidget>
 //Added by qt3to4:
 #include <QHideEvent>
 
@@ -42,7 +42,7 @@ class QTextBrowser;
 
 void messageproc(int n, const char *msg);
 
-class  ANANAS_EXPORT MessagesWindow : public Q3DockWindow
+class  ANANAS_EXPORT MessagesWindow : public QDockWidget
 {
     Q_OBJECT
 

@@ -35,8 +35,8 @@
 //Added by qt3to4:
 #include <QPixmap>
 
-aToolBar::aToolBar( aCfg *cfg, aCfgItem &obj, aEngine *e, Q3MainWindow* parent , const char* name )
-: Q3ToolBar( parent, name )
+aToolBar::aToolBar( aCfg *cfg, aCfgItem &obj, aEngine *e, QMainWindow* parent , const char* name )
+: QToolBar( parent, name )
 {
 	md = cfg;
 	en = e;

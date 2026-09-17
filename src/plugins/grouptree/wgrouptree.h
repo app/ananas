@@ -51,7 +51,7 @@ public:
 
 	virtual void initObject( aDatabase *adb );
 	virtual QDialog* createEditor( QWidget *parent );
-	virtual Q3ToolBar*	createToolBar( Q3MainWindow *parent );
+	virtual QToolBar*	createToolBar( QMainWindow *parent );
 	virtual aObject *createDBObject(  aCfgItem obj, aDatabase *adb );
 	void buildGroupTree( aCfgItem obj, aCatGroup * cg1, wGroupTreeItem * wG );
 	void findGroupTree();

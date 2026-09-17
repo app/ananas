@@ -31,7 +31,7 @@
 #include <qobject.h>
 #include <q3sqlcursor.h>
 #include <q3sqlpropertymap.h>
-#include <q3toolbar.h>
+#include <QToolBar>
 #include <qaction.h>
 //--#include <qfocusdata.h>
 #include "adatabase.h"
@@ -379,8 +379,8 @@ wCatalogue::setFormMode( int Mode )
 /*!
  * Create toolbar for Catalogue.
  */
-Q3ToolBar*
-wCatalogue::createToolBar( Q3MainWindow * owner )
+QToolBar*
+wCatalogue::createToolBar( QMainWindow * owner )
 {
 	/*
 	QAction *a;

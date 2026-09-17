@@ -4,7 +4,7 @@
 #include "ui_eaddobj.h"
 
 
-class eAddObj : public Q3MainWindow, public Ui::eAddObj
+class eAddObj : public QMainWindow, public Ui::eAddObj
 {
     Q_OBJECT
 

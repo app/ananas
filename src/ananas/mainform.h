@@ -37,13 +37,13 @@
 #include <qdialog.h>
 #include <qstringlist.h>
 #include <qworkspace.h>
-#include <q3mainwindow.h>
+#include <QMainWindow>
 #include <q3vbox.h>
 #include <qapplication.h>
 #include <qsettings.h>
 //Added by qt3to4:
 #include <QPixmap>
-#include <Q3ActionGroup>
+#include <QActionGroup>
 #include <Q3GridLayout>
 #include <Q3HBoxLayout>
 #include <Q3VBoxLayout>
@@ -59,8 +59,8 @@ class Q3VBoxLayout;
 class Q3HBoxLayout;
 class Q3GridLayout;
 class QAction;
-class Q3ActionGroup;
-class Q3ToolBar;
+class QActionGroup;
+class QToolBar;
 class Q3PopupMenu;
 
 /*!
@@ -70,7 +70,7 @@ class Q3PopupMenu;
  * \_ru
  */
 
-class MainForm : public Q3MainWindow {
+class MainForm : public QMainWindow {
 	Q_OBJECT
 
 public:

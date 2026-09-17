@@ -52,7 +52,7 @@ public:
 	virtual QString 	displayString();
 	virtual bool 		isContainer() { return true; };
         virtual aObject*	createDBObject(  aCfgItem obj, aDatabase *adb );
-	virtual Q3ToolBar*	createToolBar( Q3MainWindow *parent );
+	virtual QToolBar*	createToolBar( QMainWindow *parent );
 	void setFormMode( int Mode );
 public slots:
 	virtual ERR_Code Select( qulonglong id );

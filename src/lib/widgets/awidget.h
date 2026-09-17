@@ -30,8 +30,8 @@
 #ifndef AWIDGET_H
 #define AWIDGET_H
 #include <q3sqlform.h>
-#include <q3toolbar.h>
-#include <q3mainwindow.h>
+#include <QToolBar>
+#include <QMainWindow>
 //Added by qt3to4:
 #include <QKeyEvent>
 #include "ananas.h"
@@ -73,7 +73,7 @@ public:
 	virtual void		widgetEditor();
         static void		widgetEditor( QWidget *object, QDialog *editor );
 	virtual QDialog*	createEditor( QWidget *parent );
-	virtual Q3ToolBar*	createToolBar( Q3MainWindow *parent );
+	virtual QToolBar*	createToolBar( QMainWindow *parent );
         virtual aObject*	createDBObject( aCfgItem obj, aDatabase * );
 	virtual QString		displayString();
 

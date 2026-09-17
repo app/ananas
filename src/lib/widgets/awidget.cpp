@@ -152,8 +152,8 @@ aWidget::createDBObject(  aCfgItem , aDatabase * )
  *	Пока ничего не делает. Возвращает 0;
  *\_ru
  */
-Q3ToolBar*
-aWidget::createToolBar( Q3MainWindow * )
+QToolBar*
+aWidget::createToolBar( QMainWindow * )
 {
 	return 0;
 }

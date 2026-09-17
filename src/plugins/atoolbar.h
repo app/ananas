@@ -33,13 +33,13 @@
 #ifndef ATOOLBAR_H
 #define ATOOLBAR_H
 
-#include <q3toolbar.h>
+#include <QToolBar>
 #include <qaction.h>
 
 #include "acfg.h"
 #include "ananas.h"
 
-class  QT_WIDGET_PLUGIN_EXPORT aToolBar : public Q3ToolBar
+class  QT_WIDGET_PLUGIN_EXPORT aToolBar : public QToolBar
 {
     Q_OBJECT
 private:
@@ -48,7 +48,7 @@ private:
     Q3IntDict<QAction> actions;
 
 public:
-	aToolBar( aCfg *cfg, aCfgItem &obj, aEngine *e, Q3MainWindow* parent = 0, const char* name = 0 );
+	aToolBar( aCfg *cfg, aCfgItem &obj, aEngine *e, QMainWindow* parent = 0, const char* name = 0 );
 	~aToolBar();
 
 	void ReadTool( aCfgItem &obj );

@@ -10,7 +10,7 @@ class ANANAS_EXPORT dSelectDB : public QDialog, public Ui::dSelectDB
     Q_OBJECT
 
 public:
-    dSelectDB(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    dSelectDB(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dSelectDB();
 
     QString rcfile;

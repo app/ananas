@@ -49,6 +49,7 @@
 
 //#include <QHash>
 #include <QMap>
+#include <QMultiMap>
 #include <QVariant>
 class AMetaObjectGroup;
 
@@ -109,7 +110,7 @@ private:
     QString v_className;
     QString v_description;
     QMap <QString, QVariant> v_attr;
-    QMap <QString, AMetaObject *> v_child;
+    QMultiMap <QString, AMetaObject *> v_child;
 };
 
 

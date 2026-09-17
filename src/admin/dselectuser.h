@@ -8,7 +8,7 @@ class dSelectUser : public QDialog, public Ui::dSelectUser
     Q_OBJECT
 
 public:
-    dSelectUser(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    dSelectUser(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dSelectUser();
 
 public slots:

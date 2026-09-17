@@ -52,13 +52,13 @@ void eDocument::init()
 	otypes.clear();
 	eType->clear();
 	otypes.append("D");
-	eType->insertItem(idx++, trUtf8("Дата"));
+	eType->insertItem(idx++, tr("Дата"));
 	otypes.append("T");
-	eType->insertItem(idx++, trUtf8("Время"));
+	eType->insertItem(idx++, tr("Время"));
 	otypes.append("N %d %d");
-	eType->insertItem(idx++, trUtf8("Число"));
+	eType->insertItem(idx++, tr("Число"));
 	otypes.append("C %d");
-	eType->insertItem(idx++, trUtf8("Строка"));
+	eType->insertItem(idx++, tr("Строка"));
 
 	oc=cfgobj_count(NULL, NULL);
 	for (i=1;i<=oc;i++) {
@@ -68,15 +68,15 @@ void eDocument::init()
 		named="";
 		f=0;
 		if (strcmp((char *)ot, aot_doc)==0) {
-			named=trUtf8("Документ.");
+			named=tr("Документ.");
 			f=1;
 		}
 		if (strcmp((char *)ot, aot_cat)==0) {
-			named=trUtf8("Справочник.");
+			named=tr("Справочник.");
 			f=1;
 		}
 		if (f) {
-			named=named+trUtf8(name);
+			named=named+tr(name);
 			sprintf(otype, "O %s", id);
 			otypes.append(otype);
 			eType->insertItem(idx++, named);

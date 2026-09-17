@@ -9,7 +9,7 @@ class eSelectDocType : public QDialog, public Ui::eSelectDocType
     Q_OBJECT
 
 public:
-    eSelectDocType(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    eSelectDocType(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~eSelectDocType();
 
     QStringList dlist;

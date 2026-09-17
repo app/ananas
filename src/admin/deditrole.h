@@ -8,7 +8,7 @@ class dEditRole : public QDialog, public Ui::dEditRole
     Q_OBJECT
 
 public:
-    dEditRole(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    dEditRole(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditRole();
 
     virtual void setData( const QString & s );

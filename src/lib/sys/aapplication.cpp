@@ -30,7 +30,6 @@
 #include "aapplication.h"
 #include "dselectdb.h"
 #include "dlogin.h"
-#include "QTextCodec"
 #include <QLocale>
 
 

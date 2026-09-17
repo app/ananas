@@ -8,7 +8,7 @@ class ANANAS_EXPORT dEditRC : public QDialog, public Ui::dEditRC
     Q_OBJECT
 
 public:
-    dEditRC(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    dEditRC(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditRC();
 
 public slots:

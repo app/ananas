@@ -8,7 +8,7 @@ class dSelectRole : public QDialog, public Ui::dSelectRole
     Q_OBJECT
 
 public:
-    dSelectRole(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    dSelectRole(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dSelectRole();
 
 public slots:

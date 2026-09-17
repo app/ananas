@@ -32,6 +32,7 @@
 
 #include	<qobject.h>
 #include	<qdatetime.h>
+#include	<QElapsedTimer>
 //#include	"airegister.h"
 #include "ananas.h"
 
@@ -52,7 +53,7 @@ public:
 	aTime();
 	~aTime();
 protected:
-	QTime *time;
+	QElapsedTimer *time;
 public slots:
 
 	virtual void start();

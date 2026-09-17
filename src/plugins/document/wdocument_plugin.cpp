@@ -59,7 +59,7 @@ void wDocumentPlugin::initialize(QDesignerFormEditorInterface *core)
 
 QWidget *wDocumentPlugin::createWidget(QWidget *parent)
 {
-    wDocument *w = new wDocument(parent, 0);
+    wDocument *w = new wDocument(parent, Qt::WindowFlags());
     return w;
 }
 

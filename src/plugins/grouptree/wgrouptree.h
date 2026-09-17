@@ -47,7 +47,7 @@ public:
 	QTreeWidget *tree;
 	wGroupTreeItem *root;
 
-	wGroupTree( QWidget *parent = 0, Qt::WindowFlags fl = 0 );
+	wGroupTree( QWidget *parent = 0, Qt::WindowFlags fl = Qt::WindowFlags() );
 	virtual ~wGroupTree();
 
 	virtual void initObject( aDatabase *adb );

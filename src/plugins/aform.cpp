@@ -90,6 +90,29 @@ static QObjectList aQueryList( QObject *parent, const char *type )
 	return res;
 }
 
+aForm::aForm()
+:QObject( 0 )
+{
+	engine = 0;
+	db = 0;
+	md = 0;
+	parentWidget = 0;
+	form = 0;
+	closeAfterSelect = false;
+	dbobject = 0;
+	tobj = 0;
+	objid = 0;
+	mode = 0;
+	id = 0;
+	db_uid = 0;
+	RO = false;
+	mainWidget = 0;
+	callerWidget = 0;
+	setObjectName( "aForm" );
+}
+
+
+
 aForm::aForm( QWidget *parent,  aEngine *eng )
 :QObject( eng )
 {

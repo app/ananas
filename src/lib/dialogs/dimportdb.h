@@ -18,7 +18,7 @@ class ANANAS_EXPORT dImportDB : public dEditRC
     Q_OBJECT
 
 public:
-	dImportDB( QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0 );
+	dImportDB( QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags() );
 	~dImportDB();
 
 

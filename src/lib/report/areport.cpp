@@ -36,6 +36,7 @@
 #include	<qkeysequence.h>
 #include	<QtPrintSupport/QPrinter>
 #include	<QtPrintSupport/QPrintDialog>
+#include	<QPageLayout>
 #include 	<QProcess>
 #include 	<qmessagebox.h>
 #include 	<QFileDialog>
@@ -136,7 +137,7 @@ aReportBrowser::print()
 
 	QTextDocument doc;
 	doc.setHtml( textBrowser->toHtml() );
-	doc.setPageSize( printer.pageRect().size() );
+	doc.setPageSize( printer.pageLayout().paintRectPixels( printer.resolution() ).size() );
 	doc.print( &printer );
 }
 

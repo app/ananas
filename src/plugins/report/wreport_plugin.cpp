@@ -59,7 +59,7 @@ void wReportPlugin::initialize(QDesignerFormEditorInterface *core)
 
 QWidget *wReportPlugin::createWidget(QWidget *parent)
 {
-    wReport *w = new wReport(parent, 0);
+    wReport *w = new wReport(parent, Qt::WindowFlags());
     return w;
 }
 

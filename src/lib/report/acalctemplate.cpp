@@ -32,7 +32,7 @@
 #include "alog.h"
 
 #include <qdom.h>
-#include <qregexp.h>
+#include <QRegularExpression>
 
 
 aCalcTemplate::aCalcTemplate() : aOOTemplate()
@@ -62,7 +62,7 @@ aCalcTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
   	if(node.isText())
 	{
 		QString str = node.nodeValue();
-		QRegExp re;
+		QRegularExpression re;
 	//	printf("n->text=%s\n",str.toLatin1().constData());
 		if(params)
 		{
@@ -72,19 +72,21 @@ aCalcTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
 		{
 			re.setPattern(QString("%1.*%2").arg(open_token_section).arg(close_token_section));
 		}
-		re.setMinimal(true);
-		int pos = re.indexIn(str,0);
+		re.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
+		QRegularExpressionMatch m = re.match(str, 0);
+		int pos = m.capturedStart();
 
 		while(pos != -1)
 		{
-	//		printf("find string =%s\n",str.mid(pos+2, re.matchedLength()-4).toLatin1().constData());
-			if(tagname == str.mid(pos+2, re.matchedLength()-4))
+	//		printf("find string =%s\n",str.mid(pos+2, m.capturedLength()-4).toLatin1().constData());
+			if(tagname == str.mid(pos+2, m.capturedLength()-4))
 			{
 	//			printf(">>>>>>>>>ok!\n");
 				return true;
 			}
-			pos+= re.matchedLength();
-			pos = re.indexIn(str,pos);
+			pos+= m.capturedLength();
+			m = re.match(str, pos);
+			pos = m.capturedStart();
 		}
 
 	}

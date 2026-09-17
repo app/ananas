@@ -259,7 +259,7 @@ AMetaObject::addChild( AMetaObject * c )
     if ( c ) {
         name = c->objectName();
         if ( name.isEmpty() ) name = c->metaObject()->className();
-        v_child.insertMulti( name, c );
+        v_child.insert( name, c );
     }
 }
 
@@ -268,7 +268,13 @@ AMetaObject::addChild( AMetaObject * c )
 void
 AMetaObject::removeChild( AMetaObject * c )
 {
-    if ( c ) v_child.remove( v_child.key( c ) );
+    if ( !c ) return;
+    for ( QMultiMap<QString, AMetaObject *>::iterator it = v_child.begin(); it != v_child.end(); ++it ) {
+        if ( it.value() == c ) {
+            v_child.erase( it );
+            break;
+        }
+    }
 }
 
 

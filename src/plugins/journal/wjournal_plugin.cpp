@@ -59,7 +59,7 @@ void wJournalPlugin::initialize(QDesignerFormEditorInterface *core)
 
 QWidget *wJournalPlugin::createWidget(QWidget *parent)
 {
-    wJournal *w = new wJournal(parent, 0);
+    wJournal *w = new wJournal(parent, Qt::WindowFlags());
     return w;
 }
 

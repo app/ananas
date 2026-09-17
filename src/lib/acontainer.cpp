@@ -111,7 +111,7 @@ aContainer::generateName4TmpDir()
 #else
 	temp = getenv("TEMP");
 #endif
-	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
+	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toSecsSinceEpoch());
 	tmpDirName = QDir::toNativeSeparators(tmpDirName);
 
 }

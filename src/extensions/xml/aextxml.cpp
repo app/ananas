@@ -31,6 +31,9 @@
 
 #include <qfile.h>
 #include <qtextstream.h>
+#if QT_VERSION >= 0x060000
+#include <QStringConverter>
+#endif
 
 #include "aextxml.h"
 #include "acfg.h"
@@ -126,7 +129,11 @@ AExtXML::write(const QString &fname)
     QByteArray buf( xml.toString(4).toUtf8() );
     if ( file.open( QIODevice::WriteOnly ) ) {
 	QTextStream ts( &file );
+#if QT_VERSION >= 0x060000
+	ts.setEncoding(QStringConverter::Utf8);
+#else
 	ts.setCodec("UTF-8");
+#endif
 	xml.save(ts, 4);
 	file.close();
 	return true;

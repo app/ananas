@@ -31,7 +31,6 @@
 #include <qmessagebox.h>
 #include <qtranslator.h>
 #include <qsplashscreen.h>
-#include <qtextcodec.h>
 #include "mainform.h"
 #include "ananas.h"
 

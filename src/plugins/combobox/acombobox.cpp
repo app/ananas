@@ -25,12 +25,15 @@
 #include <QPixmap>
 #include <QStringList>
 #include <QEvent>
+#include <QCompleter>
 
 AComboBox::AComboBox( QWidget* parent, const char* name ):QComboBox( parent ) {
+	v_autoCompletion = false;
 	if (name) setObjectName(name);
 }
 
 AComboBox::AComboBox(  bool rw, QWidget* parent, const char* name ):QComboBox( parent ) {
+	v_autoCompletion = false;
 	setEditable(rw);
 	if (name) setObjectName(name);
 }
@@ -229,12 +232,30 @@ AComboBox::lineEdit() const{
 
 void
 AComboBox::setAutoCompletion( bool val ){
+	v_autoCompletion = val;
+#if QT_VERSION >= 0x060000
+	if ( val ) {
+		if ( !completer() ) {
+			QCompleter *c = new QCompleter( model(), this );
+			c->setCaseSensitivity( Qt::CaseInsensitive );
+			c->setCompletionMode( QCompleter::PopupCompletion );
+			setCompleter( c );
+		}
+	} else {
+		setCompleter( 0 );
+	}
+#else
 	QComboBox::setAutoCompletion( val );
+#endif
 }
 
 bool
 AComboBox::autoCompletion() const{
+#if QT_VERSION >= 0x060000
+	return v_autoCompletion;
+#else
 	return QComboBox::autoCompletion();
+#endif
 }
 
 bool

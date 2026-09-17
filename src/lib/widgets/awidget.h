@@ -62,9 +62,9 @@ public:
 	aCfg*		md;
 	aEngine*	engine;
 
-	aWidget( QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = 0 );
-	aWidget( const QString &oname, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = 0 );
-	aWidget( aCfgItem context, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = 0 );
+	aWidget( QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = Qt::WindowFlags() );
+	aWidget( const QString &oname, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = Qt::WindowFlags() );
+	aWidget( aCfgItem context, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = Qt::WindowFlags() );
 	virtual ~aWidget();
 
 	virtual bool		checkStructure();

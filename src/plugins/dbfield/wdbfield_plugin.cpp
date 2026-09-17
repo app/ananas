@@ -60,7 +60,7 @@ void wDBFieldPlugin::initialize(QDesignerFormEditorInterface *core)
 
 QWidget *wDBFieldPlugin::createWidget(QWidget *parent)
 {
-    wDBField *w = new wDBField(parent, 0);
+    wDBField *w = new wDBField(parent, Qt::WindowFlags());
     return w;
 }
 

@@ -57,15 +57,15 @@ void eTable::init()
 	otypes.clear();
 	eType->clear();
 	otypes.append("U");
-	eType->insertItem(idx++, trUtf8("Текстовая метка"));
+	eType->insertItem(idx++, tr("Текстовая метка"));
 	otypes.append("D");
-	eType->insertItem(idx++, trUtf8("Дата"));
+	eType->insertItem(idx++, tr("Дата"));
 	otypes.append("T");
-	eType->insertItem(idx++, trUtf8("Время"));
+	eType->insertItem(idx++, tr("Время"));
 	otypes.append("N %d %d");
-	eType->insertItem(idx++, trUtf8("Число"));
+	eType->insertItem(idx++, tr("Число"));
 	otypes.append("C %d");
-	eType->insertItem(idx++, trUtf8("Строка"));
+	eType->insertItem(idx++, tr("Строка"));
 
 	oc=cfgobj_count(NULL, NULL);
 	for (i=1;i<=oc;i++) {
@@ -75,15 +75,15 @@ void eTable::init()
 		named="";
 		f=0;
 		if (strcmp((char *)ot, aot_doc)==0) {
-			named=trUtf8("Документ.");
+			named=tr("Документ.");
 			f=1;
 		}
 		if (strcmp((char *)ot, aot_cat)==0) {
-			named=trUtf8("Справочник.");
+			named=tr("Справочник.");
 			f=1;
 		}
 		if (f) {
-			named=named+trUtf8(name);
+			named=named+tr(name);
 			sprintf(otype, "O %s", id);
 			otypes.append(otype);
 			eType->insertItem(idx++, named);
@@ -120,9 +120,9 @@ int idxt, int cw, int tw, int td)
 	tablerow_insertcolumn(r, f, -1);
 
 //	blockSignals( true );
-	ListCol->insertItem(trUtf8(Header));
-//	eColHeader->setText( trUtf8(Header));
-//	eColName->setText(trUtf8(Name));
+	ListCol->insertItem(tr(Header));
+//	eColHeader->setText( tr(Header));
+//	eColName->setText(tr(Name));
 //	eColWidth->setValue(cw);
 //	eColTWidth->setValue(tw);
 //	eColTDec->setValue(td);
@@ -172,10 +172,10 @@ void eTable::ColumnSel(int col)
 	if (col >= 0 && col < tablerow_columns( r )) {
 		f = tablerow_column( r, col );
 		blockSignals( true );
-		eColHeader->setText(trUtf8(tablefield_header( f )));
+		eColHeader->setText(tr(tablefield_header( f )));
 		eColWidth->setValue(f->sizex);
 		eType->setCurrentIndex(f->ftypeindex);
-		eColName->setText(trUtf8(f->name));
+		eColName->setText(tr(f->name));
 		eColTWidth->setValue(f->flen);
 		eColTDec->setValue(f->decimals);
 		blockSignals( false );

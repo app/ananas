@@ -9,7 +9,7 @@ class UsersForm : public QWidget, public Ui::UsersForm
     Q_OBJECT
 
 public:
-    UsersForm(QWidget* parent = 0, Qt::WindowFlags fl = 0);
+    UsersForm(QWidget* parent = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~UsersForm();
 
 signals:

@@ -9,7 +9,7 @@ class eDBField : public QDialog, public Ui::eDBField
     Q_OBJECT
 
 public:
-    eDBField(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    eDBField(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~eDBField();
 
     QStringList oids;

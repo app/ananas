@@ -29,11 +29,14 @@
 **
 **********************************************************************/
 
-#include <qtextcodec.h>
+#include <QTextStream>
 #include "aexttext.h"
 #include "acfg.h"
-#include <QTextStream>
+#if QT_VERSION >= 0x060000
+#include <QStringConverter>
+#else
 #include <QTextCodec>
+#endif
 
 /*!
 \en
@@ -176,9 +179,24 @@ AExtText::atEnd()
 QString
 AExtText::getCodec() const
 {
+#if QT_VERSION >= 0x060000
+	switch ( text->encoding() ) {
+	case QStringConverter::Utf8:    return "UTF-8";
+	case QStringConverter::Utf16:   return "UTF-16";
+	case QStringConverter::Utf16LE: return "UTF-16LE";
+	case QStringConverter::Utf16BE: return "UTF-16BE";
+	case QStringConverter::Utf32:   return "UTF-32";
+	case QStringConverter::Utf32LE: return "UTF-32LE";
+	case QStringConverter::Utf32BE: return "UTF-32BE";
+	case QStringConverter::Latin1:  return "ISO-8859-1";
+	case QStringConverter::System:  return "System";
+	default:                        return "UTF-8";
+	}
+#else
 	QTextCodec *codec = text->codec();
 	if ( codec ) return codec->name();
 	return "";
+#endif
 }
 
 
@@ -193,8 +211,21 @@ AExtText::getCodec() const
 void
 AExtText::setCodec( const QString &codecname )
 {
+#if QT_VERSION >= 0x060000
+	const QString n = codecname.toUpper();
+	if ( n == "UTF-8" || n == "UTF8" ) text->setEncoding( QStringConverter::Utf8 );
+	else if ( n == "UTF-16" ) text->setEncoding( QStringConverter::Utf16 );
+	else if ( n == "UTF-16LE" ) text->setEncoding( QStringConverter::Utf16LE );
+	else if ( n == "UTF-16BE" ) text->setEncoding( QStringConverter::Utf16BE );
+	else if ( n == "UTF-32" ) text->setEncoding( QStringConverter::Utf32 );
+	else if ( n == "UTF-32LE" ) text->setEncoding( QStringConverter::Utf32LE );
+	else if ( n == "UTF-32BE" ) text->setEncoding( QStringConverter::Utf32BE );
+	else if ( n == "ISO-8859-1" || n == "LATIN1" ) text->setEncoding( QStringConverter::Latin1 );
+	else text->setEncoding( QStringConverter::Utf8 );
+#else
 	QTextCodec *codec = QTextCodec::codecForName( codecname.toLatin1().constData() );
 	if ( codec ) text->setCodec( codec );
+#endif
 }
 
 

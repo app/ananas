@@ -28,6 +28,7 @@
 **********************************************************************/
 
 #include	"qsettings.h"
+#include	<QLocale>
 #include	"aservice.h"
 #include 	"alog.h"
 #include	"amoney.h"
@@ -370,7 +371,7 @@ aService::Date2Print(const QString &ISODate)
 {
 	QString res;
 	QDate dat = QDate::fromString(ISODate, Qt::ISODate);
-	res = dat.toString(Qt::LocalDate);
+	res = QLocale().toString(dat, QLocale::LongFormat);
 	return res;
 }
 

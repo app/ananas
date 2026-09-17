@@ -48,7 +48,7 @@ class QT_WIDGET_PLUGIN_EXPORT wDocument : public aWidget
 {
 	Q_OBJECT
 public:
-	wDocument( QWidget *parent = 0, Qt::WindowFlags fl = 0 );
+	wDocument( QWidget *parent = 0, Qt::WindowFlags fl = Qt::WindowFlags() );
 	virtual ~wDocument();
 	bool checkStructure();
 	virtual void initObject( aDatabase *adb );

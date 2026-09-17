@@ -8,7 +8,7 @@ class RolesForm : public QWidget, public Ui::RolesForm
     Q_OBJECT
 
 public:
-    RolesForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = 0);
+    RolesForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~RolesForm();
 
     QString rcfile;

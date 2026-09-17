@@ -134,6 +134,10 @@ public slots:
 
     void	hide();
 
+private:
+    // QComboBox::setAutoCompletion()/autoCompletion() were removed in Qt6;
+    // track the requested state ourselves.
+    bool v_autoCompletion;
 };
 
 

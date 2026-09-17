@@ -9,7 +9,7 @@ class dEditPermissions : public QDialog, public Ui::dEditPermissions
     Q_OBJECT
 
 public:
-    dEditPermissions(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    dEditPermissions(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditPermissions();
 
 public slots:

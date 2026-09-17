@@ -7,7 +7,7 @@ class dEditUser : public QDialog, public Ui::dEditUser
     Q_OBJECT
 
 public:
-    dEditUser(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    dEditUser(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditUser();
 
     virtual aUser * getData();

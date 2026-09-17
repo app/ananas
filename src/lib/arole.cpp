@@ -39,6 +39,11 @@
  *	\param adb - ссылка на базу данных.
  *	\_ru
  */
+aRole::aRole():aObject()
+{
+}
+
+
 aRole::aRole( qulonglong roleId, aDatabase * adb ):aObject("",adb)
 {
 

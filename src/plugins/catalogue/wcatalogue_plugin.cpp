@@ -59,7 +59,7 @@ void wCataloguePlugin::initialize(QDesignerFormEditorInterface *core)
 
 QWidget *wCataloguePlugin::createWidget(QWidget *parent)
 {
-    wCatalogue *w = new wCatalogue(parent, 0);
+    wCatalogue *w = new wCatalogue(parent, Qt::WindowFlags());
     return w;
 }
 

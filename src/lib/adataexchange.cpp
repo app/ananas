@@ -71,7 +71,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 #else
 	temp = getenv("TEMP");
 #endif
-	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
+	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toSecsSinceEpoch());
 	tmpDirName = QDir::toNativeSeparators(tmpDirName);
 	//printf("tmp dir name = %s\n",tmpDirName.toLatin1().constData());
 	if(!dir.mkdir(tmpDirName))
@@ -224,7 +224,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 #else
 	temp = getenv("TEMP");
 #endif
-	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
+	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toSecsSinceEpoch());
 	tmpDirName = QDir::toNativeSeparators(tmpDirName);
 	//printf("copy name = %s\n",tmpDirName.toLatin1().constData());
 	if(!dir.mkdir(tmpDirName))

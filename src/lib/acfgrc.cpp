@@ -32,6 +32,9 @@
 #include <qstringlist.h>
 #include <QTextStream>
 //#include <QTextStream>
+#if QT_VERSION >= 0x060000
+#include <QStringConverter>
+#endif
 #include <qpixmap.h>
 
 #include "acfg.h"
@@ -116,7 +119,11 @@ aCfgRc::read(const QString &fname)
 		QTextStream stream( &file );
 		QString line, k, v;
 
+#if QT_VERSION >= 0x060000
+		stream.setEncoding(QStringConverter::Utf8);
+#else
 		stream.setCodec("UTF-8");
+#endif
 		while ( !stream.atEnd() ) {
 			line = stream.readLine(); // line of text excluding '\n'
 			if ( line.trimmed().startsWith("#") ) // skip comments line
@@ -155,7 +162,11 @@ aCfgRc::write(const QString &fname)
 		QHashIterator<QString, QString> it( values );
 //		int i, vc;
 
+#if QT_VERSION >= 0x060000
+		stream.setEncoding(QStringConverter::Utf8);
+#else
 		stream.setCodec("UTF-8");
+#endif
 		while ( it.hasNext() ) {
 			it.next();
 			stream << it.key() << "=" << it.value() << "\n";

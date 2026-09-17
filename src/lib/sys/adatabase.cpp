@@ -872,7 +872,7 @@ aDatabase::uid ( int otype )
         QString query;
         QString drv = driverName();
 //      printf("driver name =%s\n",drv.toLatin1().constData());
-        query.sprintf ( "insert into uniques (otype) values (%d)", otype );
+        query = QString ( "insert into uniques (otype) values (%1)" ).arg ( otype );
         QSqlQuery q = db()->exec ( query );
         if ( db()->lastError().type() !=QSqlError::NoError )
         {

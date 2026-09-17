@@ -49,7 +49,7 @@ MessagesWindow *msgwindow = 0;
 
 void
 messageproc(int n, const char *msg){
-	if (msgwindow) msgwindow->message( n, QObject::trUtf8( msg ) );
+	if (msgwindow) msgwindow->message( n, QObject::tr( msg ) );
 }
 
 

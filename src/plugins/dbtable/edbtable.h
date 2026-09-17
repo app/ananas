@@ -9,7 +9,7 @@ class eDBTable : public QDialog, public Ui::eDBTable
     Q_OBJECT
 
 public:
-    eDBTable(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    eDBTable(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~eDBTable();
 
     QStringList deletedFields, deletedFieldsId;

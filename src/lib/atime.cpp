@@ -42,7 +42,7 @@
  */
 aTime::aTime(): QObject()
 {
- 	time = new QTime;
+ 	time = new QElapsedTimer;
 
 }
 

@@ -75,9 +75,9 @@ f->ftypeindex = idxt;
 tablerow_insertcolumn(r, f, -1);
 
 //	blockSignals( true );
-ListCol->addItem(trUtf8(Header));
-//	eColHeader->setText( trUtf8(Header));
-//	eColName->setText(trUtf8(Name));
+ListCol->addItem(tr(Header));
+//	eColHeader->setText( tr(Header));
+//	eColName->setText(tr(Name));
 //	eColWidth->setValue(cw);
 //	eColTWidth->setValue(tw);
 //	eColTDec->setValue(td);
@@ -259,10 +259,10 @@ QStringList lst;
 	if (col >= 0 && col < tablerow_columns( r )) {
 		f = tablerow_column( r, col );
 		blockSignals( true );
-		eColHeader->setText(trUtf8(tablefield_header( f )));
+		eColHeader->setText(tr(tablefield_header( f )));
 		eColWidth->setValue(f->sizex);
 		eType->setCurrentIndex(f->ftypeindex);
-		eColName->setText(trUtf8(f->name));
+		eColName->setText(tr(f->name));
 		eColTWidth->setValue(f->flen);
 		eColTDec->setValue(f->decimals);
 		blockSignals( false );

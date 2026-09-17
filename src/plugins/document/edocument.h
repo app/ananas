@@ -9,7 +9,7 @@ class eDocument : public QDialog, public Ui::eDocument
     Q_OBJECT
 
 public:
-    eDocument(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    eDocument(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~eDocument();
 
     QStringList otypes;

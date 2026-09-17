@@ -9,7 +9,7 @@ class eActionButton : public QDialog, public Ui::eActionButton
     Q_OBJECT
 
 public:
-    eActionButton(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    eActionButton(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~eActionButton();
 
 public slots:

@@ -38,6 +38,11 @@
  * \ru Конструктор для создания конкретного объекта класса
  * \_ru
  */
+aUser::aUser():aObject()
+{
+}
+
+
 aUser::aUser( qulonglong userId, aDatabase * adb ):aObject("",adb)
 {
 

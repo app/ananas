@@ -34,6 +34,8 @@
 #include <qmessagebox.h>
 #include <qdom.h>
 #include <qvalidator.h>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <qlabel.h>
 #include <qsizepolicy.h>
 #include <QGroupBox>
@@ -163,8 +165,8 @@ wField::widgetInit()
 		{
 		// set validator for numeric type
 			QString str = tr("^\\-{0,1}\\d{0,%1}\\.{1}\\d{0,%2}$").arg(3).arg(3);
-			QRegExp rexp( str );
-			lineEdit->setValidator(new QRegExpValidator(rexp,lineEdit));
+				QRegularExpression rexp( str );
+			   lineEdit->setValidator(new QRegularExpressionValidator(rexp,lineEdit));
 		}
 		else
 		{
@@ -172,15 +174,15 @@ wField::widgetInit()
 			{
 			   // set default validator for integer type
 			   QString str = tr("^\\-{0,1}\\d{0,%1}$").arg(n1);
-			   QRegExp rexp( str );
-			   lineEdit->setValidator(new QRegExpValidator(rexp,lineEdit));
+			QRegularExpression rexp( str );
+			lineEdit->setValidator(new QRegularExpressionValidator(rexp,lineEdit));
 			}
 			else
 			{
 				// set default validator for float type
 				QString str = tr("^\\-{0,1}\\d{0,%1}\\.{1}\\d{0,%2}$").arg(n1).arg(n2);
-				QRegExp rexp( str );
-				lineEdit->setValidator(new QRegExpValidator(rexp,lineEdit));
+			   QRegularExpression rexp( str );
+			   lineEdit->setValidator(new QRegularExpressionValidator(rexp,lineEdit));
 			}
 		}
 		connect( lineEdit, SIGNAL( textChanged( const QString & ) ),

@@ -37,7 +37,7 @@
 #include "aprocess.h"
 #include <QDir>
 #include <qdom.h>
-#include <qregexp.h>
+#include <QRegularExpression>
 #include <qdatetime.h>
 #include <QTextStream>
 
@@ -73,7 +73,7 @@ aOOTemplate::open( const QString &fname )
 #else
 	temp = getenv("TEMP");
 #endif
-	copyName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
+	copyName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toSecsSinceEpoch());
 	copyName = QDir::toNativeSeparators(copyName);
 	aLog::print(aLog::Debug, tr("aOOTemplate temporary directory is %1").arg(copyName));
 //	printf("copy name = %s\n",copyName.toLatin1().constData());
@@ -303,7 +303,7 @@ aOOTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
   	if(node.isText())
 	{
 		QString str = node.nodeValue();
-		QRegExp re;
+		QRegularExpression re;
 	//	printf("n->text=%s\n",str.toLatin1().constData());
 		if(params)
 		{
@@ -313,19 +313,21 @@ aOOTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
 		{
 			re.setPattern(QString("%1.*%2").arg(open_token_section).arg(close_token_section));
 		}
-		re.setMinimal(true);
-		int pos = re.indexIn(str,0);
+		re.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
+		QRegularExpressionMatch m = re.match(str, 0);
+		int pos = m.capturedStart();
 
 		while(pos != -1)
 		{
-	//		printf("find string =%s\n",str.mid(pos+2, re.matchedLength()-4).toLatin1().constData());
-			if(tagname == str.mid(pos+2, re.matchedLength()-4))
+	//		printf("find string =%s\n",str.mid(pos+2, m.capturedLength()-4).toLatin1().constData());
+			if(tagname == str.mid(pos+2, m.capturedLength()-4))
 			{
 	//			printf(">>>>>>>>>ok!\n");
 				return true;
 			}
-			pos+= re.matchedLength();
-			pos = re.indexIn(str,pos);
+			pos+= m.capturedLength();
+			m = re.match(str, pos);
+			pos = m.capturedStart();
 		}
 
 	}
@@ -449,7 +451,7 @@ aOOTemplate::clearTags(QDomNode node, bool section )
 		if(n.isText())
 		{
 			QString str = n.nodeValue();
-			QRegExp re;
+			QRegularExpression re;
 	//		printf("n->text tag = %s\n",str.toLatin1().constData());
 			if(section)
 			{
@@ -459,15 +461,8 @@ aOOTemplate::clearTags(QDomNode node, bool section )
 			{
 				re.setPattern(QString("%1.*%2").arg(open_token).arg(close_token));
 			}
-			re.setMinimal(true);
-			int pos = re.indexIn(str,0);
-
-			while(pos != -1)
-			{
-				str = str.remove(re);
-				//printf("str = %s\n",str.toLatin1().constData());
-				pos = re.indexIn(str,0);
-			}
+			re.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
+			str.remove(re);
 			n.setNodeValue(str);
 
 		}
@@ -497,12 +492,11 @@ QDomNode n = node.lastChild();
 		if(n.isText())
 		{
 			QString str = n.nodeValue();
-			QRegExp re;
+			QRegularExpression re;
 	//printf("n->text row=%s\n",str.toLatin1().constData());
 			re.setPattern(QString("%1.*%2").arg(open_token_section).arg(close_token_section));
-			re.setMinimal(true);
-			int pos = re.indexIn(str,0);
-			if(pos!=-1)
+			re.setPatternOptions(QRegularExpression::InvertedGreedinessOption);
+			if(re.match(str, 0).hasMatch())
 			{
 	//			printf(">>>find string =%s\n",str.toLatin1().constData());
 				QDomNode tmp = n;

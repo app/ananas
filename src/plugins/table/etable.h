@@ -9,7 +9,7 @@ class eTable : public QDialog, public Ui::eTable
     Q_OBJECT
 
 public:
-    eTable(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = 0);
+    eTable(QWidget* parent = 0, const char* name = 0, bool modal = false, Qt::WindowFlags fl = Qt::WindowFlags());
     ~eTable();
 
 public slots:

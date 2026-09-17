@@ -8,4 +8,4 @@ Exec=ananas
 Icon=ananas-32x32.png
 Terminal=false
 Type=Application
-Categories=Application;Office;X-Fedora;
+Categories=Office;

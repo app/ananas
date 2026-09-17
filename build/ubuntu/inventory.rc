@@ -1,0 +1,15 @@
+# Ananas inventory scheme (internal SQLite database).
+# Installed to /etc/ananas/ so it is offered by the scheme selection dialog
+# at Ananas startup.
+
+dbtype=internal
+dbname=inventory.db
+dbuser=
+dbpass=
+dbhost=
+dbport=
+
+dbtitle=Inventory (Оперативный учет)
+configfile=/usr/share/ananas/applications/inventory/inventory.cfg
+workdir=~/.ananas/inventory
+debug=1

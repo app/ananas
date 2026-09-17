@@ -3,11 +3,14 @@ Section: utils
 Priority: optional
 Maintainer: Andrey Paskal (app) <apaskal@gmail.com>
 Build-Depends: debhelper (>= 9), qt6-base-dev, qt6-base-dev-tools, qt6-tools-dev, qt6-declarative-dev, libmysqlclient-dev, libqdataschema
-Standards-Version: 3.7.2
+Standards-Version: 4.6.2
 
 Package: ananas
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, zip, unzip, libqdataschema, libqt6sql6-sqlite, libqt6sql6-mysql, libqt6sql6-psql
-Description: Runtime and development environment of Finance Applications
+Description: Ananas automation accounting system (runtime and schemes)
+ Runtime environment and development platform of the Ananas accounting
+ system. Ships the Ananas engine, the administrator tool and the inventory
+ scheme (internal SQLite database), selectable at startup.
 Description-ru:  Среда разработки и исполнения прикладных решений автоматизации оперативного, бухгалтерского и других видов учета.
  Учет товаров и рассчетов на компьютере.

@@ -1,3 +1,13 @@
+ananas (0.9.6-2) noble; urgency=medium
+
+  * Port to Qt6; a CMake build is available alongside qmake.
+  * Ship the inventory scheme (internal SQLite database), selectable from the
+    Ananas startup dialog; its data is kept per user under ~/.ananas/inventory.
+  * Skip the login dialog for internal schemes.
+  * Convert the embedded inventory forms from Qt3 to Qt4/Qt6.
+
+ -- Ananas Project <project@ananas.su>  Thu, 17 Sep 2026 12:00:00 +0300
+
 ananas (0.9.6-1) xenial; urgency=high
 
   * Initial release of debian package

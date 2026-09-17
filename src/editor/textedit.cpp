@@ -467,17 +467,17 @@ void TextEdit::extraAreaPaintEvent(QPaintEvent *e)
     int extraAreaWidth = m_extraArea->width() - collapseBoxWidth;
 
     QLinearGradient gradient(QPointF(extraAreaWidth - 10, 0), QPointF(extraAreaWidth, 0));
-    gradient.setColorAt(0, pal.color(QPalette::Background));
+    gradient.setColorAt(0, pal.color(QPalette::Window));
     gradient.setColorAt(1, pal.color(QPalette::Base));
     painter.fillRect(e->rect(), gradient);
 
     QLinearGradient gradient2(QPointF(0, 0), QPointF(markWidth, 0));
     gradient2.setColorAt(0, pal.color(QPalette::Dark));
-    gradient2.setColorAt(1, pal.color(QPalette::Background));
+    gradient2.setColorAt(1, pal.color(QPalette::Window));
     painter.fillRect(e->rect().intersected(QRect(0, 0, markWidth, INT_MAX)), gradient2);
 
 
-    painter.setPen(QPen(pal.color(QPalette::Background), 2));
+    painter.setPen(QPen(pal.color(QPalette::Window), 2));
     painter.drawLine(extraAreaWidth-1, e->rect().top(), extraAreaWidth-1, e->rect().bottom());
     painter.setRenderHint(QPainter::Antialiasing);
 
@@ -559,7 +559,7 @@ void TextEdit::extraAreaPaintEvent(QPaintEvent *e)
                 painter.drawLine(boxCenter.x(), boxCenter.y(), boxCenter.x(), bottom-1);
 
             if (collapseAfter || collapseNext) {
-                    painter.setBrush(pal.background());
+                    painter.setBrush(pal.window());
                     painter.drawRect(box.adjusted(0, 0, -1, -1));
                     if (!nextBlock.isVisible())
                         painter.drawLine(boxCenter.x(), box.top() + 2, boxCenter.x(), box.bottom() - 2);

@@ -12,7 +12,8 @@
 #   ANANAS_IMAGE  build image to use (default: ananas-qt5-builder)
 set -e
 
-WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 REPO="$WORKSPACE_DIR/ananas-legacy-qdataschema"
 BRANCH="${QDS_BRANCH:-qt5}"
 IMAGE="${ANANAS_IMAGE:-ananas-qt5-builder}"
@@ -32,7 +33,7 @@ if [[ -n "$MISSING" ]]; then
 fi
 
 echo "===> 1. Сборка Podman-образа (Ubuntu 24.04 + Qt5)..."
-podman build -t "$IMAGE" -f "$WORKSPACE_DIR/tools/docker/Containerfile.qt5" "$WORKSPACE_DIR"
+podman build -t "$IMAGE" -f "$SCRIPT_DIR/Containerfile.qt5" "$WORKSPACE_DIR"
 
 echo "===> 2. Сборка libqdataschema (ветка ${BRANCH})..."
 podman run --rm \

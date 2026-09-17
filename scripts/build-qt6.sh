@@ -39,9 +39,6 @@ podman run --rm \
     # libqdataschema установлена в образ вручную, сообщаем dpkg-shlibdeps её имя пакета
     echo "libqdataschema 1 libqdataschema (>= 1.0.0)" > debian/shlibs.local
 
-    # Runtime SQL drivers are dlopen()ed, so shlibs cannot see them.
-    sed -i "s/^Depends: \\(.*\\)libqdataschema$/Depends: \\1libqdataschema, libqt6sql6-sqlite, libqt6sql6-mysql, libqt6sql6-psql/" debian/control
-
     echo "Запуск компиляции..."
     # -d: libqdataschema установлена в образ вручную и не зарегистрирована в dpkg
     dpkg-buildpackage -b -uc -us -d

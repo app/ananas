@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 REPO="$WORKSPACE_DIR/ananas-legacy-qt4"
 BRANCH="${ANANAS_BRANCH:-qtscript}"
 
@@ -20,7 +21,7 @@ if [[ -n "$MISSING" ]]; then
 fi
 
 echo "===> 1. Сборка Podman-образа (Ubuntu 14.04 + Qt4 + QtScript + libqdataschema)..."
-podman build -t ananas-qt4-builder -f "$WORKSPACE_DIR/tools/docker/Containerfile.qt4-legacy" "$WORKSPACE_DIR"
+podman build -t ananas-qt4-builder -f "$SCRIPT_DIR/Containerfile.qt4-legacy" "$WORKSPACE_DIR"
 
 echo "===> 2. Сборка ananas-legacy-qt4 (ветка ${BRANCH})..."
 podman run --rm \

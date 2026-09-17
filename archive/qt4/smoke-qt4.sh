@@ -6,7 +6,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="${1:-$SCRIPT_DIR/../../ananas-legacy-qt4}"
+REPO="${1:-$SCRIPT_DIR/../../../ananas-legacy-qt4}"
 IMAGE="${ANANAS_IMAGE:-ananas-qt4-builder}"
 
 if [[ ! -d "$REPO" ]]; then

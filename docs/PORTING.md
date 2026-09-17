@@ -46,49 +46,49 @@ and an external `libqdataschema`.
 - **Phase 4 (Qt5 → Qt6): done.**
   - `docker/Containerfile.qt6` (Ubuntu 24.04 + Qt 6.4) and `scripts/build-qt6.sh`
     produce a Qt6-only `dist/ananas_0.9.6-1_amd64.deb`; the SQL driver packages
-    are added by the build script (they are dlopen()ed).
+    are declared in `debian/control`.
   - `libqdataschema` is ported to Qt6 on the `qt6` branch
     (`scripts/build-qt6-qdataschema.sh`).
   - `scripts/smoke-qt6.sh`: clean Qt6 build + `ananas-test` 7/7; the scripting
     integration harness passes on the inventory scheme under Qt 6.4.2.
   - `qmake` still drives the build (`qmake6`); CMake is Phase 5.
+- **Qt6-only cleanup: done.**
+  - `QT_VERSION` guards were removed from `ananas-legacy-qt4` and
+    `ananas-legacy-qdataschema`; the code now compiles only against Qt6.
+  - The last dual Qt5/Qt6-buildable state is kept on `ananas-legacy-qt4`
+    branch `port-qt5` (qdataschema `qt5`); Qt4/Qt5 tooling moved to
+    `tools/archive/`.
 - **Phases 5–6: pending.**
 
 ## Handoff (next session)
 
-- Branch: `ananas-legacy-qt4` @ `port` (from `origin/qtscript`); the `qtscript`
-  branch is the untouched rollback point. The Phase 1 result is
-  `port` @ `b2f77d0`. Tooling lives in the `tools` repo (`main`), sources in
-  `ananas-legacy-qt4` / `ananas-legacy-qdataschema` (branch `qt6`).
-- Phases 1–4 are done; the next step is Phase 5 (build/packaging: qmake→CMake,
-  debian/ refresh, drop outdated packaging).
+- Branch: `ananas-legacy-qt4` @ `port` (Qt6-only). History:
+  `port-qt5` (last Qt5/Qt6 dual state), `qtscript` (untouched Qt4 baseline),
+  `port` @ `b2f77d0` (Phase 1 result). Tooling lives in the `tools` repo
+  (`main`), sources in `ananas-legacy-qt4` / `ananas-legacy-qdataschema`
+  (branch `qt6`).
+- Phases 1–4 and the Qt6-only cleanup are done; the next step is Phase 5
+  (build/packaging: qmake→CMake, debian/ refresh, drop outdated packaging).
 - Commands:
   - burndown: `bash tools/scripts/port-metrics.sh`
-  - Qt4 regression bench: `bash tools/scripts/smoke-qt4.sh`
-  - Qt5 build + tests: `bash tools/scripts/smoke-qt5.sh`
-  - Qt6 build + tests (current): `bash tools/scripts/smoke-qt6.sh`
-  - package Qt6: `ANANAS_BRANCH=port bash tools/scripts/build-qt6.sh`
-  - package Qt5: `ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh`
-  - package `libqdataschema` (ananas dependency), per Qt version:
-    `bash tools/scripts/build-qt6-qdataschema.sh` /
-    `bash tools/scripts/build-qt5-qdataschema.sh`
+  - Qt6 build + tests: `bash tools/scripts/smoke-qt6.sh`
+  - package: `ANANAS_BRANCH=port bash tools/scripts/build-qt6.sh`
+  - package `libqdataschema` (ananas dependency):
+    `bash tools/scripts/build-qt6-qdataschema.sh`
   - run the app: `bash tools/scripts/run-qt6.sh ananas-administrator`
-- Images:
-  - `ananas-qt4-builder`: Ubuntu 14.04 + Qt4 + QtScript + `libqdataschema`
-    (`ananas-legacy-qdataschema@newname`).
-  - `ananas-qt5-builder`: Ubuntu 24.04 + Qt 5.15 + QtQml (QJSEngine) +
-    `libqdataschema` (`ananas-legacy-qdataschema@qt5`).
-  - `ananas-qt6-builder`: Ubuntu 24.04 + Qt 6.4 + QtQml (QJSEngine) +
-    `libqdataschema` (`ananas-legacy-qdataschema@qt6`).
-  - ccache at `<workspace>/tmp/ccache`.
+  - historical Qt4/Qt5 builds: `tools/archive/` (see `archive/README.md`)
+- Image: `ananas-qt6-builder` = Ubuntu 24.04 + Qt 6.4 + QtQml (QJSEngine) +
+  `libqdataschema` (`ananas-legacy-qdataschema@qt6`); ccache at
+  `<workspace>/tmp/ccache`.
 - Known caveat: the rewritten `wDBTable`/`wTable`/`awidget` have no functional
   tests; only the schema/DB dialogs were smoke-tested manually.
-- The Qt5/Qt6 `.deb`s target Ubuntu 24.04; the Qt6 package cannot be installed
-  on a Qt5-only host and vice versa.
+- The Qt6 `.deb` targets Ubuntu 24.04.
 
 ## Decisions
 
-- Target: **Qt5/Qt6, C++** (keep the C++/Qt architecture).
+- Target: **Qt6, C++** (keep the C++/Qt architecture). Qt5 was a stepping
+  stone; the last dual-buildable state is kept on branch `port-qt5` and the
+  Qt4/Qt5 tooling under `tools/archive/`, but neither is maintained.
 - Strategy: **staged** — first make Qt4 build without Qt3Support, then Qt5,
   then Qt6.
 - Designer: **excluded** from the first milestone.
@@ -345,13 +345,13 @@ Source of the skills: <https://github.com/TheQtCompanyRnD/agent-skills>
 
 ## Verification
 
-1. `scripts/build-qt4.sh` → `dist/ananas_*.deb` (Qt4). Later: `build-qt5.sh`,
-   `build-qt6.sh`.
-2. `scripts/smoke-qt4.sh` (container build + `ananas-test` under Xvfb);
+1. `scripts/build-qt6.sh` → `dist/ananas_0.9.6-1_amd64.deb`;
+   `scripts/build-qt6-qdataschema.sh` → `dist/libqdataschema_1.0.0-1_amd64.deb`.
+2. `scripts/smoke-qt6.sh` (clean container build + `ananas-test` under Xvfb);
    `scripts/port-metrics.sh` for the burndown.
-3. Manual GUI smoke: `scripts/run-qt4.sh ananas-administrator`; after Phase 3,
-   execute the `inventory`/`money` scripts.
-4. `scripts/port-check.sh` (to be added) chaining steps 1–2.
+3. Manual GUI smoke: `scripts/run-qt6.sh ananas-administrator`.
+4. Historical Qt4/Qt5 reproduction: `tools/archive/` (see
+   `archive/README.md`).
 
 ## Risks
 

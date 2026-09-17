@@ -7,7 +7,7 @@ Standards-Version: 3.7.2
 
 Package: ananas
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, zip, unzip, libqt5widgets5, libqt5sql5, libqt5sql5-mysql, libqt5sql5-psql, libqt5sql5-sqlite, libqdataschema
+Depends: ${shlibs:Depends}, ${misc:Depends}, zip, unzip, libqdataschema
 Description: Runtime and development environment of Finance Applications
 Description-ru:  Среда разработки и исполнения прикладных решений автоматизации оперативного, бухгалтерского и других видов учета.
  Учет товаров и рассчетов на компьютере.

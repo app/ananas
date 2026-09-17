@@ -13,13 +13,13 @@ public:
 
 public slots:
     virtual void setData( aRole * i );
-    virtual Q_ULLONG getData();
+    virtual qulonglong getData();
 
 protected slots:
     virtual void languageChange();
 
 private:
-    Q_ULLONG userId;
+    qulonglong userId;
     QStringList listId;
     aRole *role;
 

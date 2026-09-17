@@ -28,13 +28,10 @@
 **********************************************************************/
 
 #include <qobject.h>
-#include <q3sqlcursor.h>
-#include <q3sqlpropertymap.h>
 #include <qmessagebox.h>
 #include <qaction.h>
 #include <QDateEdit>
 //Added by qt3to4:
-#include <q3mimefactory.h>
 #include "adatabase.h"
 #include "wjournal.h"
 #include "ejournal.h"
@@ -43,6 +40,17 @@
 #include "eselectdoctype.h"
 #include "wdbtable.h"
 #include "alog.h"
+
+static QObjectList aQueryList( QObject *parent, const char *type )
+{
+	QObjectList res;
+	if ( !parent || !type ) return res;
+	QObjectList all = parent->findChildren<QObject*>();
+	for ( int i = 0; i < all.size(); ++i )
+		if ( all[i]->inherits( type ) )
+			res << all[i];
+	return res;
+}
 
 
 
@@ -89,7 +97,7 @@ wJournal::initObject( aDatabase *adb )
 	setFilterByDate();
 	QObject *obj;
 	uint i = 0;
-	QObjectList lb = this->queryList( "wDBTable", 0, false, false );
+	QObjectList lb = aQueryList(this, "wDBTable");
 	QListIterator<QObject*> itb( lb ); // iterate over the buttons
 	i = 0;
 	while ( itb.hasNext() )
@@ -136,58 +144,39 @@ QToolBar*
 wJournal::createToolBar( QMainWindow * owner )
 {
 	QAction *a,*b,*c,*d, *e;
-	toolbar = new QToolBar( owner, "JournalTools" );
-	a = new QAction(
-	rcIcon("doc_new.png"),
-	tr("New"),
-	QKeySequence(QString("Insert")),
-	toolbar,
-	tr("New document")
-	);
+	toolbar = new QToolBar( owner );
+	toolbar->setObjectName("JournalTools");
+	a = new QAction( rcIcon("doc_new.png"), tr("New"), toolbar );
+	a->setShortcut( QKeySequence(QString("Insert")) );
+	a->setToolTip( tr("New document") );
 	a->setToolTip(tr("New document <Ins>"));
-	a->addTo( toolbar );
-	connect( a, SIGNAL( activated() ), this, SLOT( insert() ) );
-	b = new QAction(
-	rcIcon("doc_edit.png"),
-	tr("Edit"),
-	QKeySequence(Qt::Key_Return),
-	toolbar,
-	tr("Edit document")
-	);
+	toolbar->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( insert() ) );
+	b = new QAction( rcIcon("doc_edit.png"), tr("Edit"), toolbar );
+	b->setShortcut( QKeySequence(Qt::Key_Return) );
+	b->setToolTip( tr("Edit document") );
 	b->setToolTip(tr("Edit document <Enter>"));
-	b->addTo( toolbar );
-	connect( b, SIGNAL( activated() ), this, SLOT( update() ) );
-	c = new QAction(
-	rcIcon("doc_view.png"),
-	tr("View"),
-	QKeySequence(Qt::SHIFT + Qt::Key_Return),
-	toolbar,
-	tr("View document")
-	);
+	toolbar->addAction( b );
+	connect( b, SIGNAL( triggered() ), this, SLOT( update() ) );
+	c = new QAction( rcIcon("doc_view.png"), tr("View"), toolbar );
+	c->setShortcut( QKeySequence(Qt::SHIFT + Qt::Key_Return) );
+	c->setToolTip( tr("View document") );
 	c->setToolTip(tr("View document <Shift+Enter>"));
-	c->addTo( toolbar );
-	connect( c, SIGNAL( activated() ), this, SLOT( view() ) );
-	d = new QAction(
-	rcIcon("doc_delete.png"),
-	tr("Delete"),
-	QKeySequence(QString("Del")),
-	toolbar,
-	tr("Delete document")
-	);
+	toolbar->addAction( c );
+	connect( c, SIGNAL( triggered() ), this, SLOT( view() ) );
+	d = new QAction( rcIcon("doc_delete.png"), tr("Delete"), toolbar );
+	d->setShortcut( QKeySequence(QString("Del")) );
+	d->setToolTip( tr("Delete document") );
 	d->setToolTip(tr("Delete document <Delete>"));
-	d->addTo( toolbar );
-	connect( d, SIGNAL( activated() ), this, SLOT( markDelete() ) );
+	toolbar->addAction( d );
+	connect( d, SIGNAL( triggered() ), this, SLOT( markDelete() ) );
 
-	e = new QAction(
-	rcIcon("doc_copy.png"),
-	tr("Copy"),
-	QKeySequence(Qt::CTRL+Qt::Key_D),
-	toolbar,
-	tr("Copy document")
-	);
+	e = new QAction( rcIcon("doc_copy.png"), tr("Copy"), toolbar );
+	e->setShortcut( QKeySequence(Qt::CTRL+Qt::Key_D) );
+	e->setToolTip( tr("Copy document") );
 	e->setToolTip(tr("Duplicate document <Ctrl+D>"));
-	e->addTo( toolbar );
-	connect( e, SIGNAL( activated() ), this, SLOT( copy() ) );
+	toolbar->addAction( e );
+	connect( e, SIGNAL( triggered() ), this, SLOT( copy() ) );
 
 	return toolbar;
 }
@@ -227,7 +216,7 @@ wJournal::insert()
 			if ( engine ) {
 				f = engine->openForm( md_id, 0, md_action_new, 0, 0, (aWidget*)this );
 				if ( f ) {
-//					connect(f, SIGNAL(selected( Q_ULLONG )), this, SLOT(on_selected( Q_ULLONG )));
+//					connect(f, SIGNAL(selected( qulonglong )), this, SLOT(on_selected( qulonglong )));
 //					f->closeAfterSelect = true;
 				}
 			} else printf("engine = NULL\n");
@@ -338,7 +327,7 @@ wJournal::setFilterByDate()
 	if(date_from && date_to)
 	{
 		QObject *obj;
-		QObjectList lb = this->queryList( "wDBTable" );
+		QObjectList lb = aQueryList(this, "wDBTable");
 		QListIterator<QObject*> itb( lb ); // iterate over the buttons
 		while ( itb.hasNext() )
 		{

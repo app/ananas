@@ -35,7 +35,6 @@
 #include <qdom.h>
 #include <qvalidator.h>
 #include <qlabel.h>
-#include <q3listbox.h>
 #include <qsizepolicy.h>
 #include <QGroupBox>
 #include <qpushbutton.h>
@@ -131,30 +130,30 @@ wField::widgetInit()
 	disconnect( lineEdit, SIGNAL( lostFocus() ), this, SLOT( focusOutEvent()) );
   //  lineEdit->disconnect();
     lineEdit->setReadOnly(false);
-    layout()->remove(lineEdit);
+    layout()->removeWidget(lineEdit);
     dateEdit->hide();// = new QDateEdit(this);
     disconnect(dateEdit, SIGNAL( valueChanged ( const QDate&) ),
 				this, SLOT( setValue( const QDate & ) ) );
     disconnect(dateEdit, SIGNAL( lostFocus() ),
 			 	this, SLOT( focusOutEvent() ) );
-    layout()->remove(dateEdit);
+    layout()->removeWidget(dateEdit);
     objLabel->hide();// = new QLabel(this);
     objLabel->disconnect();
-    layout()->remove(objLabel);
+    layout()->removeWidget(objLabel);
     objButton->hide();// = new wCatButton("...",this);
 	disconnect( objButton,	SIGNAL( clicked() ),
 			 this, SLOT( fieldSelect() ) );
 //    objButton->disconnect();
-    layout()->remove(objButton);
+    layout()->removeWidget(objButton);
     checkBox->hide();
 	disconnect( checkBox, SIGNAL( valueChanged ( const QString & ) ),
 				this, SLOT( setValue( const QString & ) ) );
 
 	disconnect( checkBox, SIGNAL( toggled (bool) ), checkBox, SLOT( on_toggled() ) );
 //     checkBox->disconnect();
-    layout()->remove(checkBox);
+    layout()->removeWidget(checkBox);
     //TODO: need rewrite
-    if (!vFieldType.isEmpty()) sscanf((const char *)vFieldType,"%s %i %i", s1, &n1, &n2);
+    if (!vFieldType.isEmpty()) sscanf(vFieldType.toLatin1().constData(),"%s %i %i", s1, &n1, &n2);
 
     switch (vEditorType)
     {
@@ -189,7 +188,7 @@ wField::widgetInit()
 		connect( lineEdit, SIGNAL( lostFocus() ), this, SLOT( focusOutEvent()) );
 
 		setFocusProxy(lineEdit);
-		layout()->add( lineEdit );
+		layout()->addWidget( lineEdit );
 		lineEdit->show();
 		break;
 
@@ -209,7 +208,7 @@ wField::widgetInit()
 		connect( lineEdit, SIGNAL( lostFocus() ), this, SLOT( focusOutEvent()) );
 
 		setFocusProxy(lineEdit);
-		layout()->add( lineEdit );
+		layout()->addWidget( lineEdit );
 		lineEdit->show();
 		break;
 
@@ -222,7 +221,7 @@ wField::widgetInit()
 			 	this, SLOT( focusOutEvent() ) );
 
 		setFocusProxy( dateEdit );
-		layout()->add( dateEdit );
+		layout()->addWidget( dateEdit );
 		dateEdit->show();
 		break;
 
@@ -237,8 +236,8 @@ wField::widgetInit()
 			 this, SLOT( fieldSelect() ) );
 
 		setFocusProxy(objButton);
-		layout()->add( objLabel );
-		layout()->add( objButton );
+		layout()->addWidget( objLabel );
+		layout()->addWidget( objButton );
 		objLabel->show();
 		objButton->show();
 		break;
@@ -256,8 +255,8 @@ wField::widgetInit()
 			 this, SLOT( fieldSelect() ) );
 
 		setFocusProxy(objButton);
-		layout()->add( objLabel );
-		layout()->add( objButton );
+		layout()->addWidget( objLabel );
+		layout()->addWidget( objButton );
 		objLabel->show();
 		objButton->show();
 		break;
@@ -269,7 +268,7 @@ wField::widgetInit()
 
 		connect( checkBox, SIGNAL( toggled (bool) ), checkBox, SLOT( on_toggled() ) );
 		setFocusProxy(checkBox);
-		layout()->add(checkBox);
+		layout()->addWidget(checkBox);
 		checkBox->show();
 		break;
 
@@ -277,7 +276,7 @@ wField::widgetInit()
 		objLabel->setText("UnknownField");
 		objLabel->setFrameShape(QFrame::Box);
 		setFocusPolicy(Qt::NoFocus);
-		layout()->add( objLabel );
+		layout()->addWidget( objLabel );
 		objLabel->show();
 	break;
     }
@@ -392,7 +391,7 @@ wField::setValue(const QString &newvalue)
 	 str = newvalue;
 	 if(newvalue.isEmpty())
 	 {
-		 str= QDateTime::currentDateTime(Qt::LocalTime).toString(Qt::ISODate);
+		 str= QDateTime::currentDateTime().toString(Qt::ISODate);
 	 }
 	 dt = QDateTime::fromString(str,Qt::ISODate);
 	 vValue = dt.toString(Qt::ISODate);
@@ -511,7 +510,7 @@ wField::fieldSelect()
 			}
 			else
 			{
-				printf("found special journal %s with class %s\n", (const char*) md->attr(journ,mda_name).local8Bit(),md->objClass(journ).ascii());
+				printf("found special journal %s with class %s\n", (const char*) md->attr(journ,mda_name).toLocal8Bit().constData(),md->objClass(journ).toLatin1().constData());
 			}
 			f =  engine->openForm( md->id(journ), 0, md_action_view, 0, false );
 			if( f )
@@ -701,8 +700,9 @@ wCatButton::keyPressEvent ( QKeyEvent * e )
 	}
 }
 
-wCheckBox::wCheckBox(QWidget * parent, const char * name):QCheckBox(parent,name)
+wCheckBox::wCheckBox(QWidget * parent, const char * name):QCheckBox(parent)
 {
+	if (name) setObjectName(name);
 }
 
 wCheckBox::~wCheckBox()

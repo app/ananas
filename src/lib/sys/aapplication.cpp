@@ -31,13 +31,14 @@
 #include "dselectdb.h"
 #include "dlogin.h"
 #include "QTextCodec"
+#include <QLocale>
 
 
 AApplication::AApplication(  int & argc, char ** argv, AApplicationType aat )
     :QApplication( argc, argv, true )
 {
     v_aat = aat;
-    //printf("langDir = %s\n", langDir().toUtf8().data() );
+    //printf("langDir = %s\n", langDir().toUtf8().constData().data() );
 }
 
 int
@@ -69,10 +70,9 @@ AApplication::langDir()
 QString
 AApplication::lang()
 {
-    char *s, locale[50]="en";
-
-    strncpy( locale, QTextCodec::locale(), sizeof( locale ) );
-    s = strchr( locale, '_' );
-    if ( s ) *s = 0;
-    return QString( locale );
+    QString locale = QLocale::system().name(); // e.g. "en_US"
+    int s = locale.indexOf( '_' );
+    if ( s >= 0 ) locale = locale.left( s );
+    if ( locale.isEmpty() ) locale = "en";
+    return locale;
 }

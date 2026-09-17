@@ -18,7 +18,6 @@
     <layout class="QGridLayout" />
   </widget>
   <layoutdefault spacing="6" margin="11" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >mdtree.h</include>
     <include location="local" >acfg.h</include>

@@ -55,11 +55,11 @@ aTemplate::~aTemplate()
 bool
 aTemplate::open( const QString &fname )
 {
-	QFile file( QDir::convertSeparators(QDir::currentDirPath()+"/"+templateDir+"/"+fname) );
+	QFile file( QDir::convertSeparators(QDir::currentPath()+"/"+templateDir+"/"+fname) );
     if ( file.open( QIODevice::ReadOnly ) )
     {
         QTextStream stream( &file );
-        tpl = stream.read();
+        tpl = stream.readAll();
         file.close();
 	return true;
     }
@@ -113,17 +113,17 @@ aTemplate::exec( const QString &sname )
 
     while ( !sfound ) {
 	sec_len = 0;
-	c = tpl.find( token_open, c );
+	c = tpl.indexOf( token_open, c );
 	if ( c >= 0 ) {
 	    c += strlen( token_open );
-	    c1 = tpl.find( token_close, c );
+	    c1 = tpl.indexOf( token_close, c );
 	    if ( c1 >= 0 ) {
 		l = c1 - c;
 		token = tpl.mid( c, l );
 		tname = token.section( " ", 0, 0 );
 		tparam = token.section( " ", 1, 1 );
 		if ( tname == "section" && tparam == sname ) {
-		    sec_end = tpl.find( QString(token_open"endsection"token_close), c1 );
+		    sec_end = tpl.indexOf( QString(token_open"endsection"token_close), c1 );
 		    if ( sec_end > 0 ) {
 			sfound = 1;
 			sec_start = c1 + QString( token_close ).length();
@@ -137,12 +137,12 @@ aTemplate::exec( const QString &sname )
     if ( sfound && sec_len ) {
 	c = sec_start;
 	while ( c < sec_end ) {
-	    c1 = tpl.find( token_open, c );
+	    c1 = tpl.indexOf( token_open, c );
 	    l = c1 - c;
 	    if ( l ) sec_buf.append( tpl.mid( c, l ) );
 	    if ( c1 < sec_end ) {
 		c = c1 + QString( token_open ).length();
-		c1 = tpl.find( token_close, c );
+		c1 = tpl.indexOf( token_close, c );
 		if ( c1 ) {
 		    l = c1 - c;
 		    token = tpl.mid( c, l );
@@ -157,7 +157,7 @@ aTemplate::exec( const QString &sname )
 	}
     }
     buf.append( sec_buf );
-//	printf("%s",( const char *) sec_buf.local8Bit() );
+//	printf("%s",( const char *) sec_buf.toLocal8Bit().constData() );
     return sec_buf;
 }
 
@@ -166,18 +166,18 @@ aTemplate::exec( const QString &sname )
 bool
 aTemplate::save( const QString & fname)
 {
-	QFile file( QDir::convertSeparators(QDir::currentDirPath()+"/"+templateDir+"/"+fname) );
+	QFile file( QDir::convertSeparators(QDir::currentPath()+"/"+templateDir+"/"+fname) );
 	if ( file.open( QIODevice::WriteOnly ) )
 	{
 		QTextStream stream( &file );
 		stream << result();
 		file.close();
-		aLog::print(aLog::Info, tr("aTemplate save file %1").arg(file.name()));
+		aLog::print(aLog::Info, tr("aTemplate save file %1").arg(file.fileName()));
 		return true;
 	}
 	else
 	{
-		aLog::print(aLog::Error, tr("aTemplate save file %1").arg(file.name()));
+		aLog::print(aLog::Error, tr("aTemplate save file %1").arg(file.fileName()));
 		return false;
 	}
 }

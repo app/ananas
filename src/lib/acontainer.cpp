@@ -44,8 +44,9 @@ aContainer::aContainer():QObject()
 {
 }
 
-aContainer::aContainer(const QString& name):QObject(0, name)
+aContainer::aContainer(const QString& name):QObject(0)
 {
+	setObjectName(name);
 	manifest = new aCManifest();
 }
 
@@ -58,7 +59,7 @@ aContainer::~aContainer()
 bool
 aContainer::open()
 {
-	return open(name());
+	return open(objectName());
 }
 
 bool
@@ -73,7 +74,7 @@ aContainer::open(const QString& name)
 		{
 			if(extractData(name))
 			{
-				setName(name);
+				setObjectName(name);
 				aLog::print(aLog::Debug, tr("aContainer unzip"));
 				return true;
 			}
@@ -136,7 +137,7 @@ aContainer::createTmpDir()
 bool
 aContainer::save(const QString& name)
 {
-	setName(name);
+	setObjectName(name);
 	if(manifest)
 	{
 		aCManifest::record rec;
@@ -159,7 +160,7 @@ aContainer::save(const QString& name)
 bool
 aContainer::save()
 {
-	return save(name());
+	return save(objectName());
 
 }
 
@@ -208,7 +209,7 @@ aContainer::extractManifest(const QString& archName, aCManifest *mf)
 #else
 	aProcess process( "7z" );
 //	process.setWorkingDirectory ( templateDir);
-//	printf("working dir = `%s'\n", QString(templateDir).ascii());
+//	printf("working dir = `%s'\n", QString(templateDir).toLatin1().constData());
 	process.addArgument( "x" );
 	process.addArgument( "-y" );
 	process.addArgument( QString("-o%1").arg(tmpDirName) );
@@ -261,7 +262,7 @@ aContainer::extractData(const QString& archName)
 #else
 	aProcess process( "7z" );
 //	process.setWorkingDirectory ( templateDir);
-//	printf("working dir = `%s'\n", QString(templateDir).ascii());
+//	printf("working dir = `%s'\n", QString(templateDir).toLatin1().constData());
 	process.addArgument( "x" );
 	process.addArgument( "-y" );
 	process.addArgument( QString("-o%1").arg(tmpDirName) );
@@ -306,7 +307,7 @@ aContainer::compressFile(const QString& fileName)
 	processUpdate.setWorkingDirectory(tmpDirName);
 //	processUpdate.addArgument( "-r" ); // recurce into subdirectories
 //	processUpdate.addArgument( "-0" ); // store only
-	processUpdate.addArgument( name() ); // cfg name
+	processUpdate.addArgument( objectName() ); // cfg name
 	processUpdate.addArgument(".");
 	processUpdate.addArgument("-i");
 	processUpdate.addArgument(fileName);
@@ -375,7 +376,7 @@ aContainer::cleanupTmpFiles()
 		{
 			if(rec.type!=mf_dir && rec.type!=mf_invalid)
 			{
-				file.setName(tmpDirName + QDir::convertSeparators(rec.name));
+				file.setFileName(tmpDirName + QDir::convertSeparators(rec.name));
 				if(file.remove())
 					aLog::print(aLog::Debug, tr("aContainer delete file %1").arg(rec.name));
 			}
@@ -394,8 +395,8 @@ aContainer::cleanupTmpFiles()
 	}
 
 
-	file.setName(QDir::convertSeparators(tmpDirName+"/META-INF/manifest.xml"));
-	if(file.remove()) aLog::print(aLog::Debug, tr("aContainer delete file %1").arg(file.name()));
+	file.setFileName(QDir::convertSeparators(tmpDirName+"/META-INF/manifest.xml"));
+	if(file.remove()) aLog::print(aLog::Debug, tr("aContainer delete file %1").arg(file.fileName()));
 	if(dir.rmdir(QDir::convertSeparators(tmpDirName))) aLog::print(aLog::Debug, tr("aContainer delete directory %1").arg(tmpDirName + "/META-INF"));
 	//aLog::print(aLog::Info, tr("aContainer cleanup temporary files"));
 

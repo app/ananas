@@ -65,7 +65,7 @@ class MainForm : public QMainWindow {
 	Q_OBJECT
 
 public:
-	MainForm( QWidget* parent = 0, const char* name = 0, Qt::WFlags fl = Qt::WType_TopLevel );
+	MainForm( QWidget* parent = 0, const char* name = 0, Qt::WFlags fl = Qt::Window );
 	~MainForm();
 	aEngine engine;
 	aCfg *md;

@@ -15,8 +15,10 @@
  *  true to construct a modal dialog.
  */
 eDBField::eDBField(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();
@@ -53,7 +55,7 @@ void eDBField::setData( QWidget *o, aCfg *md )
 {
 //    const QObject *o = sender();
     if ( o ) {
-	if ( o->className() != QString("wDBField") || !md ) {
+	if ( o->metaObject()->className() != QString("wDBField") || !md ) {
 	    reject();
 	    return;
 	}
@@ -72,7 +74,7 @@ void eDBField::setData( QWidget *o, aCfg *md )
 
     while ( pWidget ) {
 	pn = "";
-	pn = pWidget->className();
+	pn = pWidget->metaObject()->className();
 	if ( pn == QString("wCatalogue") || pn == QString("wDocument") ) break;
 	pWidget = pWidget->parentWidget();
     }
@@ -93,14 +95,14 @@ void eDBField::setData( QWidget *o, aCfg *md )
     eType->clear();
     for ( QStringList::Iterator it = tlist.begin(); it != tlist.end(); ++it ) {
 	otypes.append( (*it).section( "\t", 0, 0 ) );
-	eName->insertItem( (*it).section("\t", 1, 1 ), idx++ );
+	eName->insertItem(idx++,  (*it).section("\t", 1, 1 ));
     }
     for ( i = 0 ; i < otypes.count(); i++ ) {
 	oid = 0;
 	if( otypes[i][0] == 'O' ) {
-	    sscanf( (const char *)otypes[ i ], "O %d", &oid );
+	    sscanf( otypes[i].toLatin1().constData(), "O %d", &oid );
 	    if ( oid == fieldId ) {
-		eName->setCurrentItem( i );
+		eName->setCurrentIndex( i );
 		break;
 	    }
 	}
@@ -112,14 +114,14 @@ void eDBField::getData( QWidget *o )
 {
 //    const QObject *o = sender();
     if ( !o ) return;
-    if ( o->className() != QString("wDBField") ) return;
+    if ( o->metaObject()->className() != QString("wDBField") ) return;
     wDBField *f = ( wDBField*) o;
 
-    int idx=eName->currentItem();
+    int idx=eName->currentIndex();
     long oid = 0;
     if (f) {
 	if( otypes[idx][0] == 'O' ) {
-	    sscanf( (const char *)otypes[ idx ], "O %d", &oid );
+	    sscanf( otypes[idx].toLatin1().constData(), "O %d", &oid );
 	   // f->setId( oid );
 	}
     }
@@ -128,8 +130,8 @@ void eDBField::getData( QWidget *o )
 
 void eDBField::namechanged( const QString &s )
 {
-    int idx=eName->currentItem();
-//	printf("new str=%s\n", (const char *) s.utf8());
+    int idx=eName->currentIndex();
+//	printf("new str=%s\n", (const char *) s.toUtf8().constData());
     selotype=otypes[idx];
     seloid=oids[idx];
     eType->setText(onames[idx]);

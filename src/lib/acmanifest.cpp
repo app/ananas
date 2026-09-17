@@ -69,7 +69,7 @@ bool
 aCManifest::write(const QString& fname)
 {
 	QFile file(fname);
-	QByteArray buf( manifest.toString(4).utf8() );
+	QByteArray buf( manifest.toString(4).toUtf8() );
 	if ( file.open( QIODevice::WriteOnly ) )
 	{
 		QTextStream ts( &file );
@@ -164,20 +164,20 @@ aCManifest::removeEntry( const QString &fname, bool withChilds )
 		QString attr;
 		while(!el.isNull())
 		{
-			printf("element is %s\n",el.nodeName().ascii());
+			printf("element is %s\n",el.nodeName().toLatin1().constData());
 			attr = el.attribute("manifest:full-path");
 			if(withChilds)
 			{
-				if(attr.find(fname)!=0) // only if attr begining from fname
+				if(attr.indexOf(fname)!=0) // only if attr begining from fname
 				{
-					printf("remove entry %s\n",attr.ascii());
+					printf("remove entry %s\n",attr.toLatin1().constData());
 				}
 			}
 			else
 			{
 				if(attr==fname)
 				{
-					printf("remove entry %s\n",attr.ascii());
+					printf("remove entry %s\n",attr.toLatin1().constData());
 					root.removeChild(el);
 					res = true;
 				}

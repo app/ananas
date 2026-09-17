@@ -36,7 +36,6 @@
 #include <qlabel.h>
 #include <qobject.h>
 #include <qlayout.h>
-#include <q3socket.h>
 #include <qeventloop.h>
 //Added by qt3to4:
 #include <QList>

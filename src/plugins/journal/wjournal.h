@@ -66,7 +66,7 @@ public:
 	virtual QString		displayString();
 	virtual bool		isContainer() { return true; };
 	virtual aObject*	createDBObject(  aCfgItem obj, aDatabase *adb );
-//	virtual ERR_Code Select( Q_ULLONG id );
+//	virtual ERR_Code Select( qulonglong id );
 
 
 public slots:

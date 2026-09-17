@@ -32,9 +32,10 @@
 #include "aextension.h"
 
 AExtension::AExtension( const char *name )
-    : QObject( 0, name )
+    : QObject( 0 )
 {
-    if (name==0) setName( className() );
+    if (name==0) setObjectName( metaObject()->className() );
+    else setObjectName( name );
 }
 
 

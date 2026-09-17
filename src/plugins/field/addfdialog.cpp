@@ -12,8 +12,10 @@
  *  true to construct a modal dialog.
  */
 addfdialog::addfdialog(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();
@@ -44,7 +46,7 @@ void addfdialog::languageChange()
 void addfdialog::doOk()
 {
 	int idx;
-	idx = ListBox->currentItem();
+	idx = ListBox->currentRow();
 	if(idx>=0)
 	{
 	        id = idlist[idx];
@@ -86,7 +88,7 @@ const QString addfdialog::getData(bool name)
 void addfdialog::setData( QStringList displst, QStringList flst, QStringList ilds)
 {
 	list = flst;
-	ListBox->insertStringList(displst);
+	ListBox->addItems(displst);
 	idlist = ilds;
 }
 
@@ -99,7 +101,7 @@ void addfdialog::setData( QWidget *o, aCfg *md )
 	wDBField *w = (wDBField *)o;
 	w->getFields();
 	setData( w->defDisplayFields, w->defFields,w->defId);
-	ListBox->setCurrentItem(ListBox->findItem(w->getFieldName()));
+	ListBox->setCurrentItem(ListBox->findItems(w->getFieldName(), Qt::MatchExactly).value(0));
 }
 
 
@@ -114,9 +116,9 @@ void addfdialog::getData( QWidget *o )
 		s = getData(false);
 		if(s=="0") return;
 		// if select binding field
-		if(bindList.find(s.toULongLong()) != bindList.end())
+		if(bindList.contains(s.toULongLong()))
 		{
-			cfg_message(0, tr("field already binding, please select another field."));
+			cfg_message(0, tr("field already binding, please select another field.").toLocal8Bit().constData());
 			return;
 		}
 		w->setId(s.toInt());

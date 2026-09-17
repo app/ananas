@@ -15,8 +15,10 @@
  *  true to construct a modal dialog.
  */
 eActionButton::eActionButton(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
 }
@@ -59,11 +61,11 @@ void eActionButton::setData(  wActionButton *b )
     if ( b->isActionTurnOn() ) cbTurnon->setChecked( TRUE );
     if ( b->isActionClose() ) cbClose->setChecked( TRUE );
     if ( b->isScript() ) Script->setChecked( TRUE );
-//    cbAction->setCurrentItem(b->getAction())
+//    cbAction->setCurrentIndex(b->getAction())
     // eCode->setText( b->getScriptCode() );
 //    button = b;
     aWidget *wd = aWidget::parentContainer( b );
-    if ( !strcmp(wd->name(),"Catalogue") )
+    if ( wd->objectName() == "Catalogue" )
     {
 	    cbTurnon->setChecked( false );
 	    cbTurnon->setHidden( TRUE );
@@ -76,8 +78,8 @@ void eActionButton::setData(  wActionButton *b )
     l_id.clear();
     loadActions(&l_name, &l_id, parent, md);
     cbAction->clear();
-    cbAction->insertStringList(l_name);
-    cbAction->setCurrentItem( l_id.findIndex( QString("%1").arg(b->getActionId()) ) );
+    cbAction->addItems(l_name);
+    cbAction->setCurrentIndex( l_id.indexOf( QString("%1").arg(b->getActionId()) ) );
 
 }
 
@@ -94,7 +96,7 @@ void eActionButton::getData( wActionButton *button)
     if(cbAction->isEnabled())
     {
 
-    	button->setActionId ( atoi(l_id[cbAction->currentItem()].ascii()));
+    	button->setActionId ( atoi(l_id[cbAction->currentIndex()].toLatin1()));
     }
     else
     {
@@ -117,7 +119,7 @@ eActionButton::loadActions( QStringList *lst, QStringList *id,  aCfgItem p, aCfg
 	if(p.isNull())
 	{
 		p = md->find(mdc_actions);
-	//	printf("parent were NULL, set parent to %s\n",md->objClass(p).ascii());
+	//	printf("parent were NULL, set parent to %s\n",md->objClass(p).toLatin1().constData());
 	}
 
 	if(p.isNull()) return;

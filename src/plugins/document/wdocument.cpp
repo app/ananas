@@ -39,6 +39,17 @@
 #include "wactionbutton.h"
 #include "alog.h"
 
+static QObjectList aQueryList( QObject *parent, const char *type )
+{
+	QObjectList res;
+	if ( !parent || !type ) return res;
+	QObjectList all = parent->findChildren<QObject*>();
+	for ( int i = 0; i < all.size(); ++i )
+		if ( all[i]->inherits( type ) )
+			res << all[i];
+	return res;
+}
+
 
 /*!
  *\~english
@@ -100,7 +111,7 @@ wDocument::initObject( aDatabase *adb )
 {
 	aWidget::initObject( adb );
 	QObject *obj;
-	QObjectList lb = this->queryList( "wDBField" );
+	QObjectList lb = aQueryList(this, "wDBField");
 	QListIterator<QObject*> itb( lb ); // iterate over the buttons
 	while ( itb.hasNext() )
 	{
@@ -110,7 +121,7 @@ wDocument::initObject( aDatabase *adb )
 				this, SLOT(valueChanged( const QVariant & )) );
 	}
 	//--delete lb; // delete the list, not the objects
-	lb = this->queryList( "wDBTable" );
+	lb = aQueryList(this, "wDBTable");
 	QListIterator<QObject*> itb1( lb ); // iterate over the buttons
 	while ( itb1.hasNext() )
 	{
@@ -348,7 +359,7 @@ void
 wDocument::NewValues()
 {
 	QString fname;
-	QObjectList l = this->queryList( "wDBField" );
+	QObjectList l = aQueryList(this, "wDBField");
 	QListIterator<QObject*> it( l );
 	QObject *obj;
 	while ( it.hasNext() )
@@ -386,7 +397,7 @@ wDocument::NewValues()
 void
 wDocument::valueChanged( const QVariant & value )
 {
-	if ( sender()->className() != QString("wDBField") ) return;
+	if ( sender()->metaObject()->className() != QString("wDBField") ) return;
 	wDBField * fld = ( wDBField * ) sender();
 	QString fname=fld->getFieldName();
 //	printf( "field name %s\n",(const char*)fname );
@@ -403,7 +414,7 @@ wDocument::on_abuttonclick()
 	if ( b->isActionUpdate() )
 	{
 		QString fname;
-		QObjectList *l = this->queryList( "wDBField" );
+		QObjectList *l = aQueryList(this, "wDBField");
 		QObjectListIt it( *l );
 		QObject *obj;
 		uint i = 0;

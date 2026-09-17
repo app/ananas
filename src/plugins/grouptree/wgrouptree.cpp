@@ -175,7 +175,7 @@ wGroupTree::buildGroupTree( aCfgItem obj, aCatGroup * cg1, wGroupTreeItem * wG )
     	while ( cg2.Next() );
 	} else {
 //		CHECK_POINT
-		printf("table %s err = %d\n", ( const char *)cg2.table()->name(), err);
+		printf("table %s err = %d\n", cg2.table()->name().toLocal8Bit().constData(), err);
 	}
 }
 
@@ -191,8 +191,8 @@ wGroupTree::findGroupTree()
 	aWidget *pc = parentContainer( this );
 	if ( !pc ) return;
 	CHECK_POINT
-	printf("inserted in %s\n", pc->className());
-	if ( pc->className() == QString("wCatalogue") ) {
+	printf("inserted in %s\n", pc->metaObject()->className());
+	if ( pc->metaObject()->className() == QString("wCatalogue") ) {
 		cat = md->find( pc->getId() ); // md->find(mdc_metadata), md_catalogues, 0 ), md_catalogue, 0 );
 		root->setText( 0, md->attr( cat, mda_name ) );
 //		CHECK_POINT
@@ -222,7 +222,7 @@ wGroupTree::keyPressEvent ( QKeyEvent *e )
 	switch ( e->key() ){
 	case Qt::Key_Return:
 		id = item->id;
-		if ( e->state() == Qt::ShiftModifier ) {
+		if ( e->modifiers() == Qt::ShiftModifier ) {
 			printf("Shift+Return pressed %Li\n", id);
 			if ( id ) EditGroup();
 		} else {
@@ -308,7 +308,7 @@ CHECK_POINT
 				if ( f ) {
 					f->SelectGroup(id);
 					connect(f, SIGNAL( update( ANANAS_UID )), this, SLOT(updateItem( ANANAS_UID )));
-//				connect(f, SIGNAL(selected( Q_ULLONG )), this, SLOT(on_selected( Q_ULLONG )));
+//				connect(f, SIGNAL(selected( qulonglong )), this, SLOT(on_selected( qulonglong )));
 //				f->closeAfterSelect = true;
 				}
 			} else printf("No Engine\n");
@@ -347,7 +347,7 @@ wGroupTree::updateItem( ANANAS_UID element )
 	i = findItem( element );
 	if ( i ) {
 		g.select( element );
-		printf("founded text %Li %s\n", element, (const char *) i->text(0));
+		printf("founded text %Li %s\n", element, i->text(0).toLocal8Bit().constData());
 		i->setText( 0, g.displayString() );
 
 	}

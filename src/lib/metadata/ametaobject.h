@@ -56,7 +56,7 @@ class AMetaObject: public QObject
 {
 Q_OBJECT
 // system properties
-Q_PROPERTY( Q_ULONG id READ id SCRIPTABLE true )
+Q_PROPERTY( unsigned long id READ id SCRIPTABLE true )
 Q_PROPERTY( QString name READ name SCRIPTABLE true )
 Q_PROPERTY( QString className READ className SCRIPTABLE true )
 Q_PROPERTY( QString description READ description SCRIPTABLE true )
@@ -68,9 +68,10 @@ public:
 
     ~AMetaObject();
     void setClassName( const QString &name );
+    void setName( const QString &name ) { setObjectName( name ); }
 
-    Q_ULONG id();
-    void setId( Q_ULONG );
+    unsigned long id();
+    void setId( unsigned long );
     QString className();
     QString name();
     AMetaObject *rootObject();
@@ -104,7 +105,7 @@ public slots:
 private:
     static int v_lastId;
     AMetaObject *v_parent;
-    Q_ULONG v_id;
+    unsigned long v_id;
     QString v_className;
     QString v_description;
     QMap <QString, QVariant> v_attr;

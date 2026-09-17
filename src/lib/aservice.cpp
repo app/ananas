@@ -43,7 +43,7 @@
  *\~
  *	\param rubli - \~english Value to convertions \~russian  Значение для конвертации \~
  *	\return - \~english Converted value \~russian Сконвертированное значение \~
- *	\see parts2money(Q_ULLONG rubli, unsigned int kopeyki, bool positive)
+ *	\see parts2money(qulonglong rubli, unsigned int kopeyki, bool positive)
  *	\see part2string(unsigned int st3, unsigned int st2, unsigned int st1, int stepen)
  *	\see convertNumber2MoneyFormat(double number)
 */
@@ -174,8 +174,8 @@ aService::parts2money(qulonglong rubli,
 	{
 		res+=part2string(0,kopeyki/10,kopeyki%10,-1,false,"копеек","копейка","копейки");
 	}
-	res = res.stripWhiteSpace();
-	res = res.replace(0,1,res.at(0).upper());
+	res = res.trimmed();
+	res = res.replace(0,1,res.at(0).toUpper());
 	return res;
 }
 
@@ -192,7 +192,7 @@ aService::parts2money(qulonglong rubli,
  *\~
  *	\return - \~english Converted value \~russian Сконвертированное значение для переданных чисел\~
  *	\see number2money(double rubli)
- *	\see parts2money(Q_ULLONG rubli, unsigned int kopeyki, bool positive)
+ *	\see parts2money(qulonglong rubli, unsigned int kopeyki, bool positive)
 */
 QString
 aService::part2string(unsigned int st3,
@@ -389,13 +389,13 @@ void
 aService::saveSize2Config(QRect windowSize, const QString &mdname)
 {
 	QSettings settings;
-	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homeDirPath())+QString("/.ananas"));
+	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homePath())+QString("/.ananas"));
 	//--settings.insertSearchPath( QSettings::Windows, "/ananasgroup/ananas" );
 	settings.beginGroup(QString("/config/%1").arg(mdname));
-	settings.writeEntry("/left", windowSize.left());
-	settings.writeEntry("/top", windowSize.top());
-	settings.writeEntry("/right", windowSize.right());
-	settings.writeEntry("/bottom", windowSize.bottom());
+	settings.setValue("left", windowSize.left());
+	settings.setValue("top", windowSize.top());
+	settings.setValue("right", windowSize.right());
+	settings.setValue("bottom", windowSize.bottom());
 }
 
 
@@ -419,13 +419,13 @@ QRect
 aService::loadSizeFromConfig(const QString &mdname)
 {
 	QSettings settings;
-	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homeDirPath())+QString("/.ananas"));
+	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homePath())+QString("/.ananas"));
 	//--settings.insertSearchPath( QSettings::Windows, "/ananasgroup/ananas" );
 	settings.beginGroup(QString("/config/%1").arg(mdname));
-	int l = settings.readNumEntry("/left", 0);
-	int t = settings.readNumEntry("/top", 0);
-	int r = settings.readNumEntry("/right", 400);
-	int b = settings.readNumEntry("/bottom", 300);
+	int l = settings.value("left", 0).toInt();
+	int t = settings.value("top", 0).toInt();
+	int r = settings.value("right", 400).toInt();
+	int b = settings.value("bottom", 300).toInt();
 	return QRect(l,t,r,b);
 }
 
@@ -448,10 +448,12 @@ QString
 aService::readConfigVariable(const QString &name, bool *ok)
 {
 	QSettings settings;
-	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homeDirPath())+QString("/.ananas"));
+	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homePath())+QString("/.ananas"));
 	//--settings.insertSearchPath( QSettings::Windows, "/ananasgroup/ananas" );
 	settings.beginGroup(QString("/config/variables"));
-	return settings.readEntry(QString("/%1").arg(name), "", ok);
+	QString key = QString("%1").arg(name);
+	if ( ok ) *ok = settings.contains( key );
+	return settings.value( key, "" ).toString();
 }
 
 
@@ -471,10 +473,10 @@ void
 aService::writeConfigVariable(const QString &name, const QString &value)
 {
 	QSettings settings;
-	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homeDirPath())+QString("/.ananas"));
+	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homePath())+QString("/.ananas"));
 	//--settings.insertSearchPath( QSettings::Windows, "/ananasgroup/ananas" );
 	settings.beginGroup(QString("/config/variables"));
-	settings.writeEntry(QString("/%1").arg(name), value);
+	settings.setValue(QString("%1").arg(name), value);
 }
 
 /*!
@@ -522,7 +524,7 @@ aService::copyFile(const QString& srcFileName, const QString& destFileName, bool
 	}
 
 	const int BUFFER_SIZE = 1024;
-	Q_INT8 buffer[BUFFER_SIZE];
+	qint8 buffer[BUFFER_SIZE];
 	QDataStream srcStream(&srcFile);
 	QDataStream destStream(&destFile);
 

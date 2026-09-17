@@ -30,7 +30,6 @@
 #include "wactionbutton.h"
 #include "eactionbutton.h"
 #include <QMainWindow>
-#include <q3header.h>
 #include <qvariant.h>
 #include "qobject.h"
 #include "qobject.h"
@@ -45,8 +44,9 @@
 #include "adatabase.h"
 
 wActionButton::wActionButton( QWidget *parent, const char *name )
-    : QPushButton( parent, "wActionButton")
+    : QPushButton( parent )
 {
+    setObjectName("wActionButton");
     action = true;
     actionId=0;
     actionUpdate = actionTurnOn = actionClose = false;
@@ -92,7 +92,7 @@ wActionButton::keyPressHandler ( QKeyEvent * e )
 		case Qt::Key_Return:
 		break;
 		case Qt::Key_Escape:
-			if(accel() == QKeySequence(Qt::Key_Escape))
+			if(shortcut() == QKeySequence(Qt::Key_Escape))
 			{
 				emit(clicked());
 				e->accept();

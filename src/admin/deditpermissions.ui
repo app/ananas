@@ -14,7 +14,7 @@
   </property>
   <layout class="QGridLayout" >
    <item rowspan="2" row="0" column="0" >
-    <widget class="Q3ButtonGroup" name="buttonGroup1" >
+    <widget class="QGroupBox" name="buttonGroup1" >
      <property name="sizePolicy" >
       <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
        <horstretch>0</horstretch>
@@ -167,15 +167,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11" />
- <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>Q3ButtonGroup</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3ButtonGroup</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <includes>
   <include location="local" >acfg.h</include>
   <include location="global" >qmap.h</include>

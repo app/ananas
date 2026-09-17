@@ -15,8 +15,10 @@
  *  true to construct a modal dialog.
  */
 eTable::eTable(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();
@@ -55,15 +57,15 @@ void eTable::init()
 	otypes.clear();
 	eType->clear();
 	otypes.append("U");
-	eType->insertItem(trUtf8("Текстовая метка"), idx++);
+	eType->insertItem(idx++, trUtf8("Текстовая метка"));
 	otypes.append("D");
-	eType->insertItem(trUtf8("Дата"), idx++);
+	eType->insertItem(idx++, trUtf8("Дата"));
 	otypes.append("T");
-	eType->insertItem(trUtf8("Время"), idx++);
+	eType->insertItem(idx++, trUtf8("Время"));
 	otypes.append("N %d %d");
-	eType->insertItem(trUtf8("Число"), idx++);
+	eType->insertItem(idx++, trUtf8("Число"));
 	otypes.append("C %d");
-	eType->insertItem(trUtf8("Строка"), idx++);
+	eType->insertItem(idx++, trUtf8("Строка"));
 
 	oc=cfgobj_count(NULL, NULL);
 	for (i=1;i<=oc;i++) {
@@ -84,7 +86,7 @@ void eTable::init()
 			named=named+trUtf8(name);
 			sprintf(otype, "O %s", id);
 			otypes.append(otype);
-			eType->insertItem(named, idx++);
+			eType->insertItem(idx++, named);
 		}
 	}
 	CHECK_POINT
@@ -172,7 +174,7 @@ void eTable::ColumnSel(int col)
 		blockSignals( true );
 		eColHeader->setText(trUtf8(tablefield_header( f )));
 		eColWidth->setValue(f->sizex);
-		eType->setCurrentItem(f->ftypeindex);
+		eType->setCurrentIndex(f->ftypeindex);
 		eColName->setText(trUtf8(f->name));
 		eColTWidth->setValue(f->flen);
 		eColTDec->setValue(f->decimals);
@@ -193,12 +195,12 @@ void eTable::ColumnUpd()
 	if ( idx >= 0 && idx < tablerow_columns( r )) {
 		f = tablerow_column( r, idx );
 		if (f->name) free(f->name);
-		f->name=strdup((const char *) eColName->text().utf8());
-		tablefield_setheader( f, (const char *) eColHeader->text().utf8());
+		f->name=strdup((const char *) eColName->text().toUtf8());
+		tablefield_setheader( f, (const char *) eColHeader->text().toUtf8());
 		f->sizex = eColWidth->value();
 		f->flen = eColTWidth->value();
 		f->decimals = eColTDec->value();
-		f->ftypeindex = eType->currentItem();
+		f->ftypeindex = eType->currentIndex();
 
 		printf("set w=%i l=%i d=%i ti=%i\n", f->sizex, f->flen,
 		f->decimals, f->ftypeindex);
@@ -265,12 +267,12 @@ void eTable::getData( QWidget *o )
 		s = s + cdef +"\n";
 	}
 //	t->vTable->setColumnLabels(sl);
-	t->setName(eTabName->text());
+	t->setObjectName(eTabName->text());
 	CHECK_POINT
-	printf("getData defs = %s\n",(const char *)s.utf8());
+	printf("getData defs = %s\n",(const char *)s.toUtf8().constData());
 	t->setDefineCols(s);
 */
-	t->setName(eTabName->text());
+	t->setObjectName(eTabName->text());
 }
 
 

@@ -12,8 +12,10 @@
  *  true to construct a modal dialog.
  */
 dSelectUser::dSelectUser(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
 }
@@ -38,7 +40,7 @@ void dSelectUser::languageChange()
 void 
 dSelectUser::setData( aRole *i )
 {
- Q_ULLONG id = i->sysValue("id").toULongLong();
+ qulonglong id = i->sysValue("id").toULongLong();
  listBox1->clear();
  listId.clear();
  role = i;
@@ -50,7 +52,7 @@ dSelectUser::setData( aRole *i )
   {
    if(!user->hasRole(id))
    {
-    listBox1->insertItem(user->sysValue("login").toString());
+    listBox1->addItem(user->sysValue("login").toString());
     listId.append(user->sysValue("id").toString());
    }
   }while(user->Next());
@@ -60,7 +62,7 @@ dSelectUser::setData( aRole *i )
 }
 
 
-Q_ULLONG
+qulonglong
 dSelectUser::getData( )
 {
     return userId;
@@ -69,16 +71,16 @@ dSelectUser::getData( )
 
 void dSelectUser::onSelect()
 {
- if(listBox1->currentItem()!=-1)
+ if(listBox1->currentRow()!=-1)
  {
   printf("add user\n");
  
-  //emit( addRole(listId[listBox1->currentItem()].toULongLong()) );
-  userId =  listId[listBox1->currentItem()].toULongLong();
+  //emit( addRole(listId[listBox1->currentRow()].toULongLong()) );
+  userId =  listId[listBox1->currentRow()].toULongLong();
 printf("addUser()\n");
   role->addUser(userId);
   printf("user added\n");
-  listBox1->removeItem(listBox1->currentItem());
+  listBox1->takeItem(listBox1->currentRow());
   accept();
  // new aListViewItem(p_item,
  }

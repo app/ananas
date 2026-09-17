@@ -16,9 +16,6 @@
       <string>Ananas: Login</string>
     </property>
     <layout class="QGridLayout" >
-      <property name="resizeMode" >
-        <enum>Fixed</enum>
-      </property>
       <item row="0" column="0" >
         <widget class="QLabel" name="textLabel1" >
           <property name="text" >
@@ -75,7 +72,6 @@
     </layout>
   </widget>
   <layoutdefault spacing="5" margin="5" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >ananasglobal.h</include>
   </includes>

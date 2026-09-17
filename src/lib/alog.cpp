@@ -110,7 +110,7 @@ aLog::printr(	const QString &toWrite)
 {
 	if(aLog::logFileRef.handle() !=-1 && aLog::initialized && aLog::logFileRef.isOpen())
 	{
-		aLog::logFileRef.writeBlock((const char*)toWrite.local8Bit(),strlen((const char*)toWrite.local8Bit()));
+		aLog::logFileRef.write((const char*)toWrite.toLocal8Bit(),strlen((const char*)toWrite.toLocal8Bit()));
 		aLog::logFileRef.flush();
 		if (aLog::echoRequired)
 		{
@@ -153,7 +153,7 @@ aLog::init(const QString &log_name, int show_up, bool echoToConsole)
 		{
 			if (createDotAnanasDir())
 			{
-				log = QDir::homeDirPath()+"/.ananas/ananas.log";
+				log = QDir::homePath()+"/.ananas/ananas.log";
 			}
 			else
 			{
@@ -180,8 +180,8 @@ aLog::init(const QString &log_name, int show_up, bool echoToConsole)
 	aLog::logName = log;
 
 	if (aLog::logFileRef.isOpen()) aLog::logFileRef.close();
-	aLog::logFileRef.setName(getLogName());
-	aLog::initialized = aLog::logFileRef.open( IO_WriteOnly | IO_Append );
+	aLog::logFileRef.setFileName(getLogName());
+	aLog::initialized = aLog::logFileRef.open( QIODevice::WriteOnly | QIODevice::Append );
 	if (aLog::initialized && aLog::logLevel == aLog::Debug)
 	{
 		std::cout <<  "aLog::init(), logFile opened" << std::endl;
@@ -210,7 +210,7 @@ aLog::close()
 bool
 aLog::createDotAnanasDir()
 {
-	QDir dir(QDir::homeDirPath()+"/.ananas");
+	QDir dir(QDir::homePath()+"/.ananas");
 	if (dir.exists()) return true;
 	return dir.mkpath(".");
 }

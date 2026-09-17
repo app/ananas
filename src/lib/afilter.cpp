@@ -65,7 +65,7 @@ aFilter::~aFilter()
 void
 aFilter::Dump() const
 {
-	printf("%s\n", toString().ascii());
+	printf("%s\n", toString().toLatin1().constData());
 }
 
 /*!
@@ -96,7 +96,7 @@ aFilter::toString(bool removeFirst) const
 
 
 void
-aFilter::Add(const QString& fname, const Q_INT64 value, OperationEnum op, bool AndOp, bool replace)
+aFilter::Add(const QString& fname, const qint64 value, OperationEnum op, bool AndOp, bool replace)
 {
 	AddHelper(fname, QString::number(value), op, AndOp, replace);
 }
@@ -152,7 +152,7 @@ aFilter::Escape(const QString& val)
 	res.replace("'","''");
 	res.insert(0,"\"");
 	res.append("\"");
-	//printf("%s\n",res.ascii());
+	//printf("%s\n",res.toLatin1().constData());
 	return res;
 }
 

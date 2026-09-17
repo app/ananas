@@ -14,9 +14,11 @@
  *  true to construct a modal dialog.
  */
 dSelectDB::dSelectDB(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
     ,settings( QSettings::IniFormat, QSettings::UserScope, "Ananas company Ltd", "Ananas4")
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();
@@ -80,10 +82,12 @@ void dSelectDB::init()
 	progressBar1->hide();
 	QString fname;
 	withgroups = 1;
-	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homeDirPath())+QString("/.ananas"));
+	//--settings.insertSearchPath( QSettings::Unix, QString(QDir::homePath())+QString("/.ananas"));
 	//--settings.insertSearchPath( QSettings::Windows, "/ananasgroup/ananas" );
 
-	local = settings.entryList("/groups").count();
+	settings.beginGroup("/groups");
+	local = settings.childKeys().count();
+	settings.endGroup();
 	changes = false;
 	/*--if(!local)
 	{
@@ -123,8 +127,8 @@ void dSelectDB::init()
 	}
 	else*/
 	{
-		QStringList lst = settings.entryList("/groups");
 		settings.beginGroup("/groups");
+		QStringList lst = settings.childKeys();
 		readSettings(lst);
 		settings.endGroup();
 	}
@@ -147,9 +151,11 @@ void dSelectDB::readSettings(QStringList entryGroup)
 	for(uint j=0; j<entryGroup.count();j++)
 	{
         	QStringList eitems;
-		eitems = settings.entryList(entryGroup[j]);
+		settings.beginGroup(entryGroup[j]);
+		eitems = settings.childKeys();
+		settings.endGroup();
 		QString groupName = "unknown group";
-		groupName = settings.readEntry(entryGroup[j]);
+		groupName = settings.value(entryGroup[j]).toString();
 		aLog::print(aLog::Debug, tr("dSelectDB read settings for group with name %1").arg(groupName));
 		rcListViewItem * lastIt = (rcListViewItem *) listDBRC->topLevelItem( listDBRC->topLevelItemCount()-1 );
 		if(lastIt!=NULL)
@@ -171,7 +177,7 @@ void dSelectDB::readSettings(QStringList entryGroup)
 		for(int k = eitems.count()-1; k>=0; k--)
 		{
 			if(k<0) break;
-			rc = settings.readEntry(entryGroup[j]+"/"+eitems[k]);
+			rc = settings.value(entryGroup[j]+"/"+eitems[k]).toString();
 			cfg = aTests::readConfig(QDir::convertSeparators(rc));
 			sn=cfg["dbtitle"];
 			if (gitem) item= new rcListViewItem( gitem, sn, rc );
@@ -280,13 +286,13 @@ void dSelectDB::saveRC()
 	if (!local)
 	{
 		if(!changes) return;
-		QString home = QDir::homeDirPath();
+		QString home = QDir::homePath();
 #ifndef Q_OS_WIN32
 		QString msg = QString("Все внесенные изменения будут сохранены локально в вашем домашнем каталоге.\nПри очередном запуске программы будут использованы локальные настройки из каталога\n%1/.ananas.\nЕсли Вы хотите использовать глобальные настройки, вам следует удалить каталог\n%2/.ananas").arg(home).arg(home);
 #else
 		QString msg = tr("save settings local?");
 #endif
-		if(QMessageBox::question(this,tr("save"),QString::fromUtf8(msg),QMessageBox::Ok,QMessageBox::Cancel)!=QMessageBox::Ok)
+		if(QMessageBox::question(this,tr("save"),msg,QMessageBox::Ok,QMessageBox::Cancel)!=QMessageBox::Ok)
 		{
 			return;
 		}
@@ -306,13 +312,13 @@ void dSelectDB::saveRC()
 		{
 			if (withgroups)
 			{
-                                settings.writeEntry(QString::number(gcount),gitem->text(0));
+                                settings.setValue(QString::number(gcount),gitem->text(0));
 				if(gitem->childCount())
 				{
 					item = ( rcListViewItem *) gitem->child(0);
 					while (item)
 					{
-						settings.writeEntry(QString::number(gcount)+"/"+QString::number(ecount),item->rcfile);
+						settings.setValue(QString::number(gcount)+"/"+QString::number(ecount),item->rcfile);
 						item =  ( rcListViewItem *) nextSiblingItem(item);
 						++ecount;
 					}
@@ -357,16 +363,18 @@ void dSelectDB::ItemRenamed(QTreeWidgetItem *item, int col)
 void dSelectDB::clearSettings()
 {
         QStringList eitems;
-	QStringList entryGroup =settings.entryList("/groups");
 	settings.beginGroup("/groups");
+	QStringList entryGroup = settings.childKeys();
 	for(uint j=0; j<entryGroup.count();j++)
 	{
-		eitems = settings.entryList(entryGroup[j]);
-		settings.removeEntry(entryGroup[j]);
+		settings.beginGroup(entryGroup[j]);
+		eitems = settings.childKeys();
+		settings.endGroup();
+		settings.remove(entryGroup[j]);
 		for(int k = eitems.count()-1; k>=0; k--)
 		{
 			if(k<0) break;
-			settings.removeEntry(entryGroup[j]+"/"+eitems[k]);
+			settings.remove(entryGroup[j]+"/"+eitems[k]);
 		}
 	}
 	settings.endGroup();

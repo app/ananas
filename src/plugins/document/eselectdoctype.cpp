@@ -12,8 +12,10 @@
  *  true to construct a modal dialog.
  */
 eSelectDocType::eSelectDocType(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();

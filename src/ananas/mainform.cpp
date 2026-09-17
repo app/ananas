@@ -41,6 +41,7 @@
 #include <QPixmap>
 #include <QMenu>
 #include <QVBoxLayout>
+#include <QBrush>
 
 #include "mainform.h"
 
@@ -73,16 +74,16 @@ MainForm::MainForm( QWidget* parent, const char* name, Qt::WFlags fl )
     statusBar()->setObjectName("statusbar");
     if ( name ) setObjectName( name );
     else setObjectName( "mainwindow" );
-    //--engine_settings.insertSearchPath( QSettings::Unix, QString(QDir::homeDirPath())+QString("/.ananas"));
+    //--engine_settings.insertSearchPath( QSettings::Unix, QString(QDir::homePath())+QString("/.ananas"));
     //--engine_settings.insertSearchPath( QSettings::Windows, "/ananasgroup/ananas" );
 
 //    QStringList lst = settings.entryList("/engine");
     engine_settings.beginGroup("/engine");
-    bool maximize = engine_settings.readBoolEntry( "/maximize", 0 );
-    int width = engine_settings.readNumEntry( "/geometry/width", 600 );
-    int height = engine_settings.readNumEntry( "/geometry/height", 480 );
-    int offset_x = engine_settings.readNumEntry( "/geometry/x", 0 );
-    int offset_y = engine_settings.readNumEntry( "/geometry/y", 0 );
+    bool maximize = engine_settings.value( "maximize", 0 ).toBool();
+    int width = engine_settings.value( "geometry/width", 600 ).toInt();
+    int height = engine_settings.value( "geometry/height", 480 ).toInt();
+    int offset_x = engine_settings.value( "geometry/x", 0 ).toInt();
+    int offset_y = engine_settings.value( "geometry/y", 0 ).toInt();
     engine_settings.endGroup();
     resize( QSize(width, height) );//  .expandedTo(minimumSizeHint()) );
     move(offset_x,offset_y);
@@ -160,7 +161,7 @@ MainForm::initActionBar()
     obj = md->find( md->find( mdc_interface ), md_toolbars );	// look for md_toolbars
     item = md->firstChild( obj );
     while ( !item.isNull() ) {	// foreach md_toolbar
-	new aToolBar( md, item, &engine, this, md->attr( item, mda_name ) );		// create toolbar
+	new aToolBar( md, item, &engine, this, md->attr( item, mda_name ).toLatin1().constData() );		// create toolbar
 	item = md->nextSibling( item );	// next md_toolbar
     }
 }
@@ -201,10 +202,10 @@ MainForm::close()
 {
         engine_settings.beginGroup("/engine");
 //	engine_settings.writeEntry( "/maximize", windowState()&WindowMaximized ? true: false);
-	engine_settings.writeEntry( "/geometry/width", width() );
-	engine_settings.writeEntry( "/geometry/height", height() );
-	engine_settings.writeEntry( "/geometry/x", pos().x() );
-	engine_settings.writeEntry( "/geometry/y", pos().y() );
+	engine_settings.setValue( "geometry/width", width() );
+	engine_settings.setValue( "geometry/height", height() );
+	engine_settings.setValue( "geometry/x", pos().x() );
+	engine_settings.setValue( "geometry/y", pos().y() );
 	engine_settings.endGroup();
 	printf("exit\n" );
 //MainWindow::close();
@@ -218,7 +219,7 @@ MainForm::statusMessage( const QString &msg )
 
 void
 MainForm::setBackground( const QPixmap &pix ){
-	ws->setBackgroundPixmap( pix );
+	ws->setBackground( QBrush(pix) );
 }
 
 /*
@@ -308,7 +309,7 @@ void MainForm::tileHorizontal()
 	    window->showNormal();
 	}
 	int preferredHeight = window->minimumHeight()+window->parentWidget()->baseSize().height();
-	int actHeight = QMAX(heightForEach, preferredHeight);
+	int actHeight = qMax(heightForEach, preferredHeight);
 
 	window->parentWidget()->setGeometry( 0, y, ws->width(), actHeight );
 	y += actHeight;

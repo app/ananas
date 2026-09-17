@@ -214,7 +214,7 @@ aListViewItem::loadTree()
 	if ( !md ) return;
 	if (id) setFlags( flags() | Qt::ItemIsEditable );
 	oclass = md->objClass( obj );
-//	printf("oclass=`%s'\n",oclass.ascii()); 
+//	printf("oclass=`%s'\n",oclass.toLatin1().constData()); 
 	if ( oclass == md_roles )
 	{
 		loadRoles(this);	
@@ -312,7 +312,7 @@ aListViewItem::loadTree()
 		if(ldclass==md_rl_user)
 		{
 		}
-//		printf("%s\n",(const char *) ldclass.local8Bit() );
+//		printf("%s\n",(const char *) ldclass.toLocal8Bit().constData() );
 		n = md->count( obj, ldclass );
 //		printf(" objclass=%s ldclass = %s count = %d\n", (const char *) oclass, (const char *) ldclass, n);
 		for ( i = 0; i<n; i++ ) {
@@ -487,7 +487,7 @@ aListViewItem::editRole( bool isNew)
 	QString oclass = md->objClass( obj );
 	if(oclass == md_role || oclass == md_roles )
 	{
-		dEditRole *e = new dEditRole( qApp->mainWidget());
+		dEditRole *e = new dEditRole( qApp->activeWindow());
 	//	wl->insert( objid, e );
 		editor = e;
 	//	QObject::connect( mainform, SIGNAL( tosave() ), editor, SLOT( updateMD() ) );
@@ -498,7 +498,7 @@ aListViewItem::editRole( bool isNew)
 		}
 		else
 		{
-			printf("edit role `%s'\n",role->sysValue("name").toString().ascii());
+			printf("edit role `%s'\n",role->sysValue("name").toString().toLatin1().constData());
 			e->setData(role->sysValue("name").toString());
 		}
 		if(e->exec() == QDialog::Accepted)
@@ -530,7 +530,7 @@ void
 aListViewItem::editPermission()
 {
 	QString oclass = md->objClass( obj );
-	dEditPermissions *e = new dEditPermissions( qApp->mainWidget());
+	dEditPermissions *e = new dEditPermissions( qApp->activeWindow());
 //	wl->insert( objid, e );
 	editor = e;
 	
@@ -565,7 +565,7 @@ aListViewItem::editPermission()
 	}
 	delete e;
 */
-//	mainform->addTab(++mainform->lastTabId,e->name());
+//	mainform->addTab(++mainform->lastTabId,e->objectName());
 //	e->parentWidget()->setGeometry(0,0,e->parentWidget()->frameSize().width(),
 //	e->parentWidget()->frameSize().height());
 	
@@ -583,7 +583,7 @@ aListViewItem::editUser(bool isNew)
 	if ( oclass == md_users || oclass == md_user)
 	{
 		
-	    dEditUser *e = new dEditUser( qApp->mainWidget() );
+	    dEditUser *e = new dEditUser( qApp->activeWindow() );
 	    editor = e;
 	    e->setData( user, isNew );
 	    if(e->exec()==QDialog::Accepted)
@@ -616,7 +616,7 @@ aListViewItem::addUser()
 	if ( oclass == md_rl_users)
 	{
 		
-	    dSelectUser *e = new dSelectUser( qApp->mainWidget() );
+	    dSelectUser *e = new dSelectUser( qApp->activeWindow() );
 	    editor = e;
 	    e->setData( role );
 	    if(e->exec() == QDialog::Accepted)
@@ -644,7 +644,7 @@ aListViewItem::addRole()
 	if ( oclass == md_user)
 	{
 		
-	    dSelectRole *e = new dSelectRole( qApp->mainWidget() );
+	    dSelectRole *e = new dSelectRole( qApp->activeWindow() );
 	    editor = e;
 	    e->setData( user );
 	    if(e->exec() == QDialog::Accepted)
@@ -676,7 +676,7 @@ aMetadataTreeView::aMetadataTreeView(  QWidget *parent, aCfg *cfgmd )
 //	it = it.cloneNode(false).toElement();
 //	it.setTagName(md_roles);
 	
-//	conf = new aListViewItem( this, md, it, tr(QString("Roles")));
+//	conf = new aListViewItem( this, md, it, tr("Roles"));
 //	conf->setExpanded( true );
 	connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT(ContextMenu() ) );
 //	connect( this, SIGNAL( returnPressed( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
@@ -696,7 +696,7 @@ aMetadataTreeView::aMetadataTreeView( UsersForm  *parent, aCfg *cfgmd )
 	it = it.cloneNode(false).toElement();
 	it.setTagName(md_users);
 	
-	conf = new aListViewItem( this, md, it, tr(QString("Users")));
+	conf = new aListViewItem( this, md, it, tr("Users"));
 	conf->setExpanded( true );
 	connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT(ContextMenu() ) );
 //	connect( this, SIGNAL( doubleClicked( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
@@ -715,7 +715,7 @@ aMetadataTreeView::aMetadataTreeView( RolesForm *parent, aCfg *cfgmd )
 	it = it.cloneNode(false).toElement();
 	it.setTagName(md_roles);
 	
-	conf = new aListViewItem( this, md, it, tr(QString("Roles")));
+	conf = new aListViewItem( this, md, it, tr("Roles"));
 	conf->setExpanded( true );
 	connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT(ContextMenu() ) );
 //	connect( this, SIGNAL( returnPressed( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
@@ -761,7 +761,7 @@ aMetadataTreeView::ContextMenu()
 //	m->addAction( caption );
 	
 	QString oclass = md->objClass(i->obj);
-	printf("popup oclass==`%s'\n",oclass.ascii());
+	printf("popup oclass==`%s'\n",oclass.toLatin1().constData());
 	
 	if(oclass == md_user)
 	{

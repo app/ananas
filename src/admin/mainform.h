@@ -12,7 +12,7 @@ class MainForm : public QMainWindow, public Ui::MainForm
     Q_OBJECT
 
 public:
-    MainForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    MainForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::Window);
     ~MainForm();
 
     aWindowsList *wl;

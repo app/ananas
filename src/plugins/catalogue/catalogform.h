@@ -13,7 +13,7 @@ class CatalogForm : public QMainWindow, public Ui::CatalogForm
     Q_OBJECT
 
 public:
-    CatalogForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    CatalogForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::Window);
     ~CatalogForm();
 
     aListView* ListView;
@@ -24,26 +24,26 @@ public:
     aCatalogue* cat;
     bool FormToSelect;
 
-    virtual Q_ULLONG getId();
+    virtual qulonglong getId();
     virtual void init();
     virtual void destroy();
     virtual long findFirst( const QString & s );
-    virtual Q_ULLONG getIdg( Q_ULLONG ide );
+    virtual qulonglong getIdg( qulonglong ide );
     virtual QPixmap getGroupPixmap();
     virtual void edit( QTreeWidgetItem * item, bool );
     virtual QPixmap getElementPixmap();
     virtual QPixmap getMarkDeletedPixmap();
 
 public slots:
-    virtual void setData( aCatalogue * catalog, QMap<Q_ULLONG, QTreeWidgetItem *> mg, const QStringList & Fname, const QStringList & FnameGroup, Q_ULLONG idElForm, Q_ULLONG idGrForm, const bool toSelect );
-    virtual void setId( Q_ULLONG idx );
+    virtual void setData( aCatalogue * catalog, QMap<qulonglong, QTreeWidgetItem *> mg, const QStringList & Fname, const QStringList & FnameGroup, qulonglong idElForm, qulonglong idGrForm, const bool toSelect );
+    virtual void setId( qulonglong idx );
     virtual void find( const QString & s );
     virtual void pressArrow();
     virtual void isPressArrow();
     virtual void setText( const QString & s );
     virtual void go();
     virtual void goToItem( QTreeWidgetItem * item );
-    virtual void loadElements( Q_ULLONG idGroup );
+    virtual void loadElements( qulonglong idGroup );
     virtual void onLoadElements( QTreeWidgetItem * item );
     virtual void new_item( QTreeWidgetItem * parentItem );
     virtual void new_group( QTreeWidgetItem * parentItem );
@@ -52,18 +52,18 @@ public slots:
     virtual void undo_mark_deleted( QTreeWidgetItem * item );
     virtual void edit( QTreeWidgetItem * item, int );
     virtual void select( QTreeWidgetItem * item );
-    virtual void Refresh( Q_ULLONG id );
+    virtual void Refresh( qulonglong id );
 
 signals:
-    void selected(Q_ULLONG);
+    void selected(qulonglong);
 
 protected:
     QGridLayout* GridLayout;
-    Q_ULLONG id,idElementForm,idGroupForm;
+    qulonglong id,idElementForm,idGroupForm;
     QStringList fieldList, fieldListGroup;
 
     virtual long getGroupId( QTreeWidgetItem * item );
-    virtual Q_ULLONG getElementId( QTreeWidgetItem * item );
+    virtual qulonglong getElementId( QTreeWidgetItem * item );
 
 protected slots:
     virtual void languageChange();
@@ -72,9 +72,9 @@ protected slots:
 
 
 private:
-    QMap<Q_ULLONG, QTreeWidgetItem*> map_gr;
-    QMap<Q_ULLONG, QTreeWidgetItem*> map_el;
-    QMap<Q_ULLONG,bool> map_deleted;
+    QMap<qulonglong, QTreeWidgetItem*> map_gr;
+    QMap<qulonglong, QTreeWidgetItem*> map_el;
+    QMap<qulonglong,bool> map_deleted;
 
 private slots:
     virtual void doOk();

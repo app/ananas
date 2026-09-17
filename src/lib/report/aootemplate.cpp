@@ -33,14 +33,12 @@
 
 #include <stdlib.h>
 #include <qfile.h>
-#include <q3dict.h>
 #include <qsqlquery.h>
 #include "aprocess.h"
 #include <QDir>
 #include <qdom.h>
 #include <qregexp.h>
 #include <qdatetime.h>
-#include <q3textstream.h>
 #include <QTextStream>
 
 
@@ -78,7 +76,7 @@ aOOTemplate::open( const QString &fname )
 	copyName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
 	copyName = QDir::convertSeparators(copyName);
 	aLog::print(aLog::Debug, tr("aOOTemplate temporary directory is %1").arg(copyName));
-//	printf("copy name = %s\n",copyName.ascii());
+//	printf("copy name = %s\n",copyName.toLatin1().constData());
 	if(!dir.mkdir(copyName))
 	{
 		aLog::print(aLog::Error, tr("aOOTemplate create temporary directory %1").arg(copyName));
@@ -98,7 +96,7 @@ aOOTemplate::open( const QString &fname )
 #else
 	aProcess process( "7z" );
 	process.setWorkingDirectory ( templateDir);
-	//printf("working dir = `%s'\n", QString(templateDir).ascii());
+	//printf("working dir = `%s'\n", QString(templateDir).toLatin1().constData());
 	process.addArgument( "x" );
 	process.addArgument( "-y" );
 	process.addArgument( QString("-o%1").arg(copyName) );
@@ -154,9 +152,9 @@ aOOTemplate::close()
 	docTpl.clear();
 	docStyle.clear();
 #ifndef Q_OS_WIN32
-	system( "rm -Rf "+copyName);
+	system( ("rm -Rf "+copyName).toLocal8Bit().constData() );
 #else
-	system( "rd /S /Q \""+copyName+"\"");
+	system( ("rd /S /Q \""+copyName+"\"").toLocal8Bit().constData() );
 #endif
 	QDir dir;
 	dir.rmdir(copyName);
@@ -189,7 +187,7 @@ aOOTemplate::getValue( const QString &name )
 {
 	if(values.find( name )!=values.end())
 	{
-		return values.find( name ).data();
+		return values.find( name ).value();
 	}
 	else
 	{
@@ -267,7 +265,7 @@ QDomNode n = node.lastChild();
 	while( !n.isNull() )
 	{
 
-	//	printf("n->name=%s\n",n.nodeName().ascii());
+	//	printf("n->name=%s\n",n.nodeName().toLatin1().constData());
 		bool res = getNodeTags(n, sname, false);
 		if( res )
 		{
@@ -306,7 +304,7 @@ aOOTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
 	{
 		QString str = node.nodeValue();
 		QRegExp re;
-	//	printf("n->text=%s\n",str.ascii());
+	//	printf("n->text=%s\n",str.toLatin1().constData());
 		if(params)
 		{
 			re.setPattern(QString("%1.*%2").arg(open_token).arg(close_token));
@@ -316,18 +314,18 @@ aOOTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
 			re.setPattern(QString("%1.*%2").arg(open_token_section).arg(close_token_section));
 		}
 		re.setMinimal(true);
-		int pos = re.search(str,0);
+		int pos = re.indexIn(str,0);
 
 		while(pos != -1)
 		{
-	//		printf("find string =%s\n",str.mid(pos+2, re.matchedLength()-4).ascii());
+	//		printf("find string =%s\n",str.mid(pos+2, re.matchedLength()-4).toLatin1().constData());
 			if(tagname == str.mid(pos+2, re.matchedLength()-4))
 			{
 	//			printf(">>>>>>>>>ok!\n");
 				return true;
 			}
 			pos+= re.matchedLength();
-			pos = re.search(str,pos);
+			pos = re.indexIn(str,pos);
 		}
 
 	}
@@ -452,7 +450,7 @@ aOOTemplate::clearTags(QDomNode node, bool section )
 		{
 			QString str = n.nodeValue();
 			QRegExp re;
-	//		printf("n->text tag = %s\n",str.ascii());
+	//		printf("n->text tag = %s\n",str.toLatin1().constData());
 			if(section)
 			{
 				re.setPattern(QString("%1.*%2").arg(open_token_section).arg(close_token_section));
@@ -462,13 +460,13 @@ aOOTemplate::clearTags(QDomNode node, bool section )
 				re.setPattern(QString("%1.*%2").arg(open_token).arg(close_token));
 			}
 			re.setMinimal(true);
-			int pos = re.search(str,0);
+			int pos = re.indexIn(str,0);
 
 			while(pos != -1)
 			{
 				str = str.remove(re);
-				//printf("str = %s\n",str.ascii());
-				pos = re.search(str,0);
+				//printf("str = %s\n",str.toLatin1().constData());
+				pos = re.indexIn(str,0);
 			}
 			n.setNodeValue(str);
 
@@ -500,13 +498,13 @@ QDomNode n = node.lastChild();
 		{
 			QString str = n.nodeValue();
 			QRegExp re;
-	//printf("n->text row=%s\n",str.ascii());
+	//printf("n->text row=%s\n",str.toLatin1().constData());
 			re.setPattern(QString("%1.*%2").arg(open_token_section).arg(close_token_section));
 			re.setMinimal(true);
-			int pos = re.search(str,0);
+			int pos = re.indexIn(str,0);
 			if(pos!=-1)
 			{
-	//			printf(">>>find string =%s\n",str.ascii());
+	//			printf(">>>find string =%s\n",str.toLatin1().constData());
 				QDomNode tmp = n;
 				while(!tmp.parentNode().isNull())
 				{
@@ -556,11 +554,11 @@ bool
 aOOTemplate::save( const QString & fname )
 {
 
-	QString homeDir = QString("%1").arg(QDir::convertSeparators(QDir::homeDirPath ()));
+	QString homeDir = QString("%1").arg(QDir::convertSeparators(QDir::homePath()));
 	QFile fContent( QDir::convertSeparators(copyName+"/content.xml") );
 	if( !fContent.open( QIODevice::WriteOnly ) )
 	{
-		aLog::print(aLog::Error, tr("aOOTemplate save %1 open for write").arg(fContent.name()));
+		aLog::print(aLog::Error, tr("aOOTemplate save %1 open for write").arg(fContent.fileName()));
 		return false;
 	}
 	QTextStream stream4content(&fContent);
@@ -570,7 +568,7 @@ aOOTemplate::save( const QString & fname )
 	QFile fStyle( QDir::convertSeparators(copyName+"/styles.xml") );
 	if( !fStyle.open( QIODevice::WriteOnly ) )
 	{
-		aLog::print(aLog::Error, tr("aOOTemplate save %1 open for write").arg(fContent.name()));
+		aLog::print(aLog::Error, tr("aOOTemplate save %1 open for write").arg(fContent.fileName()));
 		return false;
 	}
 	QTextStream stream4styles(&fStyle);
@@ -634,7 +632,7 @@ aOOTemplate::setDir(const QString &dir)
 QString
 aOOTemplate::getDir()
 {
-	QString homeDir = QString("%1").arg(QDir::convertSeparators(QDir::homeDirPath ()));
+	QString homeDir = QString("%1").arg(QDir::convertSeparators(QDir::homePath()));
 #ifdef Q_OS_WIN32
 	if(homeDir.right(1)!="\\") homeDir.append("\\");
 #else

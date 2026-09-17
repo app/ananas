@@ -30,7 +30,6 @@
 #define ACALCTEMPLATE_H
 
 #include <qstring.h>
-#include <q3valuestack.h>
 #include <qdom.h>
 
 #include "ananasglobal.h"

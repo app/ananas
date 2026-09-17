@@ -54,7 +54,7 @@ public:
 	void Dump() const;
 
 	void Add(const QString& fname, const char* value, OperationEnum op, bool AndOp = true, bool replace = true);
-	void Add(const QString& fname, const Q_INT64 value, OperationEnum op, bool AndOp = true, bool replace = true);
+	void Add(const QString& fname, const qint64 value, OperationEnum op, bool AndOp = true, bool replace = true);
 	void Add(const QString& fname, const int value, OperationEnum op, bool AndOp = true, bool replace = true);
 	void Add(const QString& fname, const double value, OperationEnum op, bool AndOp = true, bool replace = true);
 	//void Add(const QString& fname, bool value, OperationEnum op, bool AndOp = true, bool replace = true);

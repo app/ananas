@@ -94,7 +94,6 @@
     </layout>
   </widget>
   <layoutdefault spacing="6" margin="11" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >ananas.h</include>
     <include location="local" >wreport.h</include>

@@ -29,7 +29,6 @@
 **********************************************************************/
 
 #include <stdlib.h>
-#include <q3listbox.h>
 //Added by qt3to4:
 #include <QList>
 
@@ -37,6 +36,17 @@
 #include "wfield.h"
 #include "edbfield.h"
 #include "wdbfield.h"
+
+static QObjectList aQueryList( QObject *parent, const char *type )
+{
+	QObjectList res;
+	if ( !parent || !type ) return res;
+	QObjectList all = parent->findChildren<QObject*>();
+	for ( int i = 0; i < all.size(); ++i )
+		if ( all[i]->inherits( type ) )
+			res << all[i];
+	return res;
+}
 #include "addfdialog.h"
 #include <alog.h>
 
@@ -96,7 +106,7 @@ void wDBField::openEditor()
 {
 /*
 	QString s;
-  QList<Q_ULLONG> bindList = getBindList();
+  QList<qulonglong> bindList = getBindList();
   addfdialog e(this->topLevelWidget());
   getFields();
   e.setData( defDisplayFields, defFields,defId);
@@ -109,9 +119,9 @@ void wDBField::openEditor()
 		s = e.getData(false);
 		if(s=="0") return;
 		// if select binding field
-		if(bindList.find(s.toULongLong()) != bindList.end())
+		if(bindList.contains(s.toULongLong()))
 		{
-			cfg_message(0, tr("field already binding, please select another field."));
+			cfg_message(0, tr("field already binding, please select another field.").toLocal8Bit().constData());
 			return;
 		}
 		setId(s.toInt());
@@ -218,7 +228,7 @@ wDBField::getFields()
 			o_head = md->findChild(o,md_field,i);
 			if(md->attr(o_head,mda_type).at(0)!=' ')
 			{
-//				printf("mda_type = %s\n",md->attr(o_head,mda_type).ascii());
+//				printf("mda_type = %s\n",md->attr(o_head,mda_type).toLatin1().constData());
 				lst << md->attr(o_head,mda_name);
 				dlst << md->attr(o_head,mda_name) + " (element)";
 				defId << md->attr(o_head,mda_id);
@@ -259,12 +269,12 @@ wDBField::getFields()
 	res = lst.count();
 	for(int i=0; i<res; i++)
 	{
-		if(bindList.find(defId[i].toULongLong())!=bindList.end())
+		if(bindList.contains(defId[i].toULongLong()))
 			str ="* ";
 		else
 			str ="";
 		dlst[i] = str + dlst[i]; // addes available for binding fields name
-	//	printf("defField[%d]=%s\n",i,defFields[i].ascii());
+	//	printf("defField[%d]=%s\n",i,defFields[i].toLatin1().constData());
 	}
   }
 //<<<<<<< wdbfield.cpp
@@ -361,7 +371,7 @@ wDBField::setEditorType ()
 				qulonglong tid;
 				//gets object id.
 				str = type.section(' ',1,1);
-				tid = atol(str);
+				tid = str.toLong();
 				o = md->find(tid);
 				if(!o.isNull())
 				{
@@ -401,16 +411,16 @@ QList<qulonglong> listBindings;
 wDBField* wfield;
 QObject* wd = aWidget::parentContainer (this);
 	listBindings.clear();
-    	wList = wd->queryList( "wDBField" );
+    	wList = aQueryList(wd, "wDBField");
 	QListIterator<QObject*> it( wList ); // iterate over the wDBTable
 	while ( it.hasNext() )
 	{
 		wfield = qobject_cast<wDBField*>( it.next() );
 
-		if(strcmp(wfield->name(),this->name())) // don't added current id
+		if(wfield->objectName() != this->objectName()) // don't added current id
 		{
 		//don.t added deleted widgets
-		   if(strncmp("qt_dead_widget_",wfield->name(),strlen("qt_dead_widget_")))
+		   if(strncmp("qt_dead_widget_",wfield->objectName().toLatin1().constData(),strlen("qt_dead_widget_")))
 		   {
 			id = wfield->property("Id").toULongLong();
 	//		if(id>=0) // don't added negativ id (table while not selected)

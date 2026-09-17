@@ -51,8 +51,9 @@ aDataField::aDataField(aCfg *newmd, aCfgItem newcontext )
  * Create Ananas field contaner.
  */
 aDataField::aDataField( QObject *parent, const QString &name, const QString &type )
-:QObject( parent, "aField" )
+:QObject( parent )
 {
+	setObjectName("aField");
 	init( name, type );
 }
 
@@ -61,15 +62,17 @@ aDataField::aDataField( QObject *parent, const QString &name, const QString &typ
  * Create Ananas field contaner.
  */
 aDataField::aDataField(const QString &name, const QString &type )
-:QObject( 0, "aField" )
+:QObject( 0 )
 {
+	setObjectName("aField");
 	init( name, type );
 }
 
 
 aDataField::aDataField( const aDataField &field )
-:QObject( 0, "aField" )
+:QObject( 0 )
 {
+	setObjectName("aField");
 	init( field.fieldName(), field.fType );
 }
 
@@ -128,7 +131,7 @@ aDataField::init( const QString &name, const QString &type )
 	fType = type;
 	Type = QVariant::Invalid;
 	if ( !type.isNull() ) {
-		aType = ( (const char *) type.section(" ",0,0).upper() )[0];
+		aType = type.section(" ",0,0).toUpper().at(0).toLatin1();
 		Width = type.section(" ",1,1).toInt();
 		Dec = type.section(" ",2,2).toInt();
 		switch ( aType ){

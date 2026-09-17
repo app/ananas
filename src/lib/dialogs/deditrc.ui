@@ -409,7 +409,6 @@
     </layout>
   </widget>
   <layoutdefault spacing="5" margin="5" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <tabstops>
     <tabstop>eRCFile</tabstop>
     <tabstop>bFileRC</tabstop>

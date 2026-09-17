@@ -14,13 +14,13 @@ public:
 public slots:
     virtual void setData( aUser * user );
     virtual void onSelect();
-    virtual Q_ULLONG getData();
+    virtual qulonglong getData();
 
 protected slots:
     virtual void languageChange();
 
 private:
-    Q_ULLONG roleId;
+    qulonglong roleId;
     aUser *usr;
     QStringList listId;
 

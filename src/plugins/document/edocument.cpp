@@ -14,8 +14,10 @@
  *  true to construct a modal dialog.
  */
 eDocument::eDocument(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();
@@ -50,13 +52,13 @@ void eDocument::init()
 	otypes.clear();
 	eType->clear();
 	otypes.append("D");
-	eType->insertItem(trUtf8("Дата"), idx++);
+	eType->insertItem(idx++, trUtf8("Дата"));
 	otypes.append("T");
-	eType->insertItem(trUtf8("Время"), idx++);
+	eType->insertItem(idx++, trUtf8("Время"));
 	otypes.append("N %d %d");
-	eType->insertItem(trUtf8("Число"), idx++);
+	eType->insertItem(idx++, trUtf8("Число"));
 	otypes.append("C %d");
-	eType->insertItem(trUtf8("Строка"), idx++);
+	eType->insertItem(idx++, trUtf8("Строка"));
 
 	oc=cfgobj_count(NULL, NULL);
 	for (i=1;i<=oc;i++) {
@@ -77,7 +79,7 @@ void eDocument::init()
 			named=named+trUtf8(name);
 			sprintf(otype, "O %s", id);
 			otypes.append(otype);
-			eType->insertItem(named, idx++);
+			eType->insertItem(idx++, named);
 		}
 	}
 */
@@ -89,7 +91,7 @@ void eDocument::setData( QWidget *o, aCfg *md )
 {
 //	const QObject *o = sender();
 	if ( o ) {
-	    if ( o->className() != QString("wDocument") || !md ) {
+	    if ( o->metaObject()->className() != QString("wDocument") || !md ) {
 		reject();
 		return;
 	    }
@@ -113,14 +115,14 @@ void eDocument::setData( QWidget *o, aCfg *md )
 			eType->clear();
 			for ( QStringList::Iterator it = tlist.begin(); it != tlist.end(); ++it ) {
 				otypes.append( (*it).section( "\t", 0, 0 ) );
-				eType->insertItem( (*it).section("\t", 1, 1 ), idx++ );
+				eType->insertItem(idx++,  (*it).section("\t", 1, 1 ));
 			}
 			for ( i = 0 ; i < otypes.count(); i++ ) {
 				oid = 0;
 				if( otypes[i][0] == 'O' ) {
-					sscanf( (const char *)otypes[ i ], "O %d", &oid );
+					sscanf( otypes[i].toLatin1().constData(), "O %d", &oid );
 					if ( oid == id ) {
-						eType->setCurrentItem( i );
+						eType->setCurrentIndex( i );
 						break;
 					}
 				}
@@ -134,15 +136,15 @@ void eDocument::getData( QWidget *o )
 	QVariant v;
 //	const QObject *o = sender();
             if ( !o ) return;
-	if ( o->className() != QString("wDocument") ) return;
+	if ( o->metaObject()->className() != QString("wDocument") ) return;
 	wDocument *f = ( wDocument*) o;
 
-	int idx=eType->currentItem();
+	int idx=eType->currentIndex();
 	int oid = 0;
 
 	if (f) {
 		if( otypes[idx][0] == 'O' ) {
-			sscanf( (const char *)otypes[ idx ], "O %d", &oid );
+			sscanf( otypes[idx].toLatin1().constData(), "O %d", &oid );
 //			v = oid;
 			f->setProperty("Id", QVariant( oid ) );
 //			f->setId( oid );

@@ -267,9 +267,9 @@ AMetaDataIOXML::read(  const QString &name, AMetaData *md )
     md->clear();
     rootnode = xml.documentElement();
 
-    node = rootnode.namedItem( md->info()->className() ).toElement();
+    node = rootnode.namedItem( md->info()->metaObject()->className() ).toElement();
     XMLToAMetaObject( node, md->info() );
-    node = rootnode.namedItem( md->global()->className() ).toElement();
+    node = rootnode.namedItem( md->global()->metaObject()->className() ).toElement();
     XMLToAMetaObject( node, md->global() );
 
     mdelement = rootnode.namedItem( md_metadata ).toElement();
@@ -326,8 +326,8 @@ AMetaDataIOXML::XMLToAMetaObject( QDomElement e, AMetaObject *o )
             if ( se.hasAttribute( "type" ) ) {
               t = se.attribute("type");
               v.clear();
-              v = AMetaObject::strToVar( se.text(), QVariant::nameToType( t ) );
-//              if ( v.convert( QVariant::nameToType( t ) ) ) o->setAttr( se.tagName(), v );
+              v = AMetaObject::strToVar( se.text(), QVariant::nameToType( t.toLatin1().constData() ) );
+//              if ( v.convert( QVariant::nameToType( t.toLatin1().constData() ) ) ) o->setAttr( se.tagName(), v );
               if ( v.isValid() ) o->setAttr( se.tagName(), v );
             }
             if ( se.tagName() == "description" && 
@@ -348,8 +348,8 @@ AMetaDataIOXML::AMetaObjectToXML( AMetaObject *o )
     if ( !o ) return e;
     e = xml.createElement( o->metaObject()->className() );
     if ( !o->inherits("AMetaGroup") ){
-      if ( !o->name().isEmpty() ) {
-          e.setAttribute("name", o->name() );
+      if ( !o->objectName().isEmpty() ) {
+          e.setAttribute("name", o->objectName() );
           if ( o->id() > 0 ) e.setAttribute("id", QString::number(o->id()) );
       }
       se = xml.createElement( "description" );

@@ -10,13 +10,14 @@
  *  name 'name' and widget flags set to 'f'.
  */
 RolesForm::RolesForm(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : QWidget(parent, name, fl)
+    : QWidget(parent, fl)
 {
+    if (name) setObjectName(name);
     setupUi(this);
     new QVBoxLayout( this );
     mdtree = new aMetadataTreeView( this, &aDatabase::database()->cfg ); // metadata tree creation
     mdtree->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    layout()->add( mdtree );
+    layout()->addWidget( mdtree );
     updateGeometry();
 }
 

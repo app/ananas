@@ -32,7 +32,6 @@
 #include <qlayout.h>
 #include <qvalidator.h>
 #include <qlabel.h>
-#include <q3listview.h>
 #include <qsizepolicy.h>
 //Added by qt3to4:
 #include <QFrame>
@@ -60,19 +59,21 @@
  */
 wCatalogEditor::wCatalogEditor(	wField *parent,
 				const char *name,
-				const char *catname) : QWidget(parent, name)
+				const char *catname) : QWidget(parent)
 {
+	if (name) setObjectName(name);
   QWidget* w =0;
   md = NULL;
   QString str;
-  label = new QLabel(parent, name);
+  label = new QLabel(parent);
+	if (name) label->setObjectName(name);
 	label->setFrameShape(QFrame::Box);
 	w =(QWidget*) parent->parent()->parent();
 	str = parent->getFieldType();
-	catId = atoi(str.remove(0,2));// gets catalog id.
+	catId = str.remove(0,2).toInt();// gets catalog id.
    	if(w)
    	{
-		if(strcmp(w->className(),"wDBTable")==0) // wField is element wDBTable
+		if(strcmp(w->metaObject()->className(),"wDBTable")==0) // wField is element wDBTable
 		{
 			initCat(((wDBTable*)w)->db);
 		}
@@ -165,10 +166,10 @@ wCatalogEditor::openForm(const bool toSelect)
     	}
 	else
 	{
-  		CatalogForm* newform = new CatalogForm(ws,0, WDestructiveClose);
+  		CatalogForm* newform = new CatalogForm(ws,0, Qt::Window);
 		wl->insert( objid, newform );
 	}*/
-	CatalogForm* newform = new CatalogForm(ws,0, Qt::WDestructiveClose);
+	CatalogForm* newform = new CatalogForm(ws,0, Qt::Window);
 
 	connect( newform,	SIGNAL(selected(qulonglong)),
   		 this,		SLOT(on_selected( qulonglong )));
@@ -197,14 +198,14 @@ wCatalogEditor::openForm(const bool toSelect)
 		{
 			tmp_f = md->findChild(o,md_form,i);
 			if(!tmp_f.isNull()
-			   && atoi(md->attr(tmp_f,mda_type).ascii())==md_form_elem)
+			   && atoi(md->attr(tmp_f,mda_type).toLatin1())==md_form_elem)
 	 		{
 				aLog::print(aLog::Debug, tr("wCatalog Editor found element forms"));
 				idElForm = md->id(tmp_f);
 //				 continue;
 	 		}
 			if(!tmp_f.isNull()
-			   && atoi(md->attr(tmp_f,mda_type).ascii())==md_form_group)
+			   && atoi(md->attr(tmp_f,mda_type).toLatin1())==md_form_group)
 	 		{
 				aLog::print(aLog::Debug, tr("wCatalog Editor found group forms"));
 				idGrForm = md->id(tmp_f);
@@ -267,11 +268,11 @@ wCatalogEditor::openForm(const bool toSelect)
 	//sets column name
 	for(uint i=0; i<listPos.count(); i++)
    	{
-		fid = atoi(listPos[i].remove("uf",false).ascii());
+		fid = listPos[i].remove("uf").toInt();
 		if(!fid)
 		{
-//			printf("listPos[]=%s",listPos[i].remove("text_uf",false).ascii());
-			fid = (listPos[i].remove("text_",false)).toInt();
+//			printf("listPos[]=%s",listPos[i].remove("text_uf",false).toLatin1().constData());
+			fid = listPos[i].remove("text_").toInt();
 			//tmp = md->find(fid);
 		}
 		if(fid)
@@ -286,7 +287,7 @@ wCatalogEditor::openForm(const bool toSelect)
 	listPos.clear();
 	listPos = cat->getUserFields();
 	checkUserFields(listPos);
-  	//Q_ULLONG res = 0;
+  	//qulonglong res = 0;
    	// cat deleted in function catalogform::destroy();
 
  	 newform->setData(	cat,
@@ -314,22 +315,22 @@ wCatalogEditor::checkUserFields( QStringList &lst)
 	for(int i=0; i< md->count(item,md_field); i++)
   	{
 		aCfgItem mdi = md->findChild(item,md_field,i);
-		int ind = lst.findIndex(QString("uf%1").arg(md->attr(mdi,mda_id)));
+		int ind = lst.indexOf(QString("uf%1").arg(md->attr(mdi,mda_id)));
 		if(ind!=-1)
 		{
 			//--lst.insert(lst.at(i),lst[ind]);
 			lst.insert(i,lst[ind]);
-			lst.remove(lst.at(ind+1));
+			lst.removeAt(ind+1);
 
 		}
 		else
 		{
-			ind = lst.findIndex(QString("text_uf%1").arg(md->attr(mdi,mda_id)));
+			ind = lst.indexOf(QString("text_uf%1").arg(md->attr(mdi,mda_id)));
 			if(ind!=-1)
 			{
 				//--lst.insert(lst.at(i),lst[ind]);
 				lst.insert(i,lst[ind]);
-				lst.remove(lst.at(ind+1));
+				lst.removeAt(ind+1);
 
 			}
 		}

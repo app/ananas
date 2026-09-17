@@ -17,7 +17,7 @@
     </property>
     <layout class="QGridLayout" >
       <item row="0" column="0" >
-        <widget class="Q3ButtonGroup" name="Action" >
+        <widget class="QGroupBox" name="Action" >
           <property name="sizePolicy" >
             <sizepolicy>
               <hsizetype>3</hsizetype>
@@ -26,9 +26,6 @@
               <verstretch>0</verstretch>
             </sizepolicy>
           </property>
-          <property name="midLineWidth" >
-            <number>0</number>
-          </property>
           <property name="title" >
             <string>Simple action</string>
           </property>
@@ -36,12 +33,6 @@
             <bool>true</bool>
           </property>
           <property name="checked" >
-            <bool>false</bool>
-          </property>
-          <property name="exclusive" >
-            <bool>false</bool>
-          </property>
-          <property name="radioButtonExclusive" >
             <bool>false</bool>
           </property>
           <layout class="QGridLayout" >
@@ -74,7 +65,7 @@
         </widget>
       </item>
       <item row="1" column="0" >
-        <widget class="Q3ButtonGroup" name="Script" >
+        <widget class="QGroupBox" name="Script" >
           <property name="title" >
             <string>User action</string>
           </property>
@@ -82,12 +73,6 @@
             <bool>true</bool>
           </property>
           <property name="checked" >
-            <bool>false</bool>
-          </property>
-          <property name="exclusive" >
-            <bool>false</bool>
-          </property>
-          <property name="radioButtonExclusive" >
             <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" >
@@ -172,7 +157,6 @@
     </layout>
   </widget>
   <layoutdefault spacing="5" margin="5" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >wactionbutton.h</include>
     <include location="local" >awidget.h</include>

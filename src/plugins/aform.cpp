@@ -37,7 +37,6 @@
 #include <qobject.h>
 #include <qdialog.h>
 #include <qbuffer.h>
-#include <q3cstring.h>
 #include <qiodevice.h>
 #include <qstring.h>
 #include <qfile.h>
@@ -59,14 +58,10 @@
 #include <qiodevice.h>
 #include <qmessagebox.h>
 #include <qstatusbar.h>
-#include <q3sqlcursor.h>
-#include <q3sqlpropertymap.h>
-#include <q3sqlform.h>
 #include <qwidget.h>
 //Added by qt3to4:
 #include <QKeyEvent>
 #include <QList>
-#include <q3mimefactory.h>
 
 #include "aform.h"
 #include "wcatalogue.h"
@@ -82,9 +77,22 @@
 /*!
 Base form object.
 */
-aForm::aForm( QWidget *parent,  aEngine *eng )
-:QObject( eng, (QString("aForm%1").arg(eng->next_obj_id++)).ascii())
+/* Qt4 replacement for the Qt3 QObject::queryList() helper. */
+static QObjectList aQueryList( QObject *parent, const char *type )
 {
+	QObjectList res;
+	if ( !parent || !type ) return res;
+	QObjectList all = parent->findChildren<QObject*>();
+	for ( int i = 0; i < all.size(); ++i )
+		if ( all[i]->inherits( type ) )
+			res << all[i];
+	return res;
+}
+
+aForm::aForm( QWidget *parent,  aEngine *eng )
+:QObject( eng )
+{
+	setObjectName( QString("aForm%1").arg(eng->next_obj_id++) );
 	engine = eng;
 	db = eng->db;
 	md = &db->cfg;
@@ -101,9 +109,10 @@ aForm::aForm( QWidget *parent,  aEngine *eng )
 
 
 
-aForm::aForm( QWidget *parent,  aEngine *eng,  Q_ULONG form_mid, aWidget* caller )
-:QObject( eng, (QString("aForm%1").arg(eng->next_obj_id++)).ascii() )
+aForm::aForm( QWidget *parent,  aEngine *eng,  unsigned long form_mid, aWidget* caller )
+:QObject( eng )
 {
+	setObjectName( QString("aForm%1").arg(eng->next_obj_id++) );
 	aCfgItem obj;
 
 	engine = eng;
@@ -122,8 +131,9 @@ aForm::aForm( QWidget *parent,  aEngine *eng,  Q_ULONG form_mid, aWidget* caller
 }
 
 aForm::aForm( QWidget *parent,  aEngine *eng, QString oftype, QObject *aobj )
-:QObject( eng, (QString("aForm%1").arg(eng->next_obj_id++)).ascii())
+:QObject( eng )
 {
+	setObjectName( QString("aForm%1").arg(eng->next_obj_id++) );
 	engine = eng;
 	db = eng->db;
 	md = &db->cfg;
@@ -167,7 +177,7 @@ aForm::parentContainer( QWidget *w )
 void
 aForm::initWidget( QWidget *widget, aDatabase *adb )
 {
-	QString oclass = widget->className();
+	QString oclass = widget->metaObject()->className();
 	if (oclass == "wDBTable") ( ( wDBTable* ) widget )->init( adb, engine );
 }
 
@@ -187,7 +197,7 @@ aForm::initContainer( aWidget *widget, aDatabase *adb ){
 
 	widget->engine = engine;
 	widget->init( adb );
-	QObjectList l = widget->queryList( "QWidget" );
+	QObjectList l = aQueryList(widget, "QWidget");
 	QListIterator<QObject*> it( l ); // iterate over all subwidgets
 	QObject *obj;
 	QString oclass;
@@ -251,7 +261,7 @@ aForm::init()
 			QBuffer b(&buf);
 			//--b.open(QIODevice::WriteOnly);
 
-			//--b.writeBlock( ( const char *) ui, strlen( ( const char *) ui) );
+			//--b.write( ( const char *) ui, strlen( ( const char *) ui) );
 			//--b.close();
 			b.open(QIODevice::ReadOnly );
 			aLog::print(aLog::Info, tr("aForm creating form from ui"));
@@ -263,7 +273,7 @@ aForm::init()
 			int i;
 			for (i=0; i<l.size(); i++)
 			{
-			    aLog::print(aLog::Info, l[i]->name());
+			    aLog::print(aLog::Info, l[i]->objectName());
 			}*/
                         form = fb.load(&b);
 			aLog::print(aLog::Info, tr("aForm form create from ui ok"));
@@ -271,9 +281,10 @@ aForm::init()
 		}
 	}
 	if (form) {
-		QMainWindow *mw = new QMainWindow( parentWidget, "main form", Qt::WDestructiveClose );
+		QMainWindow *mw = new QMainWindow( parentWidget, Qt::Window );
+		mw->setObjectName( "main form" );
   		mw->statusBar()->hide();
-		mw->setCaption( form->caption() );
+		mw->setWindowTitle( form->windowTitle() );
 
 		printf("try find in windowslist %d, %llu\n ", objid, db_uid);
 		if ( engine->wl->find( objid, db_uid ) )
@@ -301,32 +312,34 @@ aForm::init()
                 // Create main widgets container.
 	    	if ( md->objClass( par ) == md_catalogue ) {
                         mainWidget = ( wCatalogue *) form; //new wCatalogue( mw );
-                        mw->setIcon( rcIcon("wcatalogue.png"));
+                        mw->setWindowIcon( rcIcon("wcatalogue.png"));
                 }
 	    	if ( md->objClass( par ) == md_document ) {
                         mainWidget = ( wDocument *) form; //new wDocument( mw );
-                        mw->setIcon( rcIcon("wdocument.png"));
+                        mw->setWindowIcon( rcIcon("wdocument.png"));
                 }
 	    	if ( md->objClass( par ) == md_journal ) {
                         mainWidget = ( wJournal *) form; //new wJournal( mw );
-                        mw->setIcon( rcIcon("wjournal.png"));
+                        mw->setWindowIcon( rcIcon("wjournal.png"));
 			mw->statusBar()->show();
-			mw->statusBar()->message(tr("New document - <Ins>, Edit - <Enter>, View - <Shift+Enter>"));
+			mw->statusBar()->showMessage(tr("New document - <Ins>, Edit - <Enter>, View - <Shift+Enter>"));
 		}
 	    	if ( md->objClass( par ) == md_report ) {
                         mainWidget = ( wReport *) form;
-                        mw->setIcon( rcIcon("wreport.png"));
+                        mw->setWindowIcon( rcIcon("wreport.png"));
                 }
 
 		if ( !mainWidget ) {
-        		form->reparent( parentWidget, Qt::WDestructiveClose, QPoint(0, 0));
+			form->setParent( parentWidget, Qt::Window );
+			form->move( 0, 0 );
                         delete mw;
                 } else {
 			form = mw;
 			mainWidget->setFormMode( md->attr( mdObj, mda_type ).toInt());
 			mainWidget->createToolBar( mw );
 			mw->resize( mainWidget->size() );
-			mainWidget->reparent( mw, 0, QPoint(0, 0));
+			mainWidget->setParent( mw );
+			mainWidget->move( 0, 0 );
 			mw->setCentralWidget( mainWidget );
 			initContainer( mainWidget, db );
 			mainWidget->show();
@@ -379,7 +392,7 @@ aForm::aParent( QWidget *widget )
 	QWidget *p = widget->parentWidget();
 	QString pc;
 	while ( p ){
-		pc = p->className();
+		pc = p->metaObject()->className();
 		if ( pc == "wCatalogue") break;
 		if ( pc == "wDocument") break;
 		p = p->parentWidget();
@@ -405,7 +418,7 @@ aForm::Show()
 {
 	if ( form )
 	{
-//		if ( engine->project.interpreter()->functions( this ).findIndex("on_formstart")!=-1)
+//		if ( engine->project.interpreter()->functions( this ).indexOf("on_formstart")!=-1)
 //		{
 //			engine->project.interpreter()->call("on_formstart", QVariantList(), this);
 //		}
@@ -448,7 +461,7 @@ aForm::Close() {
 	on_form_close(); //to run ananas-script
 	
 	if( form ) {
-		if( form->isShown() ) {
+		if( form->isVisible() ) {
 			aLog::print(aLog::Debug,tr("aForm::Close() hides form"));
 			disconnect( form );
 			form->hide();
@@ -495,7 +508,7 @@ aForm::SignIn(){
         QScriptValue res;
 	if ( form && !mainWidget->dataObject()->IsConducted())
 	{
-//		if ( engine->project.interpreter()->functions( this ).findIndex("on_conduct")!=-1)
+//		if ( engine->project.interpreter()->functions( this ).indexOf("on_conduct")!=-1)
 //		{
 //			res  = engine->project.interpreter()->call("on_conduct",QVariantList(), this);
 //		}
@@ -595,18 +608,18 @@ aForm::formMetaObjectId(QString filename){
 	if (obj) {
 */
 /*
-		if (!strcmp(obj->className(),"QAnanasField")) res=((QAnanasField *)obj)->getName();
+		if (!strcmp(obj->metaObject()->className(),"QAnanasField")) res=((QAnanasField *)obj)->getName();
 		else
-		if (!strcmp(obj->className(),"QAnanasDBField")) res=((QAnanasDBField *)obj)->getName();
+		if (!strcmp(obj->metaObject()->className(),"QAnanasDBField")) res=((QAnanasDBField *)obj)->getName();
 		else
-		if (!strcmp(obj->className(),"QAnanasTable")) res=((QAnanasTable *)obj)->getName();
+		if (!strcmp(obj->metaObject()->className(),"QAnanasTable")) res=((QAnanasTable *)obj)->getName();
 		else
 */
-/*		if (!strcmp(obj->className(),"wDBField")) {
+/*		if (!strcmp(obj->metaObject()->className(),"wDBField")) {
 			res= ((wDBField*)obj)->getMdFieldName();
-//			printf("wdbfield name=%s\n",(const char*)((wDBField*)obj)->getMdFieldName().local8Bit());
+//			printf("wdbfield name=%s\n",(const char*)((wDBField*)obj)->getMdFieldName().toLocal8Bit().constData());
 		} else {
-			res=obj->name();
+			res=obj->objectName();
 		}
 	}
 	return res;
@@ -656,7 +669,7 @@ aForm::Widget( QString name )
 /*
 	QObject *res=NULL;
 	QObject* obj;
-	QObjectList* list = form->queryList("QWidget");
+	QObjectList* list = aQueryList(form, "QWidget");
 
 	QObjectListIt it(*list);
 	while ( ( obj = it.current() ) !=0 ) {
@@ -687,7 +700,7 @@ aForm::connectSlots()
 {
 	QObject* obj;
 	if ( !form ) return;
-	QObjectList list = form->queryList("QWidget");
+	QObjectList list = aQueryList(form, "QWidget");
 	if ( mainWidget->inherits("aWidget") )
 		connect( mainWidget, SIGNAL( valueChanged( const QString &, const QVariant & ) ),\
 				 this, SLOT( on_valueChanged( const QString &, const QVariant & ) ) );
@@ -785,21 +798,21 @@ aForm::Value(const QString &name)
 /*
 	w = findWidget( name );
 	if ( w ) {
-		if (!strcmp(w->className(),"wDBField")){
+		if (!strcmp(w->metaObject()->className(),"wDBField")){
 			res=( (wDBField*)w )->text(); //value();
 		} else if (w->inherits("wField")){
 			res=( (wField*)w )->text(); //value();
-		} else if (!strcmp(w->className(),"QPushButton")){
+		} else if (!strcmp(w->metaObject()->className(),"QPushButton")){
 			res=((QPushButton *)w)->text();
-		} else if (!strcmp(w->className(),"QLabel")){
+		} else if (!strcmp(w->metaObject()->className(),"QLabel")){
 			res=((QLabel*)w)->text();
-		} else if (!strcmp(w->className(),"QLineEdit")){
+		} else if (!strcmp(w->metaObject()->className(),"QLineEdit")){
 			res=((QLineEdit*)w)->text();
-		} else if (!strcmp(w->className(),"QDateEdit")){
+		} else if (!strcmp(w->metaObject()->className(),"QDateEdit")){
 			res=((QDateEdit*)w)->date().toString(Qt::ISODate);
 		}
 	} else {
-		debug_message(tr("Error! Can't find widget by name==`%s`\n"),(const char*) name.local8Bit());
+		debug_message(tr("Error! Can't find widget by name==`%s`\n"),(const char*) name.toLocal8Bit());
 	}
 	return res;
 */
@@ -851,7 +864,7 @@ aForm::DBValue(const QString &name)
 	w = Widget( name );
 	if ( w )
 	{
-		if (!strcmp(w->className(),"wDBField"))
+		if (!strcmp(w->metaObject()->className(),"wDBField"))
 		{
 			res=( (wDBField*)w )->value(); //value();
 			if(res.type()==QVariant::ULongLong || res.type()==QVariant::LongLong)
@@ -932,19 +945,19 @@ aForm::SetValue(const QString &name, QVariant value)
 
 	w = findWidget( name );
 	if ( w ) {
-		if (!strcmp(w->className(),"wDBField")){
+		if (!strcmp(w->metaObject()->className(),"wDBField")){
 			((wDBField*)w)->setValue(value.toString());
 		} else if (w->inherits("wField")){
 			((wField*)w)->setValue(value.toString());
-		} else if (!strcmp(w->className(),"QPushButton")){
+		} else if (!strcmp(w->metaObject()->className(),"QPushButton")){
 			((QPushButton *)w)->setText( value.toString() );
-		} else if (!strcmp(w->className(),"QLabel")){
+		} else if (!strcmp(w->metaObject()->className(),"QLabel")){
 			((QLabel*)w)->setText( value.toString() );
-		} else if (!strcmp(w->className(),"QLineEdit")){
+		} else if (!strcmp(w->metaObject()->className(),"QLineEdit")){
 			((QLineEdit*)w)->setText( value.toString() );
 		}
 	} else {
-		debug_message(tr("aForm::SetValue() Error! Can't find widget by name==`%s`\n"),(const char*) name.local8Bit());
+		debug_message(tr("aForm::SetValue() Error! Can't find widget by name==`%s`\n"),(const char*) name.toLocal8Bit());
 		rc = err_nowidgetfound;
 	}
 	return rc;
@@ -971,7 +984,7 @@ aForm::SetColumnReadOnly(const QString &tname, int numCol, bool ro)
 	w = Widget( tname );
 	if ( w )
 	{
-		if (!strcmp(w->className(),"wDBTable"))
+		if (!strcmp(w->metaObject()->className(),"wDBTable"))
 		{
 			((wDBTable*)w)->setColumnReadOnly(numCol,ro);
 		}
@@ -1005,13 +1018,13 @@ aForm::TabCount(const QString &tname)
 	w = Widget( tname );
 	if ( w )
 	{
-		if (!strcmp(w->className(),"wDBTable"))
+		if (!strcmp(w->metaObject()->className(),"wDBTable"))
 		{
 			res=( (wDBTable*)w )->numRows() ; //value();
 		}
 		else
 		{
-			aLog::print(aLog::Error, tr("Expected wDBTable widget but found %1").arg(w->className()));
+			aLog::print(aLog::Error, tr("Expected wDBTable widget but found %1").arg(w->metaObject()->className()));
 		}
 	}
 	else
@@ -1036,7 +1049,7 @@ aForm::TabNewLine(const QString &tname)
        QObject *w;
 
        w = Widget( tname );
-       if ( w  && !strcmp(w->className(),"wDBTable"))
+       if ( w  && !strcmp(w->metaObject()->className(),"wDBTable"))
        {
                wDBTable *wdb = (wDBTable*)w;
                aDataTable *cur = wdb->sqlCursor();
@@ -1056,7 +1069,7 @@ aForm::TabUpdate(const QString &tname)
        QObject *w;
 
        w = Widget( tname );
-       if ( w  && !strcmp(w->className(),"wDBTable"))
+       if ( w  && !strcmp(w->metaObject()->className(),"wDBTable"))
        {
                wDBTable *wdb = (wDBTable*)w;
                aDataTable *cur = wdb->sqlCursor();
@@ -1130,7 +1143,7 @@ aForm::tabValue(const QString &tname, int row, int col, bool dbval)
 	QObject *w;
 	QStringList l;
 	w = Widget( tname );
-	if ( w  && !strcmp(w->className(),"wDBTable"))
+	if ( w  && !strcmp(w->metaObject()->className(),"wDBTable"))
 	{
 		wDBTable *wdb = (wDBTable*)w;
 			if(wdb->getDefIdList().count()>col && col>=0)
@@ -1184,10 +1197,10 @@ aForm::ColIndex(const QString &tname, const QString &colname)
 	QObject *w;
 	int col=-1;
 	w = Widget( tname );
-	if ( w  && !strcmp(w->className(),"wDBTable"))
+	if ( w  && !strcmp(w->metaObject()->className(),"wDBTable"))
 	{
 			wDBTable *wdb = ((wDBTable*)w );
-			col= wdb->getDefFields().findIndex(colname);
+			col= wdb->getDefFields().indexOf(colname);
 	}
 	else
 	{
@@ -1212,9 +1225,9 @@ aForm::SetTabValue(const QString &tname, const QString &colname, int row, QVaria
 {
 	QObject *w;
 	w = Widget( tname );
-	if ( w  && !strcmp(w->className(),"wDBTable"))
+	if ( w  && !strcmp(w->metaObject()->className(),"wDBTable"))
 	{
-	//	printf(">>>>>>>>>>>>>>Set tab value %s, for %s, rov = %d, value = %s\n",(const char*)tname.local8Bit(), (const char *)colname.local8Bit(), row, (const char*)value.toString().local8Bit() );
+	//	printf(">>>>>>>>>>>>>>Set tab value %s, for %s, rov = %d, value = %s\n",(const char*)tname.toLocal8Bit().constData(), (const char *)colname.toLocal8Bit().constData(), row, (const char*)value.toString().toLocal8Bit().constData() );
 		wDBTable *wdb = (wDBTable*)w;
 		aSQLTable *t = ( aSQLTable *) wdb->sqlCursor();
 		t->select(QString("idd=%1").arg(mainWidget->uid()));
@@ -1274,9 +1287,9 @@ aForm::SetFocus(){
 
 void
 aForm::on_button(){
-//	if ( engine->project.interpreter()->functions(this).findIndex("on_button")!=-1)
+//	if ( engine->project.interpreter()->functions(this).indexOf("on_button")!=-1)
 //	{
-//		engine->project.interpreter()->call("on_button",QVariantList()<<sender()->name(),this);
+//		engine->project.interpreter()->call("on_button",QVariantList()<<sender()->objectName(),this);
 //	}
         if ( engine->code->globalObject().property("on_button").isValid() ){
             engine->code->globalObject().property("on_button").call();
@@ -1303,7 +1316,7 @@ aForm::on_actionbutton()
                         if ( b->isActionClose() )
                         {
 	                       	if(form)
-				if( form->isShown() )
+				if( form->isVisible() )
 				{
 //#ifndef _Windows
 					form->disconnect();
@@ -1337,7 +1350,7 @@ aForm::on_lostfocus(){
 void
 aForm::on_form_close(){
 	if(!engine) return;
-//	if ( engine->project.interpreter()->functions(this).findIndex("on_formstop")!=-1) {
+//	if ( engine->project.interpreter()->functions(this).indexOf("on_formstop")!=-1) {
 //		engine->project.interpreter()->call("on_formstop", QVariantList(),this);
 //	}
         if ( engine->code->globalObject().property("on_formstop").isValid() ){
@@ -1352,16 +1365,16 @@ aForm::on_valueChanged(const QString &s){
 /*
 	const QObject *sobj=sender();
 	QString objName=widgetName((QObject *) sobj);
-	cfg_message(0, "value changed %s (%s)\n", (const char *) objName.utf8(), (const char *) dbobject->className());
-	cfg_message(0, "classname %s\n", (const char *) sobj->className());
-	if (strcmp(sobj->className(),"QAnanasDBField")==0) {
-//	if (sobj->className()=="QAnanasDBField") {
+	cfg_message(0, "value changed %s (%s)\n", (const char *) objName.toUtf8(), (const char *) dbobject->metaObject()->className());
+	cfg_message(0, "classname %s\n", (const char *) sobj->metaObject()->className());
+	if (strcmp(sobj->metaObject()->className(),"QAnanasDBField")==0) {
+//	if (sobj->metaObject()->className()=="QAnanasDBField") {
 		cfg_message(0,"OK");
-		if (dbobject->className()=="QAdoc"){
+		if (dbobject->metaObject()->className()=="QAdoc"){
 			((QAdoc *)dbobject)->setfield(objName, s);
 		}
-		if (dbobject->className()=="QAcat"){
-			cfg_message(0,"Поле справочника %s=%s\n",(const char *) objName.utf8(), (const char *) s.utf8());
+		if (dbobject->metaObject()->className()=="QAcat"){
+			cfg_message(0,"Поле справочника %s=%s\n",(const char *) objName.toUtf8(), (const char *) s.toUtf8());
 			((QAcat *)dbobject)->setfield(objName, s);
 		}
 	}
@@ -1388,7 +1401,7 @@ void
 aForm::on_valueChanged( const QString & name, const QVariant & val )
 {
 
-//	if ( engine->project.interpreter()->functions(this).findIndex("on_valuechanged")!=-1)
+//	if ( engine->project.interpreter()->functions(this).indexOf("on_valuechanged")!=-1)
 //	{
 //		QList<QVariant> lst;
 //		lst << name;
@@ -1410,12 +1423,12 @@ void
 aForm::on_tabvalueChanged(int row, int col)
 {
 
-//	if ( engine->project.interpreter()->functions(this).findIndex("on_tabupdate")!=-1)
+//	if ( engine->project.interpreter()->functions(this).indexOf("on_tabupdate")!=-1)
 //	{
 //		QList<QVariant> lst;
 //		lst << row;
 //		lst << col;
-//		lst << sender()->name();
+//		lst << sender()->objectName();
 //
 //		engine->project.interpreter()->call("on_tabupdate",QVariantList(lst), this);
 //	}
@@ -1423,7 +1436,7 @@ aForm::on_tabvalueChanged(int row, int col)
             QScriptValueList list;
             list << row;
             list << col;
-            list << sender()->name();
+            list << sender()->objectName();
             engine->code->globalObject().property("on_tabupdate")
                     .call(QScriptValue(),list);
         }
@@ -1442,12 +1455,12 @@ aForm::on_dbtablerow( QSqlRecord *r )
 		aSQLTable *t = o->table();
 		id = t->value(0).toULongLong();
         }
-//	if ( engine->project.interpreter()->functions(this).findIndex("on_tablerow")!=-1) {
-//		engine->project.interpreter()->call("on_tablerow", QVariantList()<<sender()->name(), this);
+//	if ( engine->project.interpreter()->functions(this).indexOf("on_tablerow")!=-1) {
+//		engine->project.interpreter()->call("on_tablerow", QVariantList()<<sender()->objectName(), this);
 //	}
         if ( engine->code->globalObject().property("on_tablerow").isValid() ){
             QScriptValueList list;
-            list << sender()->name();
+            list << sender()->objectName();
             engine->code->globalObject().property("on_tablerow")
                     .call(QScriptValue(),list);
         }
@@ -1459,7 +1472,7 @@ aForm::on_event( const QString &source, const QString &data )
 //	QList<QVariant> lst;
 //	lst << source;
 //	lst << data;
-//	if ( engine->project.interpreter()->functions(this).findIndex("on_event")!=-1) {
+//	if ( engine->project.interpreter()->functions(this).indexOf("on_event")!=-1) {
 //		engine->project.interpreter()->call("on_event", QVariantList(lst), this);
 //	}
         if ( engine->code->globalObject().property("on_event").isValid() ){
@@ -1489,14 +1502,14 @@ void
 aForm::on_tablerow( qulonglong uid )
 {
 //	QList<QVariant> lst;
-//	lst << sender()->name();
+//	lst << sender()->objectName();
 //	lst << QString("%1").arg(uid);
-//	if ( engine->project.interpreter()->functions(this).findIndex("on_tabrowselected")!=-1) {
+//	if ( engine->project.interpreter()->functions(this).indexOf("on_tabrowselected")!=-1) {
 //		engine->project.interpreter()->call("on_tabrowselected", QVariantList(lst), this);
 //	}
         if ( engine->code->globalObject().property("on_tabrowselected").isValid() ){
             QScriptValueList list;
-            list << sender()->name();
+            list << sender()->objectName();
             list << QString("%1").arg(uid);
             engine->code->globalObject().property("on_tabrowselected")
                     .call(QScriptValue(),list);
@@ -1568,7 +1581,7 @@ aForm::Select( qulonglong id )
 int
 aForm::SelectGroup( qulonglong id )
 {
-	if ( mainWidget && !strcmp(mainWidget->className(),"wCatalogue"))
+	if ( mainWidget && !strcmp(mainWidget->metaObject()->className(),"wCatalogue"))
 	 {
 		if ( engine->wl->find( objid, db_uid ) )
 		{
@@ -1591,13 +1604,13 @@ aForm::SelectGroup( qulonglong id )
 
 /*
 int
-aForm::select( Q_ULLONG id )
+aForm::select( qulonglong id )
 {
 CHECK_POINT
 //  Select( id );
 	QObject *res=NULL;
 	QObject* obj;
-	QObjectList* list = form->queryList("wDBField");
+	QObjectList* list = aQueryList(form, "wDBField");
 	aCfgItem o;
 	QString fieldName;
 	QObjectListIt it(*list);
@@ -1612,7 +1625,7 @@ CHECK_POINT
 		fieldName = ((wDBField*)obj)->getMdFieldName();
 		((wDBField*)obj)->setValue(mainWidget->table()->value(fieldName).toString());
 
-  //debug_message("mainWidget class = %s\n", mainWidget->className() );
+  //debug_message("mainWidget class = %s\n", mainWidget->metaObject()->className() );
 			//	break;
 		//	}
 	}
@@ -1667,7 +1680,7 @@ aForm::SetReadOnly ( bool status )
 		}
 		mainWidget->SetReadOnly( status );
 	}
-/*	QObjectList *l = mainWidget->queryList( "wDBField" );
+/*	QObjectList *l = aQueryList(mainWidget, "wDBField");
 	QObjectListIt it( *l );
 	QObject *obj;
 	while ( (obj = it.current()) != 0 )

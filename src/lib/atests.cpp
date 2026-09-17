@@ -59,14 +59,14 @@ aTests::print2log(	const QString &log_name,
 	QFile f;
 	if(log_name==QString::null)
 	{
-		f.open( QIODevice::WriteOnly, stdout );
-		f.writeBlock((const char*)toWrite,strlen((const char*)toWrite));
+		f.open( stdout, QIODevice::WriteOnly );
+		f.write(toWrite.toLocal8Bit());
 	}
 	else
 	{
-		f.setName(log_name);
+		f.setFileName(log_name);
 		f.open( QIODevice::WriteOnly | QIODevice::Append );
-		f.writeBlock((const char*)toWrite,strlen((const char*)toWrite));
+		f.write(toWrite.toLocal8Bit());
 		f.flush();
 	}
 	f.close();
@@ -94,13 +94,13 @@ aTests::readConfig(const QString &conf_name,const QString &log_name)
 	QFile f(conf_name);
 	if(!f.exists())
 	{
-		aLog::print(aLog::Error, QObject::tr("aTests file %1 not exists").arg(f.name()));
+		aLog::print(aLog::Error, QObject::tr("aTests file %1 not exists").arg(f.fileName()));
 	}
 	else
 	{
 		if(!f.open( QIODevice::ReadOnly ))
 		{
-			aLog::print(aLog::Error, QObject::tr("aTests file %1 not open for read").arg(f.name()));
+			aLog::print(aLog::Error, QObject::tr("aTests file %1 not open for read").arg(f.fileName()));
 		}
 		else
 		{
@@ -112,7 +112,7 @@ aTests::readConfig(const QString &conf_name,const QString &log_name)
 				{
 					if(str==QString::null || str[0]=='#' || str[0]=='\n') continue;
 					QString s = str.section("=",0,0);
-					map[s] = (str.right(str.length() - s.length()-1)).stripWhiteSpace();
+					map[s] = (str.right(str.length() - s.length()-1)).trimmed();
 					aLog::print(aLog::Debug, QString("map[%1] = %2").arg(s).arg(map[s]));
 				}
 				else
@@ -144,7 +144,7 @@ aTests::writeConfig(const QString &conf_name, QMap<QString,QString> map, const Q
 	QFile f(conf_name);
 	if(!f.exists())
 	{
-		aLog::print(aLog::Error, QObject::tr("aTests file %1 not exists").arg(f.name()));
+		aLog::print(aLog::Error, QObject::tr("aTests file %1 not exists").arg(f.fileName()));
 	}
 	//else
 	//{
@@ -153,8 +153,8 @@ aTests::writeConfig(const QString &conf_name, QMap<QString,QString> map, const Q
 			QMap<QString,QString>::Iterator it;
 			for ( it = map.begin(); it != map.end(); ++it )
 			{
-				str= QString("%1=%2\n").arg(it.key()).arg(it.data());
-				f.writeBlock((const char*)str,strlen((const char*)str));
+				str= QString("%1=%2\n").arg(it.key()).arg(it.value());
+				f.write(str.toLocal8Bit());
 				f.flush();
 			}
 			f.close();
@@ -165,7 +165,7 @@ aTests::writeConfig(const QString &conf_name, QMap<QString,QString> map, const Q
 		}
 		else
 		{
-			aLog::print(aLog::Error, QObject::tr("aTests file %1 not open for read").arg(f.name()));
+			aLog::print(aLog::Error, QObject::tr("aTests file %1 not open for read").arg(f.fileName()));
 			return 0;
 		}
 	//}
@@ -188,14 +188,14 @@ aTests::printline2log(const QString &log_name)
 	QFile f;
 	if(log_name==QString::null)
 	{
-		f.open( QIODevice::WriteOnly, stdout );
-		f.writeBlock((const char*)toWrite,strlen((const char*)toWrite));
+		f.open( stdout, QIODevice::WriteOnly );
+		f.write(toWrite.toLocal8Bit());
 	}
 	else
 	{
-		f.setName(log_name);
+		f.setFileName(log_name);
 		f.open( QIODevice::WriteOnly | QIODevice::Append );
-		f.writeBlock((const char*)toWrite,strlen((const char*)toWrite));
+		f.write(toWrite.toLocal8Bit());
 		f.flush();
 	}
 	f.close();
@@ -221,7 +221,7 @@ aTests::parseCommandLine(int argc, char** argv, const QString requestedParam)
 	for(int j=1;j<argc;j++)
 	{
 		param = argv[j];
-		if(param.section("=",0,0).lower()==requestedParam)
+		if(param.section("=",0,0).toLower()==requestedParam)
 		{
 			if(param.section("=",1)!=QString::null)
 			{
@@ -229,7 +229,7 @@ aTests::parseCommandLine(int argc, char** argv, const QString requestedParam)
 				if(value[0]=='~')
 				{
 					value = value.mid(1);
-					value = QDir::convertSeparators(QDir::homeDirPath()+value);
+					value = QDir::convertSeparators(QDir::homePath()+value);
 				}
 				return value;
 			}

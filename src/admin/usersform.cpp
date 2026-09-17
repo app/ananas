@@ -16,7 +16,7 @@ UsersForm::UsersForm(QWidget* parent, Qt::WindowFlags fl)
     new QVBoxLayout( this );
     mdtree = new aMetadataTreeView( this, &aDatabase::database()->cfg ); // metadata tree creation
     mdtree->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    layout()->add( mdtree );
+    layout()->addWidget( mdtree );
     updateGeometry();
 }
 

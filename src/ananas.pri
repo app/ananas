@@ -2,7 +2,7 @@
 CONFIG	+= qt warn_on release thread
 #LANGUAGE = C++
 
-QT += qt3support sql xml
+QT += sql xml
 CONFIG += debug warn_on designer
 
 unix {

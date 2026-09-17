@@ -73,7 +73,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 #endif
 	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
 	tmpDirName = QDir::convertSeparators(tmpDirName);
-	//printf("tmp dir name = %s\n",tmpDirName.ascii());
+	//printf("tmp dir name = %s\n",tmpDirName.toLatin1().constData());
 	if(!dir.mkdir(tmpDirName))
 	{
 		setLastError(tr("Can't create temporary directory"));
@@ -100,7 +100,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 
 	QString srcDirName = QDir::convertSeparators(tmpDirName + "/templates/");
 	dir.setPath(srcDirName);
-	templatesName = dir.entryList("templ_*.odt;templ_*.ods");
+	templatesName = dir.entryList(QStringList() << "templ_*.odt" << "templ_*.ods");
 
 
 	qApp->processEvents();
@@ -109,13 +109,13 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 	filename.truncate( filename.length() - QString(".bsa").length() );
 	aLog::print(aLog::Debug, tr("aBackup filename = %1").arg(filename));
 
-	//printf("filename = %s\n",filename.ascii());
+	//printf("filename = %s\n",filename.toLatin1().constData());
 	changeRC(rcfile, tmpDirName + "/busines-schema.cfg");
 
 	QFile f(tmpDirName+"/content.xml");
 	QDomDocument xml;
 	xml.setContent(&f);
-//	printf("%s\n",xml.toString(4).ascii());
+//	printf("%s\n",xml.toString(4).toLatin1().constData());
 	aDatabase db;
 	if(db.init(rcfile))
 	{
@@ -161,7 +161,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 	if(!destDir.exists(destDirName))
 	{
 		aLog::print(aLog::Debug, tr("aBackup template dir `%1' not exists, try create").arg(destDirName));
-		if(!destDir.mkdir(destDirName,true))
+		if(!destDir.mkdir(destDirName))
 		{
 			aLog::print(aLog::Error, tr("aBackup create template dir `%1' fail").arg(destDirName));
 		}
@@ -183,7 +183,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 
 	db.done();
 
-//	printf("copy %s to %s\n", QDir::convertSeparators(tmpDirName+"/busines-schema.cfg").ascii(), QDir::convertSeparators(filename+".cfg").ascii());
+//	printf("copy %s to %s\n", QDir::convertSeparators(tmpDirName+"/busines-schema.cfg").toLatin1().constData(), QDir::convertSeparators(filename+".cfg").toLatin1().constData());
 	if(!aService::copyFile( QDir::convertSeparators(tmpDirName+"/busines-schema.cfg"), QDir::convertSeparators(filename+".cfg"), true))
 	{
 		setLastError(tr("Can't copy .cfg file"));
@@ -196,7 +196,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 		aLog::print(aLog::Debug, tr("aBackup copy business schema file"));
 	}
 	emit(progress(++prg,totalSteps));
-//	printf("filename =%s\n",filename.ascii());
+//	printf("filename =%s\n",filename.toLatin1().constData());
 	changeRC(rcfile, filename+".cfg");
 	cleanupTmpFiles(tmpDirName, &templatesName);
 	setLastError(tr("Database import without errors"));
@@ -226,7 +226,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 #endif
 	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
 	tmpDirName = QDir::convertSeparators(tmpDirName);
-	//printf("copy name = %s\n",tmpDirName.ascii());
+	//printf("copy name = %s\n",tmpDirName.toLatin1().constData());
 	if(!dir.mkdir(tmpDirName))
 	{
 		setLastError(tr("Can't create directory %s").arg(tmpDirName));
@@ -269,7 +269,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 		srcDirName = QDir::convertSeparators(cfg.rc.value("workdir"));
 		aLog::print(aLog::Debug, tr("aBackup workdir=%1").arg(srcDirName));
 		dir.setPath(srcDirName);
-		templatesName = dir.entryList("templ_*.odt;templ_*.ods");
+		templatesName = dir.entryList(QStringList() << "templ_*.odt" << "templ_*.ods");
 		for(uint i=0; i<templatesName.count(); i++)
 		{
 			//ayTests::print2log("f:\\ERROR.log", "aBackup", tmpDirName + "/templates/"+templatesName[i]);
@@ -317,7 +317,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 	{
 		aLog::print(aLog::Debug, tr("aBackup write manifest.xml"));
 	}
-//	printf("%s\n",(createManifest(templatesName)).toString().ascii());
+//	printf("%s\n",(createManifest(templatesName)).toString().toLatin1().constData());
 	if(withTemplates)
 	{
 		QString destNamePref = tmpDirName + "/templates";
@@ -325,7 +325,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 		bool res = false;
 		for(uint i=0; i<templatesName.count(); i++)
 		{
-//				printf("copy %s to %s\n", QString(srcDirName+"/"+templatesName[i]).ascii(), QString(destNamePref+"/"+templatesName[i]).ascii());
+//				printf("copy %s to %s\n", QString(srcDirName+"/"+templatesName[i]).toLatin1().constData(), QString(destNamePref+"/"+templatesName[i]).toLatin1().constData());
 			if(!aService::copyFile(QDir::convertSeparators(srcDirName+"/"+templatesName[i]), QDir::convertSeparators(destNamePref+"/"+templatesName[i]), true))
 			{
 				setLastError(tr("Can't copy template file"));
@@ -368,7 +368,7 @@ aBackup::unzipArchive(const QString& archName, const QString& dir)
 #else
 	aProcess process( "7z" );
 //	process.setWorkingDirectory ( templateDir);
-//	printf("working dir = `%s'\n", QString(templateDir).ascii());
+//	printf("working dir = `%s'\n", QString(templateDir).toLatin1().constData());
 	process.addArgument( "x" );
 	process.addArgument( "-y" );
 	process.addArgument( QString("-o%1").arg(dir) );
@@ -376,7 +376,7 @@ aBackup::unzipArchive(const QString& archName, const QString& dir)
 
 #endif
 
-//	printf("unzip to %s file `%s'\n",copyName.ascii(),fname.ascii());
+//	printf("unzip to %s file `%s'\n",copyName.toLatin1().constData(),fname.toLatin1().constData());
 	if( !process.start() )
 	{
 		//qWarning("FormTemplate::unzip(): failed to start unzip");
@@ -512,7 +512,7 @@ bool
 aBackup::writeXml(const QString & name2Save, QDomDocument xml)
 {
 	QFile file(name2Save);
-	QByteArray buf( xml.toString(4).utf8() );
+	QByteArray buf( xml.toString(4).toUtf8() );
 	if ( file.open( QIODevice::WriteOnly ) )
 	{
 		QTextStream ts( &file );
@@ -605,19 +605,19 @@ aBackup::cleanupTmpFiles(const QString& tmpDirName, QStringList *files)
 {
 	QFile file;
 	QDir dir;
-	file.setName(QDir::convertSeparators(tmpDirName+"/content.xml"));
-	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.name()));
+	file.setFileName(QDir::convertSeparators(tmpDirName+"/content.xml"));
+	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 	file.remove();
-	file.setName(QDir::convertSeparators(tmpDirName+"/busines-schema.cfg"));
-	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.name()));
+	file.setFileName(QDir::convertSeparators(tmpDirName+"/busines-schema.cfg"));
+	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 	file.remove();
-	file.setName(QDir::convertSeparators(tmpDirName+"/META-INF/manifest.xml"));
-	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.name()));
+	file.setFileName(QDir::convertSeparators(tmpDirName+"/META-INF/manifest.xml"));
+	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 	file.remove();
 	for(uint i=0; i<files->count(); i++)
 	{
-			file.setName(QDir::convertSeparators(tmpDirName + "/templates/"+ (*files)[i]));
-			aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.name()));
+			file.setFileName(QDir::convertSeparators(tmpDirName + "/templates/"+ (*files)[i]));
+			aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 			file.remove();
 	}
 	aLog::print(aLog::Debug, tr("aBackup delete directory %1").arg(tmpDirName + "/META-INF"));

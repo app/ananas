@@ -76,7 +76,7 @@ aCatalogue::initObject()
 }
 
 /*
-Q_ULLONG
+qulonglong
 aCatalogue::getCatGroup()
 {
 	aSQLTable * t = table();
@@ -491,7 +491,7 @@ aCatalogue::newElement(qulonglong parentId )
 	//for(uint i=0; i< rec->count(); i++)
 	//{
 	//	rec->setValue(i,ide);
-//		printf("%s\n",rec->fieldName(i).ascii());
+//		printf("%s\n",rec->fieldName(i).toLatin1().constData());
 	//}
 	rec->setValue("idg",parentId);
 	rec->setValue("df","0");

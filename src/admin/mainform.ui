@@ -20,9 +20,6 @@
     </property>
     <widget class="QWidget" />
     <widget class="QToolBar" name="toolBar" >
-      <property name="label" >
-        <string>Tools</string>
-      </property>
       <addaction name="fileExitAction" />
     </widget>
     <widget class="QMenuBar" name="MenuBar" >
@@ -53,9 +50,6 @@
       <addaction name="unnamed" />
     </widget>
     <action name="fileExitAction" >
-      <property name="name" >
-        <cstring>fileExitAction</cstring>
-      </property>
       <property name="iconText" >
         <string>Exit</string>
       </property>
@@ -67,9 +61,6 @@
       </property>
     </action>
     <action name="administratorUsersAction" >
-      <property name="name" >
-        <cstring>administratorUsersAction</cstring>
-      </property>
       <property name="iconText" >
         <string>&amp;Users</string>
       </property>
@@ -78,9 +69,6 @@
       </property>
     </action>
     <action name="administratorRolesAction" >
-      <property name="name" >
-        <cstring>administratorRolesAction</cstring>
-      </property>
       <property name="iconText" >
         <string>Roles</string>
       </property>
@@ -90,7 +78,6 @@
     </action>
   </widget>
   <layoutdefault spacing="6" margin="11" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >ananas.h</include>
     <include location="local" >qworkspace.h</include>

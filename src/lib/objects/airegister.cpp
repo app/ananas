@@ -401,7 +401,7 @@ aIRegister::deleteTable( qulonglong iddt)
 int
 aIRegister::Select( const QString &from, const QString &to)
 {
-	//printf("from %s, to %s\n",from.ascii(),to.ascii() );
+	//printf("from %s, to %s\n",from.toLatin1().constData(),to.toLatin1().constData() );
 	aLog::print(aLog::Debug, tr("aIRegister select period from %1 to %2").arg(from).arg(to));
 	return Select(QDateTime::fromString(from+"T00:00:00",Qt::ISODate), QDateTime::fromString(to+"t00:00:00",Qt::ISODate));
 }
@@ -488,7 +488,7 @@ aIRegister::SelectByDoc()
  *	\brief Возвращает значения поля с именем =  name основной таблицы объекта.
  *
  *	\param name - имя поля
- *	\return  значение поля. Поля типа Q_ULLONG и DateTime переводятся в строки.
+ *	\return  значение поля. Поля типа qulonglong и DateTime переводятся в строки.
  *\_ru
  */
 QVariant

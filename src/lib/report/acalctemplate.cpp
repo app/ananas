@@ -63,7 +63,7 @@ aCalcTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
 	{
 		QString str = node.nodeValue();
 		QRegExp re;
-	//	printf("n->text=%s\n",str.ascii());
+	//	printf("n->text=%s\n",str.toLatin1().constData());
 		if(params)
 		{
 			re.setPattern(QString("%1.*%2").arg(open_token).arg(close_token));
@@ -73,18 +73,18 @@ aCalcTemplate::getNodeTags(QDomNode node, const QString &tagname, bool params )
 			re.setPattern(QString("%1.*%2").arg(open_token_section).arg(close_token_section));
 		}
 		re.setMinimal(true);
-		int pos = re.search(str,0);
+		int pos = re.indexIn(str,0);
 
 		while(pos != -1)
 		{
-	//		printf("find string =%s\n",str.mid(pos+2, re.matchedLength()-4).ascii());
+	//		printf("find string =%s\n",str.mid(pos+2, re.matchedLength()-4).toLatin1().constData());
 			if(tagname == str.mid(pos+2, re.matchedLength()-4))
 			{
 	//			printf(">>>>>>>>>ok!\n");
 				return true;
 			}
 			pos+= re.matchedLength();
-			pos = re.search(str,pos);
+			pos = re.indexIn(str,pos);
 		}
 
 	}

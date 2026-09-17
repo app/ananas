@@ -13,8 +13,10 @@
  *  true to construct a modal dialog.
  */
 dEditPermissions::dEditPermissions(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
     
 }
@@ -44,7 +46,7 @@ void dEditPermissions::setData( int pm )
     QCheckBox *c;
     for (i=1;i<=7;i++)
     {
-	c = (QCheckBox*) child( (const char*) QString("checkBox%1").arg(i),"QCheckBox");
+	c = findChild<QCheckBox*>( QString("checkBox%1").arg(i) );
 	if ( c ) {
 	  c->setChecked( (pm & r ) !=0 );  
 	}
@@ -60,7 +62,7 @@ int dEditPermissions::getData()
     QCheckBox *c;
     for (i=1;i<=7;i++)
     {
-	c = (QCheckBox*) child( (const char*) QString("checkBox%1").arg(i),"QCheckBox");
+	c = findChild<QCheckBox*>( QString("checkBox%1").arg(i) );
 	if ( c ) {
 	  if (c->isChecked()) res |= r;  
 	}
@@ -76,7 +78,7 @@ void dEditPermissions::setAll( bool v )
     QCheckBox *c;
     for (i=1;i<=7;i++)
     {
-	c = (QCheckBox*) child( (const char*) QString("checkBox%1").arg(i),"QCheckBox");
+	c = findChild<QCheckBox*>( QString("checkBox%1").arg(i) );
 	if ( c ) c->setChecked( v );  
     }
 }

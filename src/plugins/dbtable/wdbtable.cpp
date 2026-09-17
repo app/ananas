@@ -49,6 +49,17 @@
 #include "alog.h"
 #include "asqltable.h"
 
+static QObjectList aQueryList( QObject *parent, const char *type )
+{
+	QObjectList res;
+	if ( !parent || !type ) return res;
+	QObjectList all = parent->findChildren<QObject*>();
+	for ( int i = 0; i < all.size(); ++i )
+		if ( all[i]->inherits( type ) )
+			res << all[i];
+	return res;
+}
+
 #include "wdbtable.h"
 #include "edbtable.h"
 
@@ -378,7 +389,7 @@ QList<int> vList = getBindList();
 	res = listIdTable.count();
 	for(int i=0; i<res; i++)
 	{
-		if(vList.find(listIdTable[i].toInt())!=vList.end())
+		if(vList.contains(listIdTable[i].toInt()))
 			str ="* ";
 		else
 			str ="";
@@ -425,7 +436,7 @@ wDBTable::systemIcon()
         aDataTable *r = m_table;
         int df=0, cf=0, mf=0;
 
-        if ( container ) ctype = container->className();
+        if ( container ) ctype = container->metaObject()->className();
         if ( r )
 	{
                 if ( r->contains("df") ) df = r->field("df").value().toInt();
@@ -775,7 +786,7 @@ wDBTable::init(aDatabase *adb, aEngine *e )
 		{
 			aLog::print(aLog::Error, tr("wDBTable init meta object not found "));
 		}
-		ctype = container->className();
+		ctype = container->metaObject()->className();
 		aLog::print(aLog::Info, tr("wDBTable container type is %1 ").arg(ctype));
 
 		setContainerType(ctype);
@@ -944,7 +955,7 @@ int id;
 wDBTable* wtable;
 QObject* wd = aWidget::parentContainer( this );
 	listBindings.clear();
-    	wList = wd->queryList( "wDBTable" );
+    	wList = aQueryList(wd, "wDBTable");
 	QListIterator<QObject*> it( wList ); // iterate over the wDBTable
 	while ( it.hasNext() )
 	{
@@ -1152,7 +1163,7 @@ wDBTable::journalFieldName(long columnId)
 	{
 		QString s = md->attr(item,mda_type);
 		QChar ch = s[0];
-		if(ch.upper()=='O')
+		if(ch.toUpper()=='O')
 		{
 			return QString("text_uf%1").arg(md->attr(item,mda_id));
 		}
@@ -1537,13 +1548,13 @@ aSearchWidget::aSearchWidget( QWidget *parent, wDBTable *table )
 {
 	t = table;
 	ftext = "";
-	setFrameStyle( QFrame::PopupPanel | QFrame::Raised );
+	setFrameStyle( QFrame::StyledPanel | QFrame::Raised );
 	setFocusPolicy( Qt::StrongFocus );
 	new QHBoxLayout( this );
 	l = new QLineEdit( this );
         l->installEventFilter( this );
 	setFocusProxy( l );
-	layout()->add( l );
+	layout()->addWidget( l );
 	move( 3+t->x()+t->columnViewportPosition( t->currentColumn()), t->y()+1);
 	resize( t->columnWidth( t->currentColumn() )-2, 25 );
 	connect( l, SIGNAL( textChanged( const QString & ) ), this, SLOT( setText( const QString & ) ) );

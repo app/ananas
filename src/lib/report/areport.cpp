@@ -31,11 +31,11 @@
 #include	<qlayout.h>
 #include	<QToolBar>
 #include	<qaction.h>
-#include	<q3vbox.h>
 #include	<QTextDocument>
 #include	<qpainter.h>
 #include	<qkeysequence.h>
 #include	<qprinter.h>
+#include	<QPrintDialog>
 #include 	<QProcess>
 #include 	<qmessagebox.h>
 #include 	<QFileDialog>
@@ -74,7 +74,6 @@ aReportBrowser::aReportBrowser(  QWidget *parent, const char *name, Qt::WFlags f
 
 	textBrowser = new QTextBrowser( this );
 	textBrowser->setObjectName( "textBrowser" );
-	textBrowser->setTextFormat( Qt::RichText );
 	textBrowser->setFocus();
 //	textBrowser->showMaximized();
     	setCentralWidget( textBrowser );
@@ -132,7 +131,8 @@ aReportBrowser::print()
 {
 	QPrinter printer;
 
-	if (!printer.setup()) return;
+	QPrintDialog dialog( &printer, this );
+	if ( dialog.exec() != QDialog::Accepted ) return;
 
 	QTextDocument doc;
 	doc.setHtml( textBrowser->toHtml() );
@@ -381,7 +381,7 @@ aReport::show()
 			if(!soffice.exists())
 			{
 				startCatalog = QString("%1\\Program Files\\OpenOffice.org 2.0\\program").arg(getenv("HOMEDRIVE"));
-			        soffice.setName(startCatalog + "\\soffice.exe");
+			        soffice.setFileName(startCatalog + "\\soffice.exe");
 				if(!soffice.exists())
 				{
 					startCatalog = QString("%1\\Program Files").arg(getenv("HOMEDRIVE"));
@@ -403,7 +403,7 @@ aReport::show()
 			QFile soffice(startCatalog + "/ooffice");
 			if(!soffice.exists())
 			{
-				soffice.setName(startCatalog + "/ooffice2");
+				soffice.setFileName(startCatalog + "/ooffice2");
 				if(soffice.exists())
 				{
 					aService::writeConfigVariable("OpenOfficeExecutable",startCatalog + "/ooffice2");
@@ -429,7 +429,7 @@ aReport::show()
 			if(dlg.exec()==QDialog::Accepted)
 			{
 				oowriter = dlg.selectedFiles().value( 0 );
-				//printf("select %s", oowriter.ascii());
+				//printf("select %s", oowriter.toLatin1().constData());
 				QProcess process;
 				process.start( oowriter, QStringList() << "-n" << QDir::convertSeparators( fileName ) );
 				if( !process.waitForStarted() )
@@ -530,7 +530,7 @@ aReport::getName4NewTemplate()
 	{
 		// tpl->getDir() должно заканчиваться на /
 		fname =  QDir::convertSeparators(QString(tpl->getDir()+".ananas-report%1%2").arg(count).arg(suff));
-		tmpf.setName(fname);
+		tmpf.setFileName(fname);
 		if(tmpf.exists())
 		{
 			if(tmpf.remove()) break;

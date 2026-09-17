@@ -28,8 +28,6 @@
 **********************************************************************/
 
 #include <qobject.h>
-#include <q3sqlcursor.h>
-#include <q3sqlpropertymap.h>
 //--#include <qfocusdata.h>
 #include <QToolBar>
 #include "adatabase.h"

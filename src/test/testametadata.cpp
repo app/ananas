@@ -81,7 +81,7 @@ void TestAMetaData::testAMetaObject()
     QCOMPARE( o->description(), ts );
     
     QCOMPARE( o->className(), QString::fromUtf8("КлассОбъекта"));
-    QCOMPARE( o->name(),      QString::fromUtf8("ИмяОбъекта"));
+    QCOMPARE( o->objectName(),      QString::fromUtf8("ИмяОбъекта"));
 
     o->setId(123456);
     QVERIFY( o->id()==123456);
@@ -132,11 +132,11 @@ void TestAMetaData::testAMetaGroup()
     AMetaGroup *o = new AMetaGroup( QString::fromUtf8("ИмяОбъекта") );
 
     AMetaGroupAXXX oo;
-    printf("xxx=%s\n", oo.className().toUtf8().data() );
+    printf("xxx=%s\n", oo.className().toUtf8().constData() );
 
 
     QCOMPARE( o->className(),      QString::fromUtf8("ИмяОбъекта"));
-    QCOMPARE( o->name(), QString("") );
+    QCOMPARE( o->objectName(), QString("") );
     delete o;
     
 }
@@ -193,6 +193,6 @@ void TestAMetaData::testAMetaDataIOXML()
     QCOMPARE( o->write("test2.cfg"), 0 );
     QCOMPARE( o->read("test2.cfg"), 0 );
     QCOMPARE( xml, o->text() );
-    //QCOMPARE( o->name(), QString("ROOT") );
+    //QCOMPARE( o->objectName(), QString("ROOT") );
     delete o;
 }

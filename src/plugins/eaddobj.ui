@@ -18,11 +18,11 @@
     <widget class="QWidget" >
       <layout class="QGridLayout" >
         <item row="0" column="0" >
-          <widget class="Q3Table" name="table1" >
-            <property name="numRows" >
+          <widget class="QTableWidget" name="table1" >
+            <property name="rowCount" >
               <number>0</number>
             </property>
-            <property name="numCols" >
+            <property name="columnCount" >
               <number>0</number>
             </property>
           </widget>
@@ -31,7 +31,6 @@
     </widget>
   </widget>
   <layoutdefault spacing="5" margin="5" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >adocument.h</include>
     <include location="local" >acatalogue.h</include>

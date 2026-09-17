@@ -51,12 +51,11 @@
         </layout>
       </item>
       <item row="0" column="0" >
-        <widget class="Q3ListBox" name="ListBox" />
+        <widget class="QListWidget" name="ListBox" />
       </item>
     </layout>
   </widget>
   <layoutdefault spacing="6" margin="11" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >wdbtable.h</include>
   </includes>
@@ -75,7 +74,7 @@
     </connection>
     <connection>
       <sender>ListBox</sender>
-      <signal>doubleClicked(Q3ListBoxItem*)</signal>
+      <signal>itemDoubleClicked(QListWidgetItem*)</signal>
       <receiver>addfdialog</receiver>
       <slot>doOk()</slot>
     </connection>

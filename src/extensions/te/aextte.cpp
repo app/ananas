@@ -91,7 +91,7 @@ void
 AExtTE::deviceEvent( int eventCode )
 {
     const QObject *obj = sender();
-    emit event(QString(obj->name())+"::");
+    emit event(QString(obj->objectName())+"::");
 }
 
 #include <aextensionplugin.h>

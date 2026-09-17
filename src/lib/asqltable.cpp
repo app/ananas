@@ -216,7 +216,7 @@ aSQLTable::insertFieldInfo(aCfgItem cobj, bool calculated)
 	{
 		fid = md->id(cobj);
 		fname = md->attr(cobj, mda_name);
-		objt = md->attr( cobj, mda_type ).upper();
+		objt = md->attr( cobj, mda_type ).toUpper();
 			fdbname = QString("uf%1").arg( fid );
                         if ( objt[0]=='O' )
 			{
@@ -1061,10 +1061,10 @@ aDataTable::getUserFields()
 		{
 			if(fieldName(i).left(text_uf.length()) == text_uf)
 			{
-				QStringList::iterator it  = lst.find("uf"+fieldName(i).mid(text_uf.length()));
-				if(it!=lst.end())
+				QString key = "uf"+fieldName(i).mid(text_uf.length());
+				if(lst.contains(key))
 				{
-					lst.remove(it);
+					lst.removeAll(key);
 				}
 			}
 			lst << fieldName(i);

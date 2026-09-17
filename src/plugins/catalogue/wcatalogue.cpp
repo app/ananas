@@ -29,8 +29,6 @@
 **********************************************************************/
 
 #include <qobject.h>
-#include <q3sqlcursor.h>
-#include <q3sqlpropertymap.h>
 #include <QToolBar>
 #include <qaction.h>
 //--#include <qfocusdata.h>
@@ -41,6 +39,17 @@
 #include "wdbtable.h"
 #include "wgrouptree.h"
 #include "alog.h"
+
+static QObjectList aQueryList( QObject *parent, const char *type )
+{
+	QObjectList res;
+	if ( !parent || !type ) return res;
+	QObjectList all = parent->findChildren<QObject*>();
+	for ( int i = 0; i < all.size(); ++i )
+		if ( all[i]->inherits( type ) )
+			res << all[i];
+	return res;
+}
 
 //extern aCfg *plugins_aCfg;
 
@@ -68,7 +77,7 @@ wCatalogue::initObject( aDatabase *adb )
 {
 	aWidget::initObject( adb );
 	QObject *obj;
-	QObjectList lb = this->queryList( "QWidget" );
+	QObjectList lb = aQueryList(this, "QWidget");
 	QListIterator<QObject*> itb( lb ); // iterate over all wDBFields
 	while ( itb.hasNext() )
 	{
@@ -127,7 +136,7 @@ wCatalogue::initObject( aDatabase *adb )
 void
 wCatalogue::valueChanged( const QVariant & value )
 {
-	if ( sender()->className() != QString("wDBField") ) return;
+	if ( sender()->metaObject()->className() != QString("wDBField") ) return;
 	wDBField * fld = ( wDBField * ) sender();
 	aCfgItem o_field,o_parent;
 	QString parent_name;
@@ -141,7 +150,7 @@ wCatalogue::valueChanged( const QVariant & value )
 	if( parent_name == QString(md_group) )
 	{
 
-		if (dbobj)// && dbobj->className() == QString("aCatalogue") )
+		if (dbobj)// && dbobj->metaObject()->className() == QString("aCatalogue") )
 		{
 			aLog::print(aLog::Debug, tr("wCatalogue group value changed to %1").arg(value.toString()));
 			((aCatalogue*)dbobj)->GroupSetValue( fname, value );
@@ -187,12 +196,12 @@ wCatalogue::setValue( const QString &name, QVariant &value )
 //	if ( formMode() == CATALOGUEFORMMODE_GROUP ) {
 //		( aCatalogue *) dbobj->SetValue(name,value);
 //	} else {
-//	printf("wCatalogue::setValue(%s,%s)\n",name.ascii(),value.toString().ascii());
+//	printf("wCatalogue::setValue(%s,%s)\n",name.toLatin1().constData(),value.toString().toLatin1().constData());
 	aLog::print(aLog::Debug, tr("wCatalogue set value %1 for name %2 ").arg(value.toString()).arg(name));
 	dbobj->SetValue(name,value);
 //	}
 	//dbobj->Update();
-//	debug_message("wCatalogue value changed to %s\n",value.toString().ascii());
+//	debug_message("wCatalogue value changed to %s\n",value.toString().toLatin1());
 
 }
 
@@ -265,7 +274,7 @@ wCatalogue::Select( qulonglong id )
 	//if ( formMode()==0 ) {
 
 	QObject *obj;
-	QObjectList lb = this->queryList( "wDBTable" );
+	QObjectList lb = aQueryList(this, "wDBTable");
 	QListIterator<QObject*> itb( lb ); // iterate over all wDBTable
 	while ( itb.hasNext() )
 	{
@@ -329,7 +338,7 @@ wCatalogue::NewValues()
 {
 	aLog::print(aLog::Debug, tr("wCatalogue set new values for all fields"));
 	QString fname;
-	QObjectList l = this->queryList( "wDBField" );
+	QObjectList l = aQueryList(this, "wDBField");
 	QListIterator<QObject*> it( l );
 	QObject *obj;
 	//--obj = it.toFirst();
@@ -343,13 +352,13 @@ wCatalogue::NewValues()
 		fname=((wDBField *)obj)->getFieldName();
 		o_field = md->find(((wDBField *)obj)->getId());
 		o_parent = md->parent(o_field);
-		//printf( "field name %s\n",(const char*)fname.local8Bit() );
+		//printf( "field name %s\n",(const char*)fname.toLocal8Bit().constData() );
 		parent_name = md->objClass( o_parent );
 		//printf("parent_name = %s\n", (const char*)parent_name );
 		if( parent_name == QString(md_group) )
 		{
 //			debug_message("group set value\n");
-			if (dbobj)// && dbobj->className() == QString("aCatalogue") )
+			if (dbobj)// && dbobj->metaObject()->className() == QString("aCatalogue") )
 			{
 
 				aLog::print(aLog::Debug, tr("wCatalogue set new values for group field %1").arg(fname));
@@ -394,8 +403,8 @@ wCatalogue::createToolBar( QMainWindow * owner )
 	tr("New Element")
 	);
 	a->setToolTip(tr("New element (Ins)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( insert() ) );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( insert() ) );
 
 	a = new QAction(
 	QPixmap::fromMimeSource("doc_edit.png"),
@@ -405,8 +414,8 @@ wCatalogue::createToolBar( QMainWindow * owner )
 	tr("Edit element")
 	);
 	a->setToolTip(tr("Edit element (Enter)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( update() ) );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( update() ) );
 */
 /*	a = new QAction(
 	QPixmap::fromMimeSource("doc_view.png"),
@@ -416,8 +425,8 @@ wCatalogue::createToolBar( QMainWindow * owner )
 	tr("View element")
 	);
 	a->setToolTip(tr("View element (Shift+Enter)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( view() ) );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( view() ) );
 */
 /*
 	a = new QAction(
@@ -428,8 +437,8 @@ wCatalogue::createToolBar( QMainWindow * owner )
 	tr("Delete element")
 	);
 	a->setToolTip(tr("Delete element (Shift+Enter)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( markDelete() ) );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( markDelete() ) );
 */
 	return 0;
 }

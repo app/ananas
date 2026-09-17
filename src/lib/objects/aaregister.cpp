@@ -434,7 +434,7 @@ aARegister::resum( aSQLTable * t, const QDateTime & dd, bool plus )
 	for(uint i=0; i<dims_count; i++)
 	{
 		aCfgItem dim = md->findChild(dims,md_field,i);
-		long dimId = atoi(md->attr(dim,mda_id).ascii());
+		long dimId = atoi(md->attr(dim,mda_id).toLatin1());
 		aSQLTable *t_dim = table(md->attr(dim,mda_name));
 		QVariant v = t->value(md->attr(dim,mda_name));
 		if(v.isValid() && !v.isNull() && v!=QString())
@@ -511,13 +511,13 @@ aARegister::insert_values(QSqlQuery *q, aSQLTable *t_dim, const QDateTime & dd, 
 	{
 		if(q)
 		{
-			res_value = q->value(t_dim->position(it.data()));
+			res_value = q->value(t_dim->position(it.value()));
 		}
 		else
 		{
 			res_value = 0;
 		}
-		ins_col+=QString("%1,").arg(it.data());
+		ins_col+=QString("%1,").arg(it.value());
 		ins_val+=QString("%2,").arg(res_value.toString());
 	}
 	ins_col.truncate(ins_col.length()-1);
@@ -554,7 +554,7 @@ aARegister::update_values(aSQLTable *t_dim, const QDateTime & dd, bool plus, lon
 	{
 		if(t)
 		{
-			res_value = t->value(it.data());
+			res_value = t->value(it.value());
 		}
 		else
 		{

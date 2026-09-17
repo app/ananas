@@ -39,7 +39,6 @@ default-character-set=utf8
 #include <qfile.h>
 #include <qdom.h>
 #include <qstringlist.h>
-#include <q3textstream.h>
 #include <qsqlrecord.h>
 #include <qstringlist.h>
 //Added by qt3to4:
@@ -72,10 +71,10 @@ qds_field ( const QString fname, const QString &tdef, const QString &descr = "" 
 
         if ( tdef.isEmpty() ) return "";
         n1=0; n2=0;
-        st = tdef.section ( " ", 0, 0 ).lower();
+        st = tdef.section ( " ", 0, 0 ).toLower();
         n1 = tdef.section ( " ", 1, 1 ).toInt();
         n2 = tdef.section ( " ", 2, 2 ).toInt();
-        if ( !st.isEmpty() ) t = ( ( const char * ) st ) [0];
+        if ( !st.isEmpty() ) t = st.toLocal8Bit().at(0);
         serial = ( st.mid ( 1 ).contains ( 's' ) > 0 );
         notnull = ( st.mid ( 1 ).contains ( 'n' ) > 0 );
 //      if ( serial && t=='l') t='i';
@@ -150,7 +149,7 @@ qds_fields ( aCfg &cfg, aCfgItem context )
                                 if ( t[0]!=' ' )
                                 {
                                         dd<<qds_field ( QString ( "uf%1" ).arg ( id ), t, cfg.attr ( item, mda_name ) );
-                                        if ( t.section ( " ", 3, 3 ).lower() =="i" )
+                                        if ( t.section ( " ", 3, 3 ).toLower() =="i" )
                                         {
                                                 dd<<QString ( "I=IDX_uf%1||uf%2|" ).arg ( id ).arg ( id );
                                         };
@@ -534,7 +533,7 @@ aDatabase::init ( aCfgRc *rc, const QString &dbname )
         }
         else
         {
-                cfg_message ( 3, ( const char * ) tr ( "Can't open database connection\n" ).utf8() );
+                cfg_message ( 3, tr ( "Can't open database connection\n" ).toUtf8().constData() );
                 aLog::print ( aLog::Error,tr ( "aDatabase open connection to %1" ).arg ( rc->value ( "dbname" ) ) );
         };
         QSqlQuery q = db()->exec ( QString ( "SELECT * FROM %1" ).arg ( qds->tableName ( "netusers" ) ) );
@@ -687,7 +686,7 @@ aDatabase::drop ( const QString& dbname )
 
         QString query = QString ( "drop database %1" ).arg ( dbname );
         if ( !dataBase ) return true;
-        if ( dataBase->exec ( query ).lastError().type() ==QSqlError::None )
+        if ( dataBase->exec ( query ).lastError().type() ==QSqlError::NoError )
         {
                 aLog::print ( aLog::Error,tr ( "aDatabase drop database %1" ).arg ( dbname ) );
         }
@@ -696,16 +695,16 @@ aDatabase::drop ( const QString& dbname )
 //#ifdef MYSQL_UTF8
         //if ( driverName() == "QMYSQL3" ) query.append( " character set utf8" );
 //#endif
-        //printf("query = %s\n",query.ascii());
+        //printf("query = %s\n",query.toLatin1().constData());
         QSqlQuery q = db()->exec ( query );
-        if ( db()->lastError().type() !=QSqlError::None )
+        if ( db()->lastError().type() !=QSqlError::NoError )
         {
                 reportError ( db()->lastError(),query );
         }
         dataBase->setDatabaseName ( dbname );
         if ( !dataBase->open() )
         {
-                cfg_message ( 3, ( const char * ) tr ( "Can't open database connection\n" ).utf8() );
+                cfg_message ( 3, tr ( "Can't open database connection\n" ).toUtf8().constData() );
                 aLog::print ( aLog::Error,tr ( "aDatabase open connection to %1" ).arg ( dbname ) );
                 return false;
         }
@@ -851,7 +850,7 @@ aDatabase::tableDbName ( aCfg &md, aCfgItem context, long * tid )
                 }
         }
         *tid = temp;
-//      printf("tname = %s\n",tname.ascii());
+//      printf("tname = %s\n",tname.toLatin1().constData());
         return tname;
 }
 
@@ -866,22 +865,22 @@ aDatabase::tableDbName ( aCfg &md, aCfgItem context, long * tid )
  *      \param otype (in) - \~english object type (e.g. document, catalog, journal etc.) \~russian тип объекта \~
  *      \return \~english newly generated unique id. \~russian новый сгенерированный номер \~
  */
-Q_ULLONG
+qulonglong
 aDatabase::uid ( int otype )
 {
-        Q_ULLONG uid = 0;
+        qulonglong uid = 0;
         QString query;
         QString drv = driverName();
-//      printf("driver name =%s\n",drv.ascii());
+//      printf("driver name =%s\n",drv.toLatin1().constData());
         query.sprintf ( "insert into uniques (otype) values (%d)", otype );
         QSqlQuery q = db()->exec ( query );
-        if ( db()->lastError().type() !=QSqlError::None )
+        if ( db()->lastError().type() !=QSqlError::NoError )
         {
                 reportError ( db()->lastError(),query );
         }
         query = feature ( "autoincrement" );
         q = db()->exec ( query );
-        if ( db()->lastError().type() !=QSqlError::None )
+        if ( db()->lastError().type() !=QSqlError::NoError )
         {
                 reportError ( db()->lastError(),query );
         }
@@ -911,7 +910,7 @@ aDatabase::uid ( int otype )
  *      \return \~english object's type \~russian тип объекта \~
  */
 int
-aDatabase::uidType ( Q_ULLONG uid )
+aDatabase::uidType ( qulonglong uid )
 {
         QSqlQuery q = db()->exec ( QString ( "SELECT otype FROM uniques WHERE id=%1" ).arg ( uid ) );
         if ( q.first() )
@@ -954,17 +953,17 @@ aDatabase::createdb ( bool update )
                 if ( qds->verifyStructure() )
                 {
                         // need to update
-                        printf ( "verify log:\n%s\n", ( const char * ) qds->verifyLog().join ( "\n" ) );
-                        printf ( "update structure query:\n%s\n", ( const char * ) qds->updateStructureQuery().join ( "\n" ) );
+                        printf ( "verify log:\n%s\n", qds->verifyLog().join("\n").toUtf8().constData() );
+                        printf ( "update structure query:\n%s\n", qds->updateStructureQuery().join("\n").toUtf8().constData() );
                         if ( qds->updateStructure() !=0 )
                         {
                                 rc = false;
-                                cfg_message ( 2, ( const char * ) tr ( "Data base update error\n" ) );
+                                cfg_message ( 2, tr ( "Data base update error\n" ).toLocal8Bit().constData() );
                         }
                         else
                         {
                                 rc = true;
-                                cfg_message ( 0, ( const char * ) tr ( "Data base update successfull\n" ) );
+                                cfg_message ( 0, tr ( "Data base update successfull\n" ).toLocal8Bit().constData() );
                         }
                 }
         }
@@ -983,7 +982,7 @@ aDatabase::createdb ( bool update )
  *      \param uid - \~english id for mark deleted \~russian id для пометки на удаление \~
  */
 void
-aDatabase::markDeleted ( Q_ULLONG uid )
+aDatabase::markDeleted ( qulonglong uid )
 {
         db()->exec ( QString ( "UPDATE uniques SET df='1' WHERE id=%1" ).arg ( uid ) );
 }
@@ -995,7 +994,7 @@ aDatabase::markDeleted ( Q_ULLONG uid )
  *      \~russian
  *      Удаляет все помеченные записи.
  *      \~
- *      \see markDeleted(Q_ULLONG uid)
+ *      \see markDeleted(qulonglong uid)
  */
 void
 aDatabase::deleteMarked()
@@ -1099,7 +1098,7 @@ aDatabase::exchangeDataCatalogues ( QDomDocument &xml, bool import )
                                         rc|= exportTableData ( xml, tableDbName ( cfg, cont ) );
                                 }
                         }
-                        cfg_message ( 0, ( const char * ) tr ( "Catalogue %s processed\n" ).utf8(), ( const char * ) cfg.attr ( item, mda_name ).utf8() );
+                        cfg_message ( 0, tr ( "Catalogue %s processed\n" ).toUtf8().constData(), ( const char * ) cfg.attr ( item, mda_name ).toUtf8() );
                         if ( import )
                         {
                                 aLog::print ( aLog::Info,tr ( "aDatabase catalogue %1 import" ).arg ( cfg.attr ( item, mda_name ) ) );
@@ -1160,7 +1159,7 @@ aDatabase::exchangeDataDocuments ( QDomDocument &xml, bool import )
                                 }
                         }
                 }
-                cfg_message ( 0, ( const char * ) tr ( "Document %s processed\n" ).utf8(), ( const char * ) cfg.attr ( item, mda_name ).utf8() );
+                cfg_message ( 0, tr ( "Document %s processed\n" ).toUtf8().constData(), ( const char * ) cfg.attr ( item, mda_name ).toUtf8() );
                 if ( import )
                 {
                         aLog::print ( aLog::Info,tr ( "aDatabase document %1 import" ).arg ( cfg.attr ( item, mda_name ) ) );
@@ -1206,7 +1205,7 @@ aDatabase::exchangeDataInfoRegisters ( QDomDocument &xml, bool import )
                                 rc|= exportTableData ( xml, tableDbName ( cfg, cont ) );
                         }
                 }
-                cfg_message ( 0, ( const char * ) tr ( "Information registers %s processed\n" ).utf8(), ( const char * ) cfg.attr ( item, mda_name ).utf8() );
+                cfg_message ( 0, tr ( "Information registers %s processed\n" ).toUtf8().constData(), ( const char * ) cfg.attr ( item, mda_name ).toUtf8() );
                 if ( import )
                 {
                         aLog::print ( aLog::Info,tr ( "aDatabase information register %1 import" ).arg ( cfg.attr ( item, mda_name ) ) );
@@ -1261,7 +1260,7 @@ aDatabase::exchangeDataAccumulationRegisters ( QDomDocument &xml, bool import )
                                 }
                         }
                 }
-                cfg_message ( 0, ( const char * ) tr ( "Accumulation registers %s processed\n" ).utf8(), ( const char * ) cfg.attr ( item, mda_name ).utf8() );
+                cfg_message ( 0, tr ( "Accumulation registers %s processed\n" ).toUtf8().constData(), ( const char * ) cfg.attr ( item, mda_name ).toUtf8() );
                 if ( import )
                 {
                         aLog::print ( aLog::Info,tr ( "aDatabase accumulation register %1 import" ).arg ( cfg.attr ( item, mda_name ) ) );
@@ -1319,7 +1318,7 @@ aDatabase::exportTableData ( QDomDocument& xml, const QString &tableName )
 bool
 aDatabase::importTableData ( QDomDocument &xml, const QString &tableName )
 {
-//      printf("import table data %s\n",tableName.ascii());
+//      printf("import table data %s\n",tableName.toLatin1().constData());
         QDomElement root = xml.documentElement();
         if ( root.nodeName() != "AnanasDump" )
         {
@@ -1332,7 +1331,7 @@ aDatabase::importTableData ( QDomDocument &xml, const QString &tableName )
         uint countTables = tables.count();
         for ( uint i=0; i<countTables; i++ )
         {
-                //      printf("tableName==%s\n", tables.item(i).toElement().attribute("name").ascii());
+                //      printf("tableName==%s\n", tables.item(i).toElement().attribute("name").toLatin1().constData());
                 if ( tables.item ( i ).toElement().attribute ( "name" ) == tableName )
                 {
                         // found table
@@ -1340,7 +1339,7 @@ aDatabase::importTableData ( QDomDocument &xml, const QString &tableName )
                         if ( !tableExists ( tableName ) )
                         {
                                 aLog::print ( aLog::Error,tr ( "aDatabase import table: table %1 not exists" ).arg ( tableName ) );
-                                //printf("table %s not exists\n",tableName.ascii());
+                                //printf("table %s not exists\n",tableName.toLatin1().constData());
                                 return true;
                         }
                         //printf("table exists\n");
@@ -1375,7 +1374,7 @@ aDatabase::importTableData ( QDomDocument &xml, const QString &tableName )
                                                         .arg ( tableName )
                                                         .arg ( fields.item ( 0 ).toElement().toElement().text() )
                                                         .arg ( fields.item ( 1 ).toElement().toElement().text() );
-                                                //              printf("query = %s\n",query.ascii());
+                                                //              printf("query = %s\n",query.toLatin1().constData());
                                                 // добавляем записи с правильными идентификатораи
                                                 db()->exec ( query );
 
@@ -1521,7 +1520,7 @@ aDatabase::login ( const QString &username, const QString &password, int applica
                 {
                         printf ( "P %i:%04x\n",
                                  it.key(),
-                                 it.data() );
+                                 it.value() );
                 }
 
                 return true;
@@ -1554,7 +1553,7 @@ aDatabase::netupdate()
 
 
 bool
-aDatabase::isObjectLocked ( Q_ULLONG id )
+aDatabase::isObjectLocked ( qulonglong id )
 {
         if ( !id ) return false;
         QSqlQuery q = db()->exec ( QString ( "SELECT id FROM %1 WHERE userid=%2 AND id=%3" ).arg ( qds->tableName ( "locks" ) ).arg ( v_user_id ).arg ( id ) );
@@ -1568,7 +1567,7 @@ aDatabase::isObjectLocked ( Q_ULLONG id )
 
 
 bool
-aDatabase::objectLock ( Q_ULLONG id )
+aDatabase::objectLock ( qulonglong id )
 {
         if ( !id ) return true;
 //    printf("LOCK user=%i obj=%Lu\n", v_user_id, id);
@@ -1579,7 +1578,7 @@ aDatabase::objectLock ( Q_ULLONG id )
 }
 
 void
-aDatabase::objectUnlock ( Q_ULLONG id )
+aDatabase::objectUnlock ( qulonglong id )
 {
 //    printf("UNLOCK user=%i obj=%Lu\n", v_user_id, id);
         QString query ( QString ( "DELETE FROM %1 WHERE userid=%2" ).arg ( qds->tableName ( "locks" ) ).arg ( v_user_id ) );
@@ -1622,7 +1621,7 @@ aDatabase::timerEvent ( QTimerEvent * )
 
 
 bool
-aDatabase::isAccessRights ( int md_type, Q_ULLONG obj_id, DBPermission req_operation )
+aDatabase::isAccessRights ( int md_type, qulonglong obj_id, DBPermission req_operation )
 {
         bool res = false;
 
@@ -1662,5 +1661,5 @@ aDatabase::setRolePermission ( int role_id, int md_id, int new_permission )
         if ( q.first() ) query = QString ( "UPDATE %1 SET permission=%4 WHERE id=%2 AND object=%3" ).arg ( qds->tableName ( db_right_roles ) ).arg ( role_id ).arg ( md_id ).arg ( new_permission );
         else query = QString ( "INSERT INTO %1 (id,object,permission) VALUES (%2,%3,%4)" ).arg ( qds->tableName ( db_right_roles ) ).arg ( role_id ).arg ( md_id ).arg ( new_permission );
         q = db()->exec ( query );
-        if ( db()->lastError().type() !=0 ) printf ( "error query %s\n", ( const char* ) query );
+        if ( db()->lastError().type() !=0 ) printf ( "error query %s\n", query.toLocal8Bit().constData() );
 }

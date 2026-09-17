@@ -33,7 +33,6 @@
 #include <QTextStream>
 //#include <QTextStream>
 #include <qpixmap.h>
-#include <q3dragobject.h>
 
 #include "acfg.h"
 #include "acfgrc.h"
@@ -43,7 +42,7 @@ QPixmap
 rcIcon( const char *name )
 {
 //    QString iconname = QString(":/images/%1").arg(name);
-//printf("get icon %s ",(const char *) iconname.toUtf8().data());
+//printf("get icon %s ",(const char *) iconname.toUtf8().constData().data());
     QPixmap pm(QString(":/images/%1").arg(name));
 //printf("\n");
     return pm;

@@ -107,8 +107,8 @@ public slots:
     virtual void setMaxCount( int );
     int		maxCount() const;
 
-    virtual void setInsertionPolicy( Policy policy );
-    QComboBox::Policy	insertionPolicy() const;
+    virtual void setInsertPolicy( QComboBox::InsertPolicy policy );
+    QComboBox::InsertPolicy	insertPolicy() const;
 
     virtual void setValidator( const QValidator * );
     const QValidator * validator() const;

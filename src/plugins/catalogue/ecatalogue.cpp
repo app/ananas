@@ -12,8 +12,10 @@
  *  true to construct a modal dialog.
  */
 eCatalogue::eCatalogue(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();
@@ -51,13 +53,13 @@ void eCatalogue::init()
 	otypes.clear();
 	eType->clear();
 	otypes.append("D");
-	eType->insertItem(trUtf8("Дата"), idx++);
+	eType->insertItem(idx++, trUtf8("Дата"));
 	otypes.append("T");
-	eType->insertItem(trUtf8("Время"), idx++);
+	eType->insertItem(idx++, trUtf8("Время"));
 	otypes.append("N %d %d");
-	eType->insertItem(trUtf8("Число"), idx++);
+	eType->insertItem(idx++, trUtf8("Число"));
 	otypes.append("C %d");
-	eType->insertItem(trUtf8("Строка"), idx++);
+	eType->insertItem(idx++, trUtf8("Строка"));
 
 	oc=cfgobj_count(NULL, NULL);
 	for (i=1;i<=oc;i++) {
@@ -78,7 +80,7 @@ void eCatalogue::init()
 			named=named+trUtf8(name);
 			sprintf(otype, "O %s", id);
 			otypes.append(otype);
-			eType->insertItem(named, idx++);
+			eType->insertItem(idx++, named);
 		}
 	}
 */
@@ -90,8 +92,8 @@ void eCatalogue::init()
 {
 	aCfg *md = 0;
 	if ( !f ) return;
-//	printf("name = '%s'\n", (const char *) mw->name() );
-	if (mw->name() == QString("ananas-designer_mainwindow") ) {
+//	printf("name = '%s'\n", (const char *) mw->objectName() );
+	if (mw->objectName() == QString("ananas-designer_mainwindow") ) {
 //		printf("running under ananas designer\n");
 		CfgForm *cf = ( ( MainForm *) mw )->cfgForm();
 		if ( cf ) {
@@ -112,14 +114,14 @@ void eCatalogue::init()
 			eType->clear();
 			for ( QStringList::Iterator it = tlist.begin(); it != tlist.end(); ++it ) {
 				otypes.append( (*it).section( "\t", 0, 0 ) );
-				eType->insertItem( (*it).section("\t", 1, 1 ), idx++ );
+				eType->insertItem(idx++,  (*it).section("\t", 1, 1 ));
 			}
 			for ( i = 0 ; i < otypes.count(); i++ ) {
 				oid = 0;
 				if( otypes[i][0] == 'O' ) {
-					sscanf( (const char *)otypes[ i ], "O %d", &oid );
+					sscanf( otypes[i].toLatin1().constData(), "O %d", &oid );
 					if ( oid == id ) {
-						eType->setCurrentItem( i );
+						eType->setCurrentIndex( i );
 						break;
 					}
 				}
@@ -135,7 +137,7 @@ eCatalogue::setData( QWidget *o, aCfg *md )
 {
 //    const QObject *o = sender();
     if ( o ) {
-	if ( o->className() != QString("wCatalogue") || !md ) {
+	if ( o->metaObject()->className() != QString("wCatalogue") || !md ) {
 	    reject();
 	    return;
 	}
@@ -156,14 +158,14 @@ eCatalogue::setData( QWidget *o, aCfg *md )
     eType->clear();
     for ( QStringList::Iterator it = tlist.begin(); it != tlist.end(); ++it ) {
 	otypes.append( (*it).section( "\t", 0, 0 ) );
-	eType->insertItem( (*it).section("\t", 1, 1 ), idx++ );
+	eType->insertItem(idx++,  (*it).section("\t", 1, 1 ));
     }
     for ( i = 0 ; i < otypes.count(); i++ ) {
 	oid = 0;
 	if( otypes[i][0] == 'O' ) {
-	    sscanf( (const char *)otypes[ i ], "O %d", &oid );
+	    sscanf( otypes[i].toLatin1().constData(), "O %d", &oid );
 	    if ( oid == id ) {
-		eType->setCurrentItem( i );
+		eType->setCurrentIndex( i );
 		break;
 	    }
 	}
@@ -174,27 +176,27 @@ eCatalogue::setData( QWidget *o, aCfg *md )
 void eCatalogue::getData( QWidget * o )
 {
 
-/*	int idx=eType->currentItem();
+/*	int idx=eType->currentIndex();
 	long oid = 0;
 
 	if (f) {
 		if( otypes[idx][0] == 'O' ) {
-			sscanf( (const char *)otypes[ idx ], "O %d", &oid );
+			sscanf( otypes[idx].toLatin1().constData(), "O %d", &oid );
 			f->setId( oid );
 		}
 	}
 */
 //    const QObject *o = sender();
     if ( !o ) return;
-    if ( o->className() != QString("wCatalogue") ) return;
+    if ( o->metaObject()->className() != QString("wCatalogue") ) return;
     wCatalogue *f = ( wCatalogue*) o;
 
-    int idx=eType->currentItem();
+    int idx=eType->currentIndex();
     long oid = 0;
 
     if (f) {
 	if( otypes[idx][0] == 'O' ) {
-	    sscanf( (const char *)otypes[ idx ], "O %d", &oid );
+	    sscanf( otypes[idx].toLatin1().constData(), "O %d", &oid );
 	    f->setId( oid );
 	}
     }

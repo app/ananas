@@ -33,7 +33,6 @@
 #include <qtextcodec.h>
 //Added by qt3to4:
 #include <QPixmap>
-#include <q3mimefactory.h>
 #include "mainform.h"
 #include "dselectdb.h"
 #include "dlogin.h"
@@ -52,9 +51,9 @@ QString lang="en",
 int 
 setTranslator(QString langdir, QString lang)
 {
-	tr_app.load( langdir+"ananas-engine-"+lang.lower()+".qm",".");
-	tr_lib.load( langdir+"ananas-lib-"+lang.lower()+".qm",".");
-	tr_plugins.load( langdir+"ananas-plugins-"+lang.lower()+".qm",".");
+	tr_app.load( langdir+"ananas-engine-"+lang.toLower()+".qm",".");
+	tr_lib.load( langdir+"ananas-lib-"+lang.toLower()+".qm",".");
+	tr_plugins.load( langdir+"ananas-plugins-"+lang.toLower()+".qm",".");
 	return 0;
 }
 
@@ -77,7 +76,7 @@ parseCommandLine( AApplication *a )
 	for ( i=1; i<argc; i++)
 	{
 	    param = argv[i];
-	    name = param.section("=",0,0).lower();
+	    name = param.section("=",0,0).toLower();
 	    value = param.section("=",1);
 //	    printf("%s = %s\n", (const char *) name, (const char *) value );
 	    if (param == "--help")
@@ -103,11 +102,11 @@ parseCommandLine( AApplication *a )
 	{
 		if(lang == "ru")
 		{
-			printf("%s",(const char*)str_ru.local8Bit());
+			printf("%s",(const char*)str_ru.toLocal8Bit().constData());
 		}
 		else
 		{
-			printf("%s",str_en.ascii());
+			printf("%s",str_en.toLatin1().constData());
 		}
 		return 1;
 	}
@@ -157,21 +156,21 @@ int main( int argc, char ** argv )
 		pixmap = QPixmap( ":/images/engine-splash-en.png" );
 	QSplashScreen *splash = new QSplashScreen( pixmap );
 
-//	printf("Keys:\n%s\n",( const char *) AExtensionFactory::keys().join("\n").toUtf8().data());
+//	printf("Keys:\n%s\n",( const char *) AExtensionFactory::keys().join("\n").toUtf8().constData().data());
 	
 	if ( ananas_login( rcfile, username, userpassword, 0, AApplication::Ananas ) ){
 		splash->show();
-		splash->message( QObject::tr("Init application"), Qt::AlignBottom, Qt::white );
+		splash->showMessage( QObject::tr("Init application"), Qt::AlignBottom, Qt::white );
 		MainForm *w = new MainForm( 0, "MainForm");
 		mainform = w;
 		mainformws = mainform->ws;
 		mainformwl = mainform->wl;
-		qApp->setMainWidget( w );
+
 		w->rcfile = rcfile;
-//		printf( "rcfile = %s\n", rcfile.ascii() );
+//		printf( "rcfile = %s\n", rcfile.toLatin1().constData() );
 		w->show();
 		ok = w->init();
-		splash->clear();
+		splash->clearMessage();
        		splash->finish( w );
        		delete splash;
 		if ( ok ) {

@@ -75,7 +75,7 @@ AMetaObject::~AMetaObject()
 
 
 
-Q_ULONG 
+unsigned long 
 AMetaObject::id()
 {
     return v_id;
@@ -83,7 +83,7 @@ AMetaObject::id()
 
 
 void 
-AMetaObject::setId( Q_ULONG new_id )
+AMetaObject::setId( unsigned long new_id )
 {
     v_id = new_id;
 }
@@ -257,8 +257,8 @@ AMetaObject::addChild( AMetaObject * c )
     QString name;
 
     if ( c ) {
-        name = c->name();
-        if ( name.isEmpty() ) name = c->className();
+        name = c->objectName();
+        if ( name.isEmpty() ) name = c->metaObject()->className();
         v_child.insertMulti( name, c );
     }
 }

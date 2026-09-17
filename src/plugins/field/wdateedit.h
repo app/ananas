@@ -46,7 +46,7 @@ class wUnknownField : public QLabel
 {
 	Q_OBJECT
 public:
-    wUnknownField( QWidget *parent = 0, const char *name = 0):QLabel(parent, name){};
+    wUnknownField( QWidget *parent = 0, const char *name = 0):QLabel(parent){ if(name) setObjectName(name); };
 
 };
 

@@ -55,7 +55,7 @@ class  ANANAS_EXPORT aReportBrowser :public QMainWindow
 public:
 	QWorkspace *ws;
 	QTextBrowser *textBrowser;
-	aReportBrowser(  QWidget *parent = 0, const char *name = 0, Qt::WFlags f = Qt::WDestructiveClose );
+	aReportBrowser(  QWidget *parent = 0, const char *name = 0, Qt::WFlags f = Qt::Window );
 	void append( const QString &text );
 	void clear();
 public slots:

@@ -15,8 +15,10 @@
  *  true to construct a modal dialog.
  */
 dEditRC::dEditRC(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
 }
@@ -50,7 +52,7 @@ void dEditRC::setdata(QString nameRC, rcListViewItem *item)
 
 	cfg = aTests::readConfig(QDir::convertSeparators(nameRC));
 	eRCFile->setText(QDir::convertSeparators(nameRC));
-	eDBType->setCurrentItem(0);
+	eDBType->setCurrentIndex(0);
 
 	eDBTitle->setText(cfg["dbtitle"]);
 	eDBName->setText(cfg["dbname"]);
@@ -59,9 +61,9 @@ void dEditRC::setdata(QString nameRC, rcListViewItem *item)
 	eDBHost->setText(cfg["dbhost"]);
 	eDBPort->setText(cfg["dbport"]);
 	eCfgName->setText(QDir::convertSeparators(cfg["configfile"]));
-	if(cfg["dbtype"]=="postgres") eDBType->setCurrentItem(3);
-	if(cfg["dbtype"]=="mysql") eDBType->setCurrentItem(2);
-	if(cfg["dbtype"]=="internal") eDBType->setCurrentItem(1);
+	if(cfg["dbtype"]=="postgres") eDBType->setCurrentIndex(3);
+	if(cfg["dbtype"]=="mysql") eDBType->setCurrentIndex(2);
+	if(cfg["dbtype"]=="internal") eDBType->setCurrentIndex(1);
 	eWorkDir->setText(QDir::convertSeparators(cfg["workdir"]));
 }
 
@@ -72,9 +74,9 @@ void dEditRC::updatecfg()
 
 	cfg["dbtitle"]	= eDBTitle->text();
 	cfg["dbname"]	= eDBName->text();
-	if(eDBType->currentItem()==1) cfg["dbtype"] ="internal";
-	if(eDBType->currentItem()==2) cfg["dbtype"] ="mysql";
-	if(eDBType->currentItem()==3) cfg["dbtype"]= "postgres";
+	if(eDBType->currentIndex()==1) cfg["dbtype"] ="internal";
+	if(eDBType->currentIndex()==2) cfg["dbtype"] ="mysql";
+	if(eDBType->currentIndex()==3) cfg["dbtype"]= "postgres";
 	cfg["dbuser"]	= eDBUserName->text();
 	cfg["dbpass"]	= ePass->text();
 	cfg["dbhost"]	= eDBHost->text();

@@ -2,13 +2,13 @@
 
 #include <qvariant.h>
 #include <qimage.h>
+#include <QPainter>
 #include "alog.h"
 // TODO Remove!!!
 #include "../ananas/mainform.h"
 #include "aform.h"
 #include "aservice.h"
 
-#include <q3mimefactory.h>
 #include <QGridLayout>
 #include <QFrame>
 #include <QList>
@@ -67,7 +67,7 @@ CatalogForm::getId()
 void
 CatalogForm::setData( aCatalogue* catalog,
    QMap<qulonglong, QTreeWidgetItem*> mg,
-   //QMap<Q_ULLONG, bool> map_d,
+   //QMap<qulonglong, bool> map_d,
    const QStringList & Fname,
    const QStringList & FnameGroup,
    qulonglong idElForm,
@@ -200,7 +200,10 @@ CatalogForm::find(const QString& s )
 		else
 		{
 			StatusFrame->repaint();
-			StatusFrame->drawText(	5, StatusFrame->size().height()-3, QString(tr("displaying %1 from %2")).arg(ListHint->count()).arg(count) );
+			{
+				QPainter p( StatusFrame );
+				p.drawText( 5, StatusFrame->size().height()-3, QString(tr("displaying %1 from %2")).arg(ListHint->count()).arg(count) );
+			}
 		}
 
 	}
@@ -259,7 +262,8 @@ CatalogForm::init()
 	ListView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 	LineEdit = new aLineEdit(centralWidget(), "lineEdit");
 	ListHint = new aListBox(centralWidget(), "listBox");
-	StatusFrame = new QFrame(centralWidget(), "statusFrame");
+	StatusFrame = new QFrame(centralWidget());
+	StatusFrame->setObjectName("statusFrame");
 
 	ListView->setRootIsDecorated( true );
 
@@ -276,7 +280,7 @@ CatalogForm::init()
 	GridLayout->addWidget( LineEdit, 1, 0 );
 	GridLayout->addWidget( bCancel, 3, 1 );
 	QLabel *lb = new QLabel(tr("Search"),centralWidget());
-	lb->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)0, 0, 0, lb->sizePolicy().hasHeightForWidth() ) );
+	lb->setSizePolicy( QSizePolicy( (QSizePolicy::Policy)5, (QSizePolicy::Policy)0 ) );
 	GridLayout->addWidget( lb ,0,0);
 	QSpacerItem* spacer = new QSpacerItem( 20, 390, QSizePolicy::Minimum, QSizePolicy::Expanding );
 	GridLayout->addItem( spacer, 0, 1, 3, 1 );
@@ -480,7 +484,7 @@ void
 CatalogForm::onLoadElements( QTreeWidgetItem *item )
 {
 	QList<QTreeWidgetItem*> lst = map_gr.values();
-	int ind = lst.findIndex(item);
+	int ind = lst.indexOf(item);
 	qulonglong key;
 	if(ind!=-1)
 	{
@@ -520,7 +524,7 @@ CatalogForm::new_item( QTreeWidgetItem * parentItem )
 		map_el.insert(cat->sysValue("id").toULongLong(),item);
 		edit(item,true);
 		ListView->scrollToItem(item);
-	//	cfg_message(0,tr("Can't added element"));
+	//	cfg_message(0, tr("Can't added element").toLocal8Bit().constData());
 		return;
 	}
 	qulonglong id = getGroupId(parentItem);
@@ -538,12 +542,12 @@ CatalogForm::new_item( QTreeWidgetItem * parentItem )
 			ListView->scrollToItem(item);
 			//ListView->setFocus();
 		}
-		else cfg_message(0,tr("Can't added new element to mark deleted group"));
+		else cfg_message(0, tr("Can't added new element to mark deleted group").toLocal8Bit().constData());
 	}
 	else
 	{
 		new_item(parentItem->parent());
-	}//cfg_message(0,tr("Can't added element to element"));
+	}//cfg_message(0, tr("Can't added element to element").toLocal8Bit().constData());
 }
 
 /*!
@@ -554,7 +558,7 @@ long
 CatalogForm::getGroupId( QTreeWidgetItem * item )
 {
 	QList<QTreeWidgetItem*> lst = map_gr.values();
-	int ind = lst.findIndex(item);
+	int ind = lst.indexOf(item);
 	qulonglong key=0;
 	if(ind!=-1)
 	{
@@ -580,7 +584,7 @@ CatalogForm::new_group( QTreeWidgetItem * parentItem )
 		id = getElementId(parentItem);
 		if(id)
 		{
-			cfg_message(0,tr("Can't added group to element"));
+			cfg_message(0, tr("Can't added group to element").toLocal8Bit().constData());
 			return;
 		}
 		else
@@ -595,7 +599,7 @@ CatalogForm::new_group( QTreeWidgetItem * parentItem )
 		//cat->groupSelect(id);
 		if(cat->isGroupMarkDeleted())
 		{
-			cfg_message(0,tr("Can't added group to mark deleted group"));
+			cfg_message(0, tr("Can't added group to mark deleted group").toLocal8Bit().constData());
 			return;
 		}
 		cat->newGroup(id);
@@ -731,7 +735,7 @@ void CatalogForm::mark_deleted( QTreeWidgetItem * item )
 		    	{
 				map_el[*it]->setIcon(0, QIcon(getMarkDeletedPixmap()));
 				cat->setMarkDeletedElement(*it,true);
-				it = listDeletedId.remove(it);
+				it = listDeletedId.erase(it);
 			}
 			else
 			{
@@ -745,7 +749,7 @@ void CatalogForm::mark_deleted( QTreeWidgetItem * item )
 			{
 				map_gr[*it]->setIcon(0, QIcon(getMarkDeletedPixmap()));
 				cat->setMarkDeletedGroup(*it,true);
-				it = listDeletedId.remove(it);
+				it = listDeletedId.erase(it);
 				//map_el[*it]->invalidateHeight();// setHeight(10);
 			}
 			else
@@ -790,7 +794,7 @@ void CatalogForm::undo_mark_deleted( QTreeWidgetItem * item )
 				{
 					map_el[*it]->setIcon(0, QIcon(getElementPixmap()));
 					cat->setMarkDeletedElement(*it,false);
-					it = listDeletedId.remove(it);
+					it = listDeletedId.erase(it);
 				}
 				else
 				{
@@ -804,7 +808,7 @@ void CatalogForm::undo_mark_deleted( QTreeWidgetItem * item )
 				{
 					map_gr[*it]->setIcon(0, QIcon(getGroupPixmap()));
 					cat->setMarkDeletedGroup(*it,false);
-					it = listDeletedId.remove(it);
+					it = listDeletedId.erase(it);
 					//map_el[*it]->invalidateHeight();// setHeight(10);
 				}
 				else
@@ -851,9 +855,9 @@ void CatalogForm::edit( QTreeWidgetItem * item, bool afterNew)
 					aLog::print(aLog::Error, tr("Catalog Form edit element form is null"));
 				}
 			}
-			else cfg_message(0, tr("Can't edit mark deleted element"));
+			else cfg_message(0, tr("Can't edit mark deleted element").toLocal8Bit().constData());
 		}
-		else cfg_message(1,tr("Catalog haven't edit element form"));
+		else cfg_message(1, tr("Catalog haven't edit element form").toLocal8Bit().constData());
 	}
 	else
   	{
@@ -882,9 +886,9 @@ void CatalogForm::edit( QTreeWidgetItem * item, bool afterNew)
 						aLog::print(aLog::Error, tr("Catalog Form edit group form is null"));
 					}
      				}
-				else cfg_message(0, tr("Can't edit mark deleted group"));
+				else cfg_message(0, tr("Can't edit mark deleted group").toLocal8Bit().constData());
     			}
-			else cfg_message(1,tr("Catalog haven't edit group form"));
+			else cfg_message(1, tr("Catalog haven't edit group form").toLocal8Bit().constData());
 		}
 	}
   }
@@ -932,7 +936,7 @@ void CatalogForm::select( QTreeWidgetItem * item )
 qulonglong CatalogForm::getElementId( QTreeWidgetItem * item )
 {
 	QList<QTreeWidgetItem*> lst = map_el.values();
-	int ind = lst.findIndex(item);
+	int ind = lst.indexOf(item);
 	qulonglong key=0;
 	if(ind!=-1)
 	{

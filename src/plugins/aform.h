@@ -36,7 +36,6 @@
 #include "ananasglobal.h"
 
 #include <qobject.h>
-#include <q3buttongroup.h>
 //#include <qsproject.h>
 //#include <qsinterpreter.h>
 
@@ -86,7 +85,7 @@ public:
 
 	aForm();
 	aForm( QWidget *parent, aEngine *eng );
-	aForm( QWidget *parent,  aEngine *eng,  Q_ULONG form_mid = 0, aWidget* caller = NULL);
+	aForm( QWidget *parent,  aEngine *eng,  unsigned long form_mid = 0, aWidget* caller = NULL);
 	aForm( QWidget *parent,  aEngine *eng, QString oftype, QObject *aobj = NULL);
 	~aForm();
 	QWidget *form;

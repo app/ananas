@@ -15,8 +15,10 @@
  *  true to construct a modal dialog.
  */
 eField::eField(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
     init();
@@ -56,13 +58,13 @@ void eField::setData( QWidget *o, aCfg *cfg )
 		reject();
 		return;
 	}
-	if ( o->className() != QString("wField") || !md ) {
+	if ( o->metaObject()->className() != QString("wField") || !md ) {
 	    reject();
 	    return;
 	}
     wField *f = ( wField*) o;
     QString ts = f->getFieldType();
-//    printf(">>> fieldType = %s;\n", ts.ascii() );
+//    printf(">>> fieldType = %s;\n", ts.toLatin1().constData() );
     char t=' ';
     int w=0, d=0, oid, idx=0;
     unsigned int i;
@@ -76,10 +78,10 @@ void eField::setData( QWidget *o, aCfg *cfg )
     eType->clear();
     for ( QStringList::Iterator it = tlist.begin(); it != tlist.end(); ++it ) {
 	otypes.append( (*it).section( "\t", 0, 0 ) );
-	eType->insertItem( (*it).section("\t", 1, 1 ), idx++ );
+	eType->insertItem(idx++,  (*it).section("\t", 1, 1 ));
     }
     if ( !ts.isEmpty() ) {
-	sscanf( ts, "%c %d %d", &t, &w, &d );
+	sscanf( ts.toLatin1().constData(), "%c %d %d", &t, &w, &d );
     } else {
 	t = 'N';
 	w = 10;
@@ -87,9 +89,9 @@ void eField::setData( QWidget *o, aCfg *cfg )
     if ( t=='O' ) {
 	for( i = 0 ; i < otypes.count(); i++ ) {
 	    if( otypes[i][0] == 'O' ) {
-		sscanf( (const char *)otypes[ i ], "O %d", &oid );
+		sscanf( otypes[i].toLatin1().constData(), "O %d", &oid );
 		if ( oid == w ) {
-		    eType->setCurrentItem( i );
+		    eType->setCurrentIndex( i );
 		    break;
 		}
 	    }
@@ -97,13 +99,13 @@ void eField::setData( QWidget *o, aCfg *cfg )
     } else {
 	eWidth->setValue( w );
 	eDec->setValue( d );
-	if ( t == ' ' ) eType->setCurrentItem( 0 );
-	if ( t == 'N' ) eType->setCurrentItem( 1 );
-	if ( t == 'C' ) eType->setCurrentItem( 2 );
-	if ( t == 'D' ) eType->setCurrentItem( 3 );
-	if ( t == 'B' ) eType->setCurrentItem( 4 );
+	if ( t == ' ' ) eType->setCurrentIndex( 0 );
+	if ( t == 'N' ) eType->setCurrentIndex( 1 );
+	if ( t == 'C' ) eType->setCurrentIndex( 2 );
+	if ( t == 'D' ) eType->setCurrentIndex( 3 );
+	if ( t == 'B' ) eType->setCurrentIndex( 4 );
     }
-    typeSelect( eType->currentItem() );
+    typeSelect( eType->currentIndex() );
 }
 
 
@@ -111,15 +113,15 @@ void eField::getData( QWidget *o )
 {
 //    const QObject *o = sender();
     if ( !o ) return;
-    if ( o->className() != QString("wField") ) return;
+    if ( o->metaObject()->className() != QString("wField") ) return;
     wField *f = ( wField*) o;
     wField::tEditorType type;
     char ntype[40]="";
-    int idx=eType->currentItem();
+    int idx=eType->currentIndex();
 
     if (f) {
 	//f->setName(eName->text());
-	sprintf(ntype, (const char *) otypes[idx], eWidth->value(), eDec->value());
+	sprintf(ntype, otypes[idx].toLatin1().constData(), eWidth->value(), eDec->value());
 	f->setFieldType(ntype);
 	if(otypes[idx][0]==' ') type = wField::Unknown;
 	if(otypes[idx][0]=='N') type = wField::Numberic;
@@ -129,7 +131,7 @@ void eField::getData( QWidget *o )
 	if(otypes[idx][0]=='O')
 	{
 		QString tmp = otypes[idx].section(' ',1,1);
-		long tid = atol(tmp);
+		long tid = tmp.toLong();
 		aCfgItem item = md->find(tid);
 		if(!item.isNull())
 		{

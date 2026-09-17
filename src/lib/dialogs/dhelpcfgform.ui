@@ -18,9 +18,6 @@
     <layout class="QGridLayout" >
       <item rowspan="1" row="0" column="0" colspan="3" >
         <widget class="QTextEdit" name="textEdit1" >
-          <property name="textFormat" >
-            <enum>Qt::RichText</enum>
-          </property>
           <property name="text" >
             <string/>
           </property>
@@ -82,7 +79,6 @@
     </layout>
   </widget>
   <layoutdefault spacing="6" margin="11" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <connections>
     <connection>
       <sender>closeButton</sender>

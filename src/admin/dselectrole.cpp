@@ -12,8 +12,10 @@
  *  true to construct a modal dialog.
  */
 dSelectRole::dSelectRole(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
-    : QDialog(parent, name, modal, fl)
+    : QDialog(parent, fl)
 {
+    Q_UNUSED(name);
+    setModal(modal);
     setupUi(this);
 
 }
@@ -45,7 +47,7 @@ dSelectRole::setData( aUser *user )
  QList<aRole*>::iterator it;
  for ( it = list.begin(); it != list.end(); ++it )
  {
-  listBox1->insertItem( (*it)->sysValue("name").toString() );
+  listBox1->addItem( (*it)->sysValue("name").toString() );
   listId.append((*it)->sysValue("id").toString());
   delete (*it);
  }
@@ -56,14 +58,14 @@ dSelectRole::setData( aUser *user )
 void
 dSelectRole::onSelect()
 {
- if(listBox1->currentItem()!=-1)
+ if(listBox1->currentRow()!=-1)
  {
   printf("add role\n");
  
-  //emit( addRole(listId[listBox1->currentItem()].toULongLong()) );
-  roleId =  listId[listBox1->currentItem()].toULongLong();
+  //emit( addRole(listId[listBox1->currentRow()].toULongLong()) );
+  roleId =  listId[listBox1->currentRow()].toULongLong();
    usr->addRole(roleId);
-  listBox1->removeItem(listBox1->currentItem());
+  listBox1->takeItem(listBox1->currentRow());
   accept();
  // new aListViewItem(p_item,
  }
@@ -74,7 +76,7 @@ dSelectRole::onSelect()
 }
 
 
-Q_ULLONG dSelectRole::getData()
+qulonglong dSelectRole::getData()
 {
     return roleId;
 }

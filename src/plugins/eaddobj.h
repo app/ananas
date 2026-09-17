@@ -9,7 +9,7 @@ class eAddObj : public QMainWindow, public Ui::eAddObj
     Q_OBJECT
 
 public:
-    eAddObj(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    eAddObj(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::Window);
     ~eAddObj();
 
 protected slots:

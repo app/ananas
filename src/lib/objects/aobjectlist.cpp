@@ -29,8 +29,6 @@
 **********************************************************************/
 
 #include <qobject.h>
-#include <q3sqlcursor.h>
-#include <q3sqlpropertymap.h>
 #include <qdialog.h>
 #include "adatabase.h"
 #include "aobjectlist.h"
@@ -54,8 +52,9 @@
  *	\_ru
  */
 aObjectList::aObjectList( QObject *parent, const char *name )
-:QObject( parent, name )
+:QObject( parent )
 {
+	setObjectName(name);
 	db = 0;
 	vInited = false;
 	filtred = false;
@@ -87,8 +86,9 @@ aObjectList::aObjectList( QObject *parent, const char *name )
  *	\_ru
  */
 aObjectList::aObjectList( const QString &oname, aDatabase *adb, QObject *parent, const char *name )
-:QObject( parent, name )
+:QObject( parent )
 {
+	setObjectName(name);
 	vInited = false;
 	filtred = false;
 	selectFlag = false;
@@ -110,8 +110,9 @@ aObjectList::aObjectList( const QString &oname, aDatabase *adb, QObject *parent,
  *	\param name - name of object
  */
 aObjectList::aObjectList( aCfgItem context, aDatabase *adb, QObject *parent, const char *name )
-:QObject( parent, name )
+:QObject( parent )
 {
+	setObjectName(name);
 	filtred = false;
 	vInited = false;
 	db = adb;

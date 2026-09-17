@@ -18,7 +18,7 @@ dImportDB::dImportDB( QWidget* parent, const char* name, bool modal, Qt::WFlags 
     : dEditRC( parent, name, modal, fl )
 {
     if ( !name )
-	setName( "dImportDB" );
+	setObjectName( "dImportDB" );
     languageChange();
 
 }
@@ -39,7 +39,7 @@ void
 dImportDB::languageChange()
 {
 	dEditRC::languageChange();
-	setCaption( tr( "Resource file" ) );
+	setWindowTitle( tr( "Resource file" ) );
 	textLabel8_2->setText( tr( "archive file" ) );
 	bOK->setText( tr( "Import" ) );
 }

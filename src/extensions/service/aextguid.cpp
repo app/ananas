@@ -70,7 +70,7 @@ QString aExtGUID::Generate() const
 #ifdef Q_OS_WIN32
 	return QUuid().toString();
 #else
-	return QUuid::createUuid().toString().upper();
+	return QUuid::createUuid().toString().toUpper();
 #endif
 }
 

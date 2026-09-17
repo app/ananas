@@ -241,7 +241,7 @@ aObjectsFactory::create( const QString &className,
 		res = obj;
 	} else if ( className == "ComboBox" ) {
 		if (arguments.size() == 1) {
-			res = new AComboBox( 0, arguments[0].toString());
+			res = new AComboBox( 0, arguments[0].toString().toLatin1().constData() );
 		} else {
 			res = new AComboBox();
 		}
@@ -264,8 +264,9 @@ aObjectsFactory::create( const QString &className,
  *	\endcode
  *\_ru
  */
-aEngine::aEngine():QObject(0,"sys")
+aEngine::aEngine():QObject(0)
 {
+	setObjectName( "sys" );
 	md = 0;
 	next_obj_id = 1;
 	db = aDatabase::database();
@@ -376,7 +377,7 @@ aEngine::done()
 int
 aEngine::on_systemstart(){
 
-//	if (project.interpreter()->functions().findIndex("on_systemstart")!=-1) {
+//	if (project.interpreter()->functions().indexOf("on_systemstart")!=-1) {
 //		project.interpreter()->call("on_systemstart",QVariantList());
 //	}
         if ( code->globalObject().property("on_systemstart").isValid() ){
@@ -391,21 +392,21 @@ void
 aEngine::on_event( const QString &data )
 {
 //	QList<QVariant> lst;
-//	lst <<  sender()->name();
+//	lst <<  sender()->objectName();
 //	lst << data;
-//	if (project.interpreter()->functions().findIndex("on_event")!=-1) {
+//	if (project.interpreter()->functions().indexOf("on_event")!=-1) {
 //		project.interpreter()->call("on_event", QVariantList(lst));
 //	}
         if ( code->globalObject().property("on_event").isValid() ){
             QScriptValueList list;
-            list.append(QScriptValue(sender()->name()));
+            list.append(QScriptValue(sender()->objectName()));
 //            list.append( engine->code->newVariant(val));
             list.append(QScriptValue(data));
             code->globalObject().property("on_event")
                     .call(QScriptValue(),list);
         }
 
-	emit event( sender()->name(), data );
+	emit event( sender()->objectName(), data );
 }
 
 
@@ -422,7 +423,7 @@ aEngine::on_event( const QString &data )
  */
 int
 aEngine::on_systemstop(){
-//	if (project.interpreter()->functions().findIndex("on_systemstop")!=-1) {
+//	if (project.interpreter()->functions().indexOf("on_systemstop")!=-1) {
 //		project.interpreter()->call("on_systemstop",QVariantList());
 //	}
         if ( code->globalObject().property("on_systemstop").isValid() ){
@@ -508,7 +509,7 @@ aEngine::Exit() {
 void
 aEngine::Message(int n, const QString &msg)
 {
-	cfg_message(n, (const char *) msg.utf8());
+	cfg_message(n, (const char *) msg.toUtf8());
 }
 
 
@@ -604,7 +605,7 @@ void aEngine::execAction( aCfgItem &act, QObject *context )
 			oid = md->sText( act, md_objectid ).toLong();
 			foid = md->sText( act, md_formid ).toLong();
 			arg = md->sText( act, md_argument );
-//			printf("satype=%d, oid=%d,foid=%d,arg=%s",satype,oid,foid,arg.ascii());
+//			printf("satype=%d, oid=%d,foid=%d,arg=%s",satype,oid,foid,arg.toLatin1().constData());
 			gobj =  md->find( oid );
 			if ( foid == 0 )
 			{
@@ -665,7 +666,7 @@ void aEngine::execAction( aCfgItem &act, QObject *context )
 		case 2:
 			break;
 		}
-//		printf("executed %s\n", ( const char *) md->attr( act, mda_name ).local8Bit() );
+//		printf("executed %s\n", ( const char *) md->attr( act, mda_name ).toLocal8Bit().constData() );
 	}
 }
 
@@ -691,7 +692,7 @@ void aEngine::execAction( aCfgItem &act, QObject *context )
  			\~russian ссылку на новую форму или 0, если форма не создана.\~
  */
 bool
-aEngine::OpenForm(QString fname, int mode, aObject* selecter)//Q_ULLONG ido)
+aEngine::OpenForm(QString fname, int mode, aObject* selecter)//qulonglong ido)
 {
 	aCfgItem object, form;
 
@@ -701,7 +702,7 @@ aEngine::OpenForm(QString fname, int mode, aObject* selecter)//Q_ULLONG ido)
         if(object.isNull()) return false;
         qulonglong ido =0;
         if(selecter) ido = selecter->sysValue("id").toULongLong();
-        return (0 != openForm(atoi(md->attr(object,mda_id)), atoi(md->attr(form,mda_id)), mode, mode, ido));
+        return (0 != openForm(md->attr(object,mda_id).toInt(), md->attr(form,mda_id).toInt(), mode, mode, ido));
 }
 
 
@@ -940,10 +941,13 @@ aDataField*
 aEngine::enterValue( const QString &FieldType, const QString &title )
 {
 	aDataField *f = new aDataField( "", FieldType );
-	QDialog *d = new QDialog( ws, title, true );
+	QDialog *d = new QDialog( ws );
+	d->setObjectName( title );
+	d->setWindowTitle( title );
+	d->setModal( true );
 	wField *wf = new wField( d, "" );
-	QPushButton *b_ok = new QPushButton( d, tr("OK") );
-	QPushButton *b_cancel =new QPushButton( d, tr("Cancel") );
+	QPushButton *b_ok = new QPushButton( tr("OK"), d );
+	QPushButton *b_cancel =new QPushButton( tr("Cancel"), d );
 	connect( b_ok, SIGNAL( pressed() ), d, SLOT( accept() ) );
 	connect( b_cancel, SIGNAL( pressed() ), d, SLOT( reject() ) );
 	if ( d->exec() == QDialog::Accepted ) {

@@ -104,7 +104,7 @@ AExtension *AExtensionFactory::create( const QString& key )
         iface = instance->hash.value( key );
         if ( iface ) ret = iface->create(); 
     }
-    if (ret) ret->setName(key);
+    if (ret) ret->setObjectName(key);
     return ret;
 }
 

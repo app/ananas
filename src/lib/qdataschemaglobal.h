@@ -19,41 +19,20 @@
 
 #define DEBUG
 
-#if QT_VERSION>=0x040000
-// QT4 code    
-    #include <QtCore>
-    #include <QtSql>
-    #include <QtXml>
-    #include <QCoreApplication>
-    #include <QStringList>
-    #define QSqlFieldInfo QSqlField
-    
-    #define QDATASCHEMA_QT4
-    #define QDS_SQLTable       QSqlTableModel
-    #define QDS_int            int
-    #define QDS_IO_ReadOnly    QIODevice::ReadOnly     
-    #define QDS_IO_WriteOnly   QIODevice::WriteOnly
-    #define QTextStream_readAll( t )    t.readAll()
-#else
-// QT3 code
-    #include <qobject.h>
-    #include <qsqldatabase.h>
-    #include <qapplication.h>
-    #include <qsqlrecord.h>
-    #include <qsqlcursor.h>
-    #include <qstringlist.h>
-    #include <qfile.h>
-    #include <qdom.h>
-    #include <qtextcodec.h>
+#include <QtCore>
+#include <QtSql>
+#include <QtXml>
+#include <QCoreApplication>
+#include <QStringList>
+#define QSqlFieldInfo QSqlField
 
-    #define QDS_SQLTable        QSqlCursor
-    #define QDS_int             uint
-    #define QDS_IO_ReadOnly     IO_ReadOnly
-    #define QDS_IO_WriteOnly    IO_WriteOnly
-    #define QTextStream_readAll( t )    t.read()
-#endif
+#define QDS_SQLTable       QSqlTableModel
+#define QDS_int            int
+#define QDS_IO_ReadOnly    QIODevice::ReadOnly
+#define QDS_IO_WriteOnly   QIODevice::WriteOnly
+#define QTextStream_readAll( t )    t.readAll()
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 #	include <windows.h>
 #	include <math.h>
 #endif
@@ -61,7 +40,7 @@
 #	include <unistd.h>
 #endif
 
-#if defined(Q_OS_WIN32) && !defined(LIB_NO_DLL)
+#if defined(Q_OS_WIN) && !defined(LIB_NO_DLL)
 #  define LIB_DLLIMPORT __declspec(dllimport)
 #  define LIB_DLLEXPORT __declspec(dllexport)
 #else

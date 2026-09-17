@@ -31,13 +31,12 @@
 #define QDATASCHEMA_H
 #include "qdataschemaglobal.h"
 
-#if defined(Q_OS_WIN32) && !defined(LIB_NO_DLL)
+#if defined(Q_OS_WIN) && !defined(LIB_NO_DLL)
 #    define DB_IMPORT __declspec(dllimport)
 #else
 #	define DB_IMPORT
 #endif
 
-class QSqlCursor;
 class QDataSchemaDriver;
 
 class QDataSchema: public QObject
@@ -46,10 +45,6 @@ Q_OBJECT
 public:
     QDataSchema( const QString ctype, const char *objname = 0, QObject *owner = 0 );
     ~QDataSchema();
-#if QT_VERSION<0x040000
-    QString objectName() const { return name();};
-    void setObjectName( const QString &newname ) { setName( newname );};
-#endif
 
     bool open( const QString &dbname,
             const QString &dbuser = "", const QString &dbpass = "",
@@ -121,11 +116,7 @@ private:
 
     QDataSchemaDriver *p_drv;
 
-#if QT_VERSION<0x040000
-    QSqlDatabase *p_db;
-#else
     QSqlDatabase p_db;
-#endif
     QString v_dbname, v_dbuser, v_dbpass, v_dbtype, v_dbhost;
     int	v_dbport;
 

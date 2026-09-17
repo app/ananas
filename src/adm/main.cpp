@@ -1,9 +1,5 @@
 #include <QtGlobal>
-#if QT_VERSION<0x040000
-    #include <qapplication.h>
-#else
-    #include <qcoreapplication.h>
-#endif
+#include <qcoreapplication.h>
 #include <qfile.h>
 #include <qvariant.h>
 
@@ -29,14 +25,7 @@ void help()
 
 int main(int argc, char * argv[])
 {
-#if QT_VERSION<0x040000
-    QApplication app(argc,argv);
-#else
     QCoreApplication app(argc,argv);
-#endif
-#if QT_VERSION<0x050000
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
-#endif
 
     QStringList l;
     QString dbtype="QSQLITE";

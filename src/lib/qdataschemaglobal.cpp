@@ -84,14 +84,6 @@
 
 #include "qdataschemaglobal.h"
 
-// Шаблон для вставки версионно-зависимого кода.
-#if QT_VERSION>=0x040000
-// QT4 code
-#else
-// QT3 code
-
-#endif
-
 /*!
  *\class QDS qdsglobal.h
  *\en
@@ -117,42 +109,21 @@ QDS::version()
 QChar
 toLower(QChar c)
 {
-#if QT_VERSION>=0x040000
-// QT4 code
     return c.toLower();
-#else
-// QT3 code
-    return c.lower();
-#endif   
 }
 
 
 QString
 toLower(const QString &s)
 {
-#if QT_VERSION>=0x040000
-// QT4 code
     return s.toLower();
-#else
-// QT3 code
-    return s.lower();
-#endif   
 }
 
 
 char
 toAscii(QChar c)
 {
-#if QT_VERSION>=0x050000
-// QT5 code
     return c.toLatin1();
-#elif QT_VERSION>=0x040000
-// QT4 code
-    return c.toAscii();
-#else
-// QT3 code
-    return c.latin1();
-#endif   
 }
 
 const char*
@@ -163,25 +134,13 @@ toChar(QString str) {
 int
 indexOf( const QString &str, const QString &find_str )
 {
-#if QT_VERSION>=0x040000
-// QT4 code
     return str.indexOf( find_str );
-#else
-// QT3 code
-    return str.find( find_str );
-#endif
 }
    
 const char *
 toLocal8Bit(const QString &s)
 {
-#if QT_VERSION>=0x040000
-// QT4 code
     return s.toLocal8Bit().data();
-#else
-// QT3 code
-    return s.local8Bit();
-#endif   
 }
 
 
@@ -193,11 +152,7 @@ toLocal8Bit(const QString &s)
 QStringList
 split(const QString &div, const QString &str )
 {
-#if QT_VERSION>=0x040000
     return str.split( div );
-#else
-    return QStringList::split( div, str );
-#endif
 }
 
 
@@ -207,9 +162,5 @@ split(const QString &div, const QString &str )
  * \_ru
  */
 QString trimm(const QString &str ) {
-#if QT_VERSION<0x040000
-    return str.stripWhiteSpace();
-#else
     return str.trimmed();
-#endif
 }

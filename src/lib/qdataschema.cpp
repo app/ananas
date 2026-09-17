@@ -22,9 +22,7 @@ default-character-set=koi8_ru
 #include "qdataschemadriver-postgresql.h"
 #include "qdataschemadriver-sqlite.h"
 
-#if QT_VERSION >= 0x060000
 #include <QStringConverter>
-#endif
 
 /*!
  * \class QDataSchema qdataschema.h
@@ -202,9 +200,6 @@ QDataSchema::QDataSchema( const QString ct, const char *objname, QObject *owner 
 {
     if ( !objname ) setObjectName("QDataSchema");
     p_drv=0;
-#if QT_VERSION<0x040000
-    p_db=0;
-#endif
     if ( isDriverAvailable( ct ) ) {
         p_drv = createDriver( ct );
         if ( p_drv ) p_db = QSqlDatabase::addDatabase( p_drv->sqlDriverName(), objectName() );
@@ -227,11 +222,6 @@ QDataSchema::QDataSchema( const QString ct, const char *objname, QObject *owner 
 QDataSchema::~QDataSchema()
 {
     close();
-#if QT_VERSION<0x040000
-    if ( p_db ) QSqlDatabase::removeDatabase( p_db );
-#else
-    // QSqlDatabase::removeDatabase( objectName() );
-#endif
 }
 
 
@@ -341,11 +331,7 @@ QDataSchema::close()
 QSqlDatabase*
 QDataSchema::db()
 {
-#if QT_VERSION<0x040000
-    return p_db;
-#else
     return &p_db;
-#endif
 }
 
 
@@ -375,12 +361,8 @@ QDataSchema::table( const QString & name )
     QDS_SQLTable *t;
     
     if ( tableExists( name ) ) {
-#if QT_VERSION<0x040000
-        t = new QSqlCursor( name, this );
-#else
         t = new QSqlTableModel( this, *db() );
         t->setTable( name );
-#endif
     } else {
         t = 0;
     }
@@ -722,15 +704,9 @@ QDataSchema::verifyStructure()
     int tu_count;
 
 //    printf("lt0 = %s\n",(const char *) lt.toLocal8Bit().data() );
-#if QT_VERSION<0x040000
-    QSqlRecordInfo recInfo;
-    QSqlRecordInfo::Iterator it;
-    QSqlFieldInfo f;
-#else
     QSqlRecord recInfo;
     int it;
     QSqlField f;
-#endif
 
     QString
             fields,   // Список новых полей БД с описанием типа, разделенных "\n"
@@ -777,21 +753,11 @@ QDataSchema::verifyStructure()
 //            recInfo = db()->recordInfo( tname_db );
             recInfo = db()->record( tname_db );
             // Сформируем список старых полей таблицы
-#if QT_VERSION<0x040000
-            it = recInfo.begin();
-            while( it != recInfo.end() ) {
-                t_es_sql = fieldTypeSql( ddRecord( ddIndexSub( tsql_idx, "F", (*it).name(), true ), true ) );
-                if ( !oldfields.isEmpty() ) oldfields.append("\n");
-                oldfields.append( t_es_sql );
-                ++it;
-            }
-#else
             for( it=0; it<recInfo.count(); it++ ) {
                 t_es_sql = fieldTypeSql( ddRecord( ddIndexSub( tsql_idx, "F", recInfo.field(it).name(), true ), true ) );
                 if ( !oldfields.isEmpty() ) oldfields.append("\n");
                 oldfields.append( t_es_sql );
             }
-#endif
             // Проверим, требуется ли обновление структуры таблицы.
             if ( fields != oldfields ) {
                 // Описания полей различны, требуется обновление структуры таблицы
@@ -803,11 +769,7 @@ QDataSchema::verifyStructure()
                     t_es = fieldTypeSql( es );
                     if ( recInfo.contains( ename ) > 0 ) {
                         // Если поле найдено в старой структуре
-#if QT_VERSION<0x040000
-                        f = recInfo.find( ename );
-#else
                         f = recInfo.field( ename );
-#endif
                         es_sql = ddRecord( ddIndexSub( ddIndex( "T", tname, true ), "F", ename, true ), true );
                         t_es_sql = fieldTypeSql( es_sql );
                         // Проверка, изменилось ли описание поля
@@ -828,15 +790,9 @@ QDataSchema::verifyStructure()
                     }
                 }
                 // Сформируем список полей для удаления
-#if QT_VERSION<0x040000
-                it = recInfo.begin();
-                while( it != recInfo.end() ) {
-                    f = *it;
-#else
                 it = 0;
                 while( it < recInfo.count() ) {
                     f = recInfo.field(it);
-#endif
                     es_sql = ddRecord( ddIndexSub( tsql_idx, "F", f.name(), true ), true );
                     t_es_sql = fieldTypeSql( es_sql );
                     if ( ddIndexSub( tidx, "F", f.name() )==-1){
@@ -1198,18 +1154,10 @@ int
 QDataSchema::checkSqlError( QSqlQuery &query )
 {
     QString err="";
-#if QT_VERSION<0x040000
-    if (query.lastError().type()!=QSqlError::None)
-#else
     if (query.lastError().type()!=QSqlError::NoError)
-#endif
     {
         err = QString("SQLError %1 %2\n").arg(query.lastError().databaseText()).arg(query.lastError().driverText());
-#if QT_VERSION<0x040000
-        fprintf(stderr, err.ascii());
-#else
         fprintf(stderr, "%s\n", toChar(err));
-#endif
         return 1;
     }
     return 0;
@@ -1241,11 +1189,7 @@ QDataSchema::execList( const QStringList &queryList, bool inTransaction )
 		query = db()->exec( queryList[ i ] );
 		rc = checkSqlError( query );
                 if ( rc ) {
-#if QT_VERSION<0x040000
-                    printf("ERROR ON QUERY %i:%s\n", i, (const char *) queryList[i] );
-#else
                     printf("ERROR ON QUERY %i:%s\n", i, (const char *) queryList[i].toLatin1() );
-#endif
                     break;
                 }
 	}
@@ -1582,11 +1526,7 @@ QDataSchema::ddRecSection( const QString &rec, int secnum )
 QString
 QDataSchema::ddRecType( const QString &rec )
 {
-#if QT_VERSION<0x040000
-    if ( trimmedQString(rec)[0].latin1()=='#' ) return "#";
-#else
     if ( trimmedQString(rec)[0].toLatin1()=='#' ) return "#";
-#endif
     return trimmedQString(ddRecSection( rec, 0 ).section("=", 0, 0 ));
 }
 
@@ -1751,11 +1691,7 @@ QDataSchema::databaseExport( const QString &filename )
 
     if ( f.open( QDS_IO_WriteOnly ) ) {
         QTextStream t ( &f );
-#if QT_VERSION >= 0x060000
         t.setEncoding(QStringConverter::Utf8);
-#else
-        t.setCodec(QTextCodec::codecForName("UTF-8"));
-#endif
         if ( verifyStructure()==0 ) {
             root = doc.createElement("qdataschema");
             doc.appendChild( root );
@@ -1845,11 +1781,7 @@ QDataSchema::databaseImport( const QString &filename, bool updateStruct )
     savedd = dataDictionary();
     if ( f.open( QDS_IO_ReadOnly ) ) {
         QTextStream t ( &f );
-#if QT_VERSION >= 0x060000
         t.setEncoding(QStringConverter::Utf8);
-#else
-        t.setCodec(QTextCodec::codecForName("UTF-8"));
-#endif
         data = QTextStream_readAll( t );
         if ( doc.setContent( data ) ) {
             docElem = doc.documentElement();
@@ -1936,11 +1868,7 @@ QDataSchema::databaseImport( const QString &filename, bool updateStruct )
  */
 QStringList QDataSchema::splitQString(const QString &div, const QString &str )
 {
-#if QT_VERSION<0x040000
-    return QStringList::split( div, str );
-#else
     return str.split( div );
-#endif
 }
 
 
@@ -1952,11 +1880,7 @@ QStringList QDataSchema::splitQString(const QString &div, const QString &str )
  */
 QString QDataSchema::lowerQString(const QString &str )
 {
-#if QT_VERSION<0x040000
-    return str.lower();
-#else
     return str.toLower();
-#endif
 }
 
 
@@ -1967,9 +1891,5 @@ QString QDataSchema::lowerQString(const QString &str )
  * \_ru
  */
 QString QDataSchema::trimmedQString(const QString &str ) {
-#if QT_VERSION<0x040000
-    return str.stripWhiteSpace();
-#else
     return str.trimmed();
-#endif
 }

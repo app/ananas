@@ -116,52 +116,26 @@ QDataSchemaDriver::fieldSQLToDS( QSqlFieldInfo *ftypedef )
 	w = fieldWidth( ftypedef );
         d = fieldDecimals( ftypedef );
 
-        // Qt6 QSqlField::type() returns QMetaType::Type; Qt4/Qt5 returned
-        // QVariant::Type.
-#if QT_VERSION >= 0x060000
         switch ( ftypedef->type() ) {
         case QMetaType::QDateTime:
-#else
-        switch ( ftypedef->type() ) {
-        case QVariant::DateTime:
-#endif
             t = "D 0 0";
             break;
-#if QT_VERSION >= 0x060000
         case QMetaType::Int:
-#else
-        case QVariant::Int:
-#endif
             t = "I 0 0";
             break;
-#if QT_VERSION >= 0x060000
         case QMetaType::LongLong:
-#else
-        case QVariant::LongLong:
-#endif
             t = "L 0 0";
             break;
-#if QT_VERSION >= 0x060000
         case QMetaType::QString:
-#else
-        case QVariant::String:
-#endif
-#if QT_VERSION<0x040000
-        case QVariant::CString:
-#endif
             t = QString("S %1 0").arg(w);
             break;
-#if QT_VERSION >= 0x060000
         case QMetaType::Double:
-#else
-        case QVariant::Double:
-#endif
 /*
-            if ( drv == "QPSQL7" ) {
+            if ( drv == "QPSQL" ) {
                 d = w & 0xFF;
                 w = ( w & 0xFF0000 ) >> 16;
             }
-            if ( drv == "QMYSQL3" ) {
+            if ( drv == "QMYSQL" ) {
                 w = w - d;
                 if ( d==0 ) w--;
             }
@@ -171,11 +145,7 @@ QDataSchemaDriver::fieldSQLToDS( QSqlFieldInfo *ftypedef )
 	default:
 		t = "";
         }
-#if QT_VERSION<0x040000
-        if ( ftypedef->isRequired() )
-#else
         if ( ftypedef->requiredStatus() )
-#endif
             t = t.section(" ",0,0)+"N "+t.section(" ",1);
         t = ftypedef->name()+" "+t;
 	return t;

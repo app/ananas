@@ -13,8 +13,9 @@ HEADERS	+=  \
 TRANSLATES = 
 
 CONFIG +=qtestlib
+QT += script scripttools
 FORMS	= 
 TEMPLATE	=app
 INCLUDEPATH	+= ../lib ../plugins
-LIBS	+= -L$(QTDIR)/lib -lqsa -L../../lib -lananas
+LIBS	+= -L../../lib -lananas
 LIBS	+= -L../../lib/designer -lananasplugin -lqdataschema

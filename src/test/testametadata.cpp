@@ -188,7 +188,7 @@ void TestAMetaData::testAMetaDataIOXML()
         
 //    delete d;
     QCOMPARE( o->write("test.cfg"), 0 );
-    QCOMPARE( o->read("test1.cfg"), 0 );
+    QCOMPARE( o->read("test.cfg"), 0 );
     xml = o->text();
     QCOMPARE( o->write("test2.cfg"), 0 );
     QCOMPARE( o->read("test2.cfg"), 0 );

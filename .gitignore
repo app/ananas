@@ -8,3 +8,8 @@ src/**/Makefile
 qrc_*.cpp
 moc_*.cpp
 bin
+lib
+tmp
+translations/*.qm
+src/test/ananas-test
+src/test/test*.cfg

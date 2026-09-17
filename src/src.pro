@@ -1,7 +1,9 @@
 TEMPLATE = subdirs
 SUBDIRS += editor
 SUBDIRS  += lib plugins
-SUBDIRS += designer/formdesigner designer ananas admin
+# Designer is excluded from the first porting milestone (see tools/docs/PORTING.md).
+#SUBDIRS += designer/formdesigner designer
+SUBDIRS += ananas admin
 SUBDIRS += extensions
 
 #TRANSLATIONS = \

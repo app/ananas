@@ -13,6 +13,9 @@ DESTDIR = ../../bin
 LIBS	+= -L../../lib -lananas 
 LIBS    += -L../../lib/designer -lananasplugin -lqdataschema
 
+# See src/ananas/ananas.pro: locate libananasplugin.so at its install path.
+unix:QMAKE_RPATHDIR += /usr/lib/ananas/designer
+
 INCLUDEPATH	+= ../lib ../lib/tmp/ui ../lib/.ui
 
 HEADERS	+= atreeitems.h \

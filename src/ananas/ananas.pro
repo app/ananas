@@ -14,6 +14,10 @@ INCLUDEPATH += ../lib ../../tmp/ui/ananas ../plugins
 #LIBS += -L../../lib -lananas -L../../lib/designer -lananasplugin 
 LIBS += -L../../lib -lananas -L../../lib/designer -lananasplugin -lqdataschema 
 
+# libananasplugin.so is installed under <LIBDIR>/ananas/designer, which is not
+# in the default loader path; bake the install location into the binary.
+unix:QMAKE_RPATHDIR += /usr/lib/ananas/designer
+
 HEADERS = \
     mainform.h
 

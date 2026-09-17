@@ -26,6 +26,27 @@ and an external `libqdataschema`.
   - Branch `port` (from `origin/qtscript`).
 - **Phases 2–6: pending.**
 
+## Handoff (next session)
+
+- Branch: `ananas-legacy-qt4` @ `port` (from `origin/qtscript`); the `qtscript`
+  branch is the untouched rollback point. Tooling lives in the `tools` repo
+  (`main`), sources in `ananas-legacy-qt4` / `ananas-legacy-qdataschema`
+  (branch `newname`).
+- Phase 1 is done and functionally verified; the next step is Phase 2
+  (Qt4→Qt5), see below.
+- Commands:
+  - burndown: `bash tools/scripts/port-metrics.sh`
+  - build + tests (trusty): `bash tools/scripts/smoke-qt4.sh`
+  - package: `ANANAS_BRANCH=port bash tools/scripts/build-qt4.sh`
+  - run the app: `bash tools/scripts/run-qt4.sh ananas-administrator`
+- Image `ananas-qt4-builder`: Ubuntu 14.04 + Qt4 + QtScript + `libqdataschema`
+  (built from `ananas-legacy-qdataschema@newname`); ccache at
+  `<workspace>/tmp/ccache`.
+- Known caveat: the rewritten `wDBTable`/`wTable`/`awidget` have no functional
+  tests; only the schema/DB dialogs were smoke-tested manually.
+- The `.deb` targets Ubuntu 14.04 and cannot be installed on a modern host
+  until Phase 2/4.
+
 ## Decisions
 
 - Target: **Qt5/Qt6, C++** (keep the C++/Qt architecture).
@@ -121,21 +142,63 @@ package builds in the trusty container; `ananas-test` green; smoke
 
 ## Phase 2 — Qt4 → Qt5
 
-- `QT += widgets printsupport`; `qtestlib`→`testlib`; `QFormBuilder` from
-  `QtUiTools` (`QT += uitools`); widget plugins use `QT += designer`.
-- `Q_EXPORT_PLUGIN2` → `Q_PLUGIN_METADATA` (`aWidgetsCollection`,
-  `AExtensionPlugin`, `A_EXPORT_PLUGIN`).
-- Removed/changed APIs: `QWorkspace`→`QMdiArea`,
-  `QApplication::setMainWidget` (drop), `QApplication::desktop()`→`QScreen`,
-  `setCaption`→`setWindowTitle`, `QDir::convertSeparators`→
-  `toNativeSeparators`, `QString::utf8`→`toUtf8`,
-  `QTextCodec::setCodecForCStrings` (drop), `QRegExp`→`QRegularExpression`,
-  `QFontMetrics::width`→`horizontalAdvance`, `QAssistantClient` (drop),
-  `QLibraryInfo::location`→`path`.
-- Migrate the old `QSettings` API (~50 sites) to `value`/`setValue`.
-- Move hardcoded `/usr/lib/ananas`, `/usr/share/ananas` to `QStandardPaths`.
-- Add `docker/Containerfile.qt5` on a current LTS + `scripts/build-qt5.sh`.
-- Build `libqdataschema` for Qt5 in parallel.
+Reference: <https://wiki.qt.io/Transition_from_Qt_4.x_to_Qt5>. The counts below
+were measured on the `port` branch at the end of Phase 1.
+
+### 2.1 Build system
+
+- `QT += widgets printsupport uitools`; widget plugins add `QT += designer`.
+- `CONFIG += qtestlib` → `QT += testlib` (`src/test/test.pro`).
+- Add `docker/Containerfile.qt5` (current LTS) + `scripts/build-qt5.sh`.
+- Build `libqdataschema` for Qt5 in lockstep.
+
+### 2.2 Includes
+
+- Split `<QtGui/…>`: widget classes (`QAction`, `QApplication`, `QDialog`,
+  `QGridLayout`, `QHeaderView`, `QLabel`, `QMenu`, `QPushButton`,
+  `QTreeWidget`, `QTableWidget`, …) → `<QtWidgets/…>`; painting/event classes
+  (`QIcon`, `QPainter`, `QCloseEvent`, `QTextBlock`, `QTextCharFormat`,
+  `QTextCursor`, `QTextDocument`, `QSyntaxHighlighter`) stay `<QtGui/…>`.
+  Automate with `fixqt4headers.pl` (qtbase/bin) if available.
+- `QFormBuilder` → `<QtUiTools/QFormBuilder>` (`src/plugins/aform.cpp`).
+- `QPrinter`/`QPrintDialog` → `<QtPrintSupport/…>`
+  (`src/lib/report/areport.cpp`).
+
+### 2.3 API replacements (measured)
+
+| Qt4 | Qt5 | Sites |
+| --- | --- | --- |
+| `QWorkspace` | `QMdiArea` | 7 |
+| `QDir::convertSeparators` | `toNativeSeparators` | 58 |
+| `QRegExp` | `QRegularExpression` | 10 |
+| `QTextCodec` / `setCodecForCStrings` | remove / UTF-8 default | 6 / 2 |
+| `QHeaderView::setResizeMode` | `setSectionResizeMode` | 1 |
+| `qInstallMsgHandler` | `qInstallMessageHandler` | 1 |
+| `Q_EXPORT_PLUGIN2` | `Q_PLUGIN_METADATA` | 2 |
+
+Already zero: `QDesktopWidget`, `QApplication::desktop()`,
+`QApplication::setMainWidget`, `QLibraryInfo`, `QDesktopServices`,
+`QUrl::addQueryItem`, `QDrag`, `QWeakPointer`, QtConcurrent, QtWebKit,
+`UnicodeUTF8` (only comments). Old `QSettings` API was migrated during Phase 1.
+
+### 2.4 Plugins
+
+- `Q_PLUGIN_METADATA` + JSON for `aWidgetsCollection`
+  (`src/plugins/awidgets_plugin.cpp`) and `AExtensionPlugin` /
+  `A_EXPORT_PLUGIN` (`src/lib/aextensionplugin.h`).
+
+### 2.5 Scripting
+
+- QtScript still exists in Qt5 (deprecated) — leave until Phase 3 (`QJSEngine`).
+
+### 2.6 Verification
+
+- `scripts/build-qt5.sh` (image + `.deb`) and `scripts/smoke-qt5.sh`
+  (build + `ananas-test`), then `scripts/run-qt5.sh` and a manual GUI smoke.
+
+Note: this phase is Qt4→Qt5 only; the Qt5→Qt6 items (`QTextCodec`, `QRegExp`,
+`Qt::SplitBehavior`, `QAction` in QtGui, qmake→CMake, `QJSEngine`) stay in
+Phase 4.
 
 ## Phase 3 — QtScript → QJSEngine
 
@@ -187,11 +250,13 @@ Source of the skills: <https://github.com/TheQtCompanyRnD/agent-skills>
 
 ## Verification
 
-1. Full container build + `dpkg-buildpackage` → `.deb`.
-2. `ananas-test` (QtTest) + burndown metrics.
-3. Headless smoke: `xvfb-run ananas-administrator` on SQLite + demo scheme;
-   after Phase 3, execute the `inventory`/`money` scripts.
-4. `scripts/port-check.sh` chaining steps 1–3.
+1. `scripts/build-qt4.sh` → `dist/ananas_*.deb` (Qt4). Later: `build-qt5.sh`,
+   `build-qt6.sh`.
+2. `scripts/smoke-qt4.sh` (container build + `ananas-test` under Xvfb);
+   `scripts/port-metrics.sh` for the burndown.
+3. Manual GUI smoke: `scripts/run-qt4.sh ananas-administrator`; after Phase 3,
+   execute the `inventory`/`money` scripts.
+4. `scripts/port-check.sh` (to be added) chaining steps 1–2.
 
 ## Risks
 

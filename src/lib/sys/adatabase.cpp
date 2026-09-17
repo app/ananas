@@ -531,6 +531,10 @@ aDatabase::init ( aCfgRc *rc, const QString &dbname )
         if ( qds->open() )
         {
                 aLog::print ( aLog::Info,tr ( "aDatabase open connection to %1" ).arg ( rc->value ( "dbname" ) ) );
+                // Create or bring the database structure up to date, so that a
+                // freshly installed scheme (e.g. inventory on internal SQLite)
+                // works on first run.
+                createdb ( true );
         }
         else
         {

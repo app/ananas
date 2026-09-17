@@ -6,6 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 #    QtQml (QJSEngine) and QtDesigner/QtUiTools.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    cmake \
     devscripts \
     debhelper \
     dh-make \

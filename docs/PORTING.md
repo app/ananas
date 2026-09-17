@@ -58,17 +58,21 @@ and an external `libqdataschema`.
   - The last dual Qt5/Qt6-buildable state is kept on `ananas-legacy-qt4`
     branch `port-qt5` (qdataschema `qt5`); Qt4/Qt5 tooling moved to
     `tools/archive/`.
-- **Phases 5–6: pending.**
+- **Phase 5 (CMake migration): done.** `CMakeLists.txt` + per-directory targets
+  build and install the whole tree on Qt6; `ananas-test` 7/7. Packaging
+  (`debian/`, `build/*`) is deferred and untouched.
+- **Phase 6: pending (out of scope).**
 
 ## Handoff (next session)
 
-- Branch: `ananas-legacy-qt4` @ `port` (Qt6-only). History:
+- Branch: `ananas-legacy-qt4` @ `port` (Qt6-only, qmake + CMake). History:
   `port-qt5` (last Qt5/Qt6 dual state), `qtscript` (untouched Qt4 baseline),
   `port` @ `b2f77d0` (Phase 1 result). Tooling lives in the `tools` repo
   (`main`), sources in `ananas-legacy-qt4` / `ananas-legacy-qdataschema`
   (branch `qt6`).
-- Phases 1–4 and the Qt6-only cleanup are done; the next step is Phase 5
-  (build/packaging: qmake→CMake, debian/ refresh, drop outdated packaging).
+- Phases 1–5 are done; the next step is packaging (deferred): update `debian/`
+  and the legacy `build/*` (RPM/Inno/menus) for Qt6/CMake, or add CPack. The
+  legacy scripts are kept, not deleted.
 - Commands:
   - burndown: `bash tools/scripts/port-metrics.sh`
   - Qt6 build + tests: `bash tools/scripts/smoke-qt6.sh`
@@ -310,15 +314,22 @@ Note: this phase is Qt4→Qt5 only; the Qt5→Qt6 items (`QTextCodec`, `QRegExp`
   `QTextStream::setEncoding`, `QMetaType` field types, Qt6 debian paths.
 - Added `docker/Containerfile.qt6`, `scripts/build-qt6.sh`, `smoke-qt6.sh`,
   `run-qt6.sh`, `build-qt6-qdataschema.sh`.
-- `qmake6` still drives the build; CMake is Phase 5.
+- `qmake6` drives the active build; a CMake build was added in Phase 5.
 
-## Phase 5 — Build and packaging
+## Phase 5 — CMake migration (done) / packaging (deferred)
 
-- Migrate qmake → CMake: targets `libananas`, `ananasplugin`, `ananas`,
-  `ananas-administrator`, extensions, tests.
-- Update `debian/` (Qt5/6 deps, `libqdataschema`); drop the outdated
-  `.spec`/`.iss` packaging.
-- Remove the non-existent `doc/doc.pro` from the install rule.
+- CMake migration **done**: `CMakeLists.txt` + per-directory targets
+  (`libananas`, `ananasplugin`, `qtscriptedit`, `ananas`,
+  `ananas-administrator`, the six extensions, `ananas-test`) with
+  AUTOMOC/AUTOUIC/AUTORCC, `AUTOUIC -c string`, `find_library(qdataschema)`,
+  the qmake output layout (`lib/`, `lib/designer/`, `bin/`) and `install()`
+  rules via `GNUInstallDirs`.
+  - Build tree `cmake-build/` (gitignored); qmake files are untouched.
+  - Verified: clean configure/build, `ananas-test` 7/7, staged install.
+- **Packaging deferred**: `debian/`, `build/*` (RPM/Inno/menus) are kept
+  as-is and will be updated for Qt6/CMake later (nothing is deleted). CPack is
+  not used; distribution packages will keep using the native tooling
+  (debhelper/`rpmbuild`) and call CMake for build+install.
 
 ## Phase 6 — Designer (deferred, out of scope)
 
@@ -350,7 +361,10 @@ Source of the skills: <https://github.com/TheQtCompanyRnD/agent-skills>
 2. `scripts/smoke-qt6.sh` (clean container build + `ananas-test` under Xvfb);
    `scripts/port-metrics.sh` for the burndown.
 3. Manual GUI smoke: `scripts/run-qt6.sh ananas-administrator`.
-4. Historical Qt4/Qt5 reproduction: `tools/archive/` (see
+4. CMake (in `ananas-qt6-builder`): `cmake -S . -B cmake-build` +
+   `cmake --build cmake-build`, then `bin/ananas-test`; staged install via
+   `DESTDIR=/tmp/stage cmake --install cmake-build --prefix /usr`.
+5. Historical Qt4/Qt5 reproduction: `tools/archive/` (see
    `archive/README.md`).
 
 ## Risks

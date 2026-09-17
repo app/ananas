@@ -59,6 +59,23 @@ Run the whole pipeline (build the image, then compile and package):
 bash tools/scripts/build-qt6.sh
 ```
 
+### CMake build (alternative)
+
+The tree also has a Qt6 CMake build (`CMakeLists.txt`) alongside qmake. It
+builds the same targets and installs them; it does not touch the packaging
+(`debian/`, `build/*`):
+
+```sh
+podman run --rm -v "$PWD":/workspace:z -w /workspace/ananas-legacy-qt4 \
+    ananas-qt6-builder bash -c '
+        cmake -S . -B cmake-build -DCMAKE_BUILD_TYPE=Debug
+        cmake --build cmake-build -j"$(nproc)"
+        DESTDIR=/tmp/stage cmake --install cmake-build --prefix /usr'
+```
+
+The build tree is `cmake-build/` (gitignored); the output mirrors qmake
+(`lib/`, `lib/designer/`, `bin/`).
+
 The resulting Debian package is copied to `dist/`:
 
 ```
@@ -139,8 +156,8 @@ at the end.
 Qt6 (`Containerfile.qt6`, Ubuntu 24.04):
 
 1. Installs `qt6-base-dev`, `qt6-tools-dev` (Designer), `qt6-declarative-dev`
-   (QtQml/QJSEngine), the Qt6 SQL drivers and the Debian packaging tools;
-   symlinks `qmake`/`lrelease` to their Qt6 locations.
+   (QtQml/QJSEngine), `cmake`, the Qt6 SQL drivers and the Debian packaging
+   tools; symlinks `qmake`/`lrelease` to their Qt6 locations.
 2. Builds `libqdataschema` from the `qt6` branch of the
    `ananas-legacy-qdataschema` checkout and installs it under
    `/usr/lib` + the Qt6 header paths.

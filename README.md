@@ -59,10 +59,10 @@ dist/ananas_0.9.6-1_amd64.deb
 ### Choosing a branch
 
 The script builds the `qtscript` branch by default. Override it with the
-`ANANAS_BRANCH` environment variable:
+`ANANAS_BRANCH` environment variable (any local branch or ref works):
 
 ```sh
-ANANAS_BRANCH=qtscript bash tools/scripts/build-qt4.sh
+ANANAS_BRANCH=port bash tools/scripts/build-qt4.sh
 ```
 
 ### Building the image only
@@ -77,6 +77,28 @@ podman build --no-cache -t ananas-qt4-builder \
 ```sh
 podman run --rm -it -v "$PWD":/workspace:z ananas-qt4-builder bash
 ```
+
+## Porting helpers
+
+Used while porting the Qt4 codebase (see `docs/PORTING.md`).
+
+```sh
+# Read-only burndown report of remaining Qt3Support/QtScript usage
+bash tools/scripts/port-metrics.sh
+
+# Build in place and run the QtTest suite headlessly (Xvfb)
+bash tools/scripts/smoke-qt4.sh
+```
+
+Both scripts take an optional path to `ananas-legacy-qt4` as their first
+argument.
+
+### Build caching
+
+The image ships `ccache` (on `PATH` ahead of `gcc`/`g++`). The cache directory
+is `tmp/ccache` on the mounted workspace, so it survives `podman run --rm` and
+speeds up repeated and clean builds. `build-qt4.sh` and `smoke-qt4.sh` print
+`ccache -s` at the end.
 
 ## How it works
 

@@ -14,9 +14,11 @@ podman run --rm \
   ananas-qt4-builder \
   bash -c '
     set -e
+    export CCACHE_DIR=/workspace/tmp/ccache
+    mkdir -p "$CCACHE_DIR"
     rm -rf /tmp/ananas
     mkdir -p /tmp/ananas
-    git -C /workspace/ananas-legacy-qt4 archive "origin/${BRANCH}" | tar -x -C /tmp/ananas
+    git -C /workspace/ananas-legacy-qt4 archive "${BRANCH}" | tar -x -C /tmp/ananas
     cd /tmp/ananas
 
     # libqdataschema установлена в образ вручную, сообщаем dpkg-shlibdeps её имя пакета
@@ -29,6 +31,9 @@ podman run --rm \
     echo "Копирование пакетов в /workspace/dist..."
     mkdir -p /workspace/dist
     cp -v /tmp/*.deb /workspace/dist/
+
+    echo "===> ccache stats:"
+    ccache -s
   '
 
 echo "===> Сборка завершена успешно! Пакеты: $WORKSPACE_DIR/dist"

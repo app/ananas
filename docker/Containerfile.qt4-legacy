@@ -28,7 +28,16 @@ RUN apt-get update && apt-get install -y --force-yes \
     wget \
     unzip \
     git \
+    xvfb \
+    ccache \
     && rm -rf /var/lib/apt/lists/*
+
+# ccache впереди gcc/g++: ускоряет повторные (в т.ч. чистые) сборки.
+# CCACHE_DIR задаётся при запуске контейнера (см. scripts/*.sh), чтобы кэш
+# лежал на смонтированном томе и переживал --rm.
+ENV PATH=/usr/lib/ccache:$PATH
+ENV CCACHE_MAXSIZE=5G
+ENV CCACHE_COMPRESS=1
 
 # 3. Сборка и установка libqdataschema (ветка newname даёт libqdataschema.so)
 COPY ananas-legacy-qdataschema /tmp/qdataschema

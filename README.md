@@ -149,8 +149,8 @@ at the end.
 
 Qt5 (`Containerfile.qt5`, Ubuntu 24.04):
 
-1. Installs `qtbase5-dev`, `qttools5-dev` (Designer), `qtscript5-dev`, the Qt5
-   SQL drivers and the Debian packaging tools.
+1. Installs `qtbase5-dev`, `qttools5-dev` (Designer), `qtdeclarative5-dev`
+   (QtQml/QJSEngine), the Qt5 SQL drivers and the Debian packaging tools.
 2. Builds `libqdataschema` from the `qt5` branch of the
    `ananas-legacy-qdataschema` checkout and installs it under
    `/usr/lib` + the Qt5 header paths.

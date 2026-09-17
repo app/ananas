@@ -36,7 +36,13 @@ and an external `libqdataschema`.
   - `scripts/build-qt5-qdataschema.sh` builds the matching
     `dist/libqdataschema_1.0.0-1_amd64.deb` (Qt5), so both packages install
     together on a Qt5 host.
-- **Phases 3–6: pending.**
+- **Phase 3 (QtScript → QJSEngine): done.**
+  - `aEngine::code` is a `QJSEngine`; the script debugger was dropped.
+  - Build + `ananas-test` 7/7; an integration harness exercised the engine
+    against the `applications/inventory` scheme (SQLite): slot binding via
+    `newQObject`, global function call, `QVariant` bridging and `isError()`
+    detection all pass.
+- **Phases 4–6: pending.**
 
 ## Handoff (next session)
 
@@ -44,7 +50,7 @@ and an external `libqdataschema`.
   branch is the untouched rollback point. The Phase 1 result is
   `port` @ `b2f77d0`. Tooling lives in the `tools` repo (`main`), sources in
   `ananas-legacy-qt4` / `ananas-legacy-qdataschema` (branch `qt5`).
-- Phases 1–2 are done; the next step is Phase 3 (QtScript → QJSEngine).
+- Phases 1–3 are done; the next step is Phase 4 (Qt5 → Qt6).
 - Commands:
   - burndown: `bash tools/scripts/port-metrics.sh`
   - Qt4 regression bench: `bash tools/scripts/smoke-qt4.sh`
@@ -56,8 +62,8 @@ and an external `libqdataschema`.
 - Images:
   - `ananas-qt4-builder`: Ubuntu 14.04 + Qt4 + QtScript + `libqdataschema`
     (`ananas-legacy-qdataschema@newname`).
-  - `ananas-qt5-builder`: Ubuntu 24.04 + Qt 5.15 + QtScript + `libqdataschema`
-    (`ananas-legacy-qdataschema@qt5`).
+  - `ananas-qt5-builder`: Ubuntu 24.04 + Qt 5.15 + QtQml (QJSEngine) +
+    `libqdataschema` (`ananas-legacy-qdataschema@qt5`).
   - ccache at `<workspace>/tmp/ccache`.
 - Known caveat: the rewritten `wDBTable`/`wTable`/`awidget` have no functional
   tests; only the schema/DB dialogs were smoke-tested manually.
@@ -225,7 +231,8 @@ Already zero: `QDesktopWidget`, `QApplication::desktop()`,
 
 ### 2.5 Scripting
 
-- QtScript still exists in Qt5 (deprecated) — leave until Phase 3 (`QJSEngine`).
+- QtScript was left in place during Phase 2 and migrated in Phase 3
+  (`QJSEngine`).
 
 ### 2.6 Verification
 
@@ -234,18 +241,29 @@ Already zero: `QDesktopWidget`, `QApplication::desktop()`,
   `ananas-administrator`; the manual GUI smoke (schema/DB dialogs) is pending.
 
 Note: this phase is Qt4→Qt5 only; the Qt5→Qt6 items (`QTextCodec`, `QRegExp`,
-`Qt::SplitBehavior`, `QAction` in QtGui, qmake→CMake, `QJSEngine`) stay in
-Phase 4.
+`Qt::SplitBehavior`, `QAction` in QtGui, qmake→CMake) stay in Phase 4.
 
-## Phase 3 — QtScript → QJSEngine
+## Phase 3 — QtScript → QJSEngine (done)
 
-- `aEngine`/`aForm`/`mainform`: `QScriptEngine`→`QJSEngine`,
-  `QScriptValue(List)`→`QJSValue(List)`, `newQMetaObject` constructors → JS
-  shim/`QJSValue` callable, `uncaughtException`→`QJSValue::isError`.
-- `QScriptEngineDebugger` has no equivalent — remove/replace the debugger.
-- Remove `Q_PROPERTY(... SCRIPTABLE true)` (dead layer already deleted).
-- Verify by executing the sample schemes (`applications/inventory`,
-  `applications/money`).
+- `aEngine::code`: `QScriptEngine`→`QJSEngine`; `QScriptValue(List)`→
+  `QJSValue(List)`; `QScriptEngineDebugger` removed (no QJSEngine equivalent).
+- Property existence is checked with `QJSValue::isCallable()`; global calls use
+  `QJSValue::call(args)` (no `thisObject` overload); `newVariant()` →
+  `QJSEngine::toScriptValue()`.
+- `uncaughtException()` → `QJSValue::isError()`: `aEngine::checkScriptError()`
+  logs the result of `evaluate()` (global module, actions); `aForm` logs its
+  form module errors.
+- `aObjectsFactory` is kept for plugin API compatibility; its constructor now
+  registers meta objects via `QJSEngine::newQMetaObject()` (the QtScript
+  native-function constructor hook has no QJSEngine equivalent). Its `create()`
+  factory is unchanged.
+- `QT += script scripttools` → `QT += qml`; the image/control use
+  `qtdeclarative5-dev`.
+- Verified: build + `ananas-test` 7/7, and an integration harness that opened
+  `applications/inventory` (SQLite) through `aDatabase`/`aEngine` — slot binding,
+  global function calls, `QVariant` bridging and `isError()` all pass.
+- Compatibility note: `aEngine::code` changes type, a source-level break for any
+  plugin touching it (none in-tree; Qt4 ABI is incompatible anyway).
 
 ## Phase 4 — Qt5 → Qt6
 

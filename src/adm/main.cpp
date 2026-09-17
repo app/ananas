@@ -4,7 +4,6 @@
 #else
     #include <qcoreapplication.h>
 #endif
-#include <qtextcodec.h>
 #include <qfile.h>
 #include <qvariant.h>
 

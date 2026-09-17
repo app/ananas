@@ -22,6 +22,10 @@ default-character-set=koi8_ru
 #include "qdataschemadriver-postgresql.h"
 #include "qdataschemadriver-sqlite.h"
 
+#if QT_VERSION >= 0x060000
+#include <QStringConverter>
+#endif
+
 /*!
  * \class QDataSchema qdataschema.h
  * \en
@@ -407,19 +411,19 @@ QDataSchema::uid( int otype )
     QString query;
 
     QString drv = db()->driverName();
-    query.sprintf("insert into uniques (otype) values (%d)", otype );
+    query = QString("insert into uniques (otype) values (%1)").arg(otype);
     QSqlQuery q = db()->exec( query );
     if ( drv == "QSQLITE") {
     // sqlite
-        query.sprintf("select last_insert_rowid()");
+        query = "select last_insert_rowid()";
     }
     if ( drv == "QMYSQL") {
     // mysql
-        query.sprintf("select last_insert_id()");
+        query = "select last_insert_id()";
     }
     if ( drv == "QPSQL" ) {
     // pgsql
-        query.sprintf("select currval('uniques_id_seq')");
+        query = "select currval('uniques_id_seq')";
     }
     q = db()->exec( query );
     if ( q.first() ) uid = q.value( 0 ).toULongLong();
@@ -1747,7 +1751,11 @@ QDataSchema::databaseExport( const QString &filename )
 
     if ( f.open( QDS_IO_WriteOnly ) ) {
         QTextStream t ( &f );
+#if QT_VERSION >= 0x060000
+        t.setEncoding(QStringConverter::Utf8);
+#else
         t.setCodec(QTextCodec::codecForName("UTF-8"));
+#endif
         if ( verifyStructure()==0 ) {
             root = doc.createElement("qdataschema");
             doc.appendChild( root );
@@ -1837,7 +1845,11 @@ QDataSchema::databaseImport( const QString &filename, bool updateStruct )
     savedd = dataDictionary();
     if ( f.open( QDS_IO_ReadOnly ) ) {
         QTextStream t ( &f );
+#if QT_VERSION >= 0x060000
+        t.setEncoding(QStringConverter::Utf8);
+#else
         t.setCodec(QTextCodec::codecForName("UTF-8"));
+#endif
         data = QTextStream_readAll( t );
         if ( doc.setContent( data ) ) {
             docElem = doc.documentElement();

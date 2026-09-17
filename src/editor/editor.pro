@@ -1,6 +1,10 @@
 TEMPLATE = lib
 #DESTDIR = ../lib
 TARGET = qtscriptedit
+QT += widgets
+UI_DIR = .ui
+MOC_DIR = .moc
+OBJECTS_DIR = .obj
 #DEFINES += Q_SCRIPTDEBUG_BUILD_LIB
 include(editor.pri)
 unix:VERSION 	= 1.0.0

@@ -24,6 +24,8 @@
 
 #include "scripthighlighter.h"
 
+#include <algorithm>
+
 enum ScriptIds {
     Comment = 1,
     Number,
@@ -121,7 +123,7 @@ static bool isKeyword(const QString &word)
 {
     const char * const *start = &keywords[0];
     const char * const *end = &keywords[MAX_KEYWORD - 1];
-    const char * const *kw = qBinaryFind(start, end, KeywordHelper(word));
+    const char * const *kw = std::lower_bound(start, end, KeywordHelper(word));
 
     return kw != end;
 }

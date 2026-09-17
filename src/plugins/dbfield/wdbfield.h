@@ -39,7 +39,7 @@
 #include <q3socket.h>
 #include <qeventloop.h>
 //Added by qt3to4:
-#include <Q3ValueList>
+#include <QList>
 #include "adatabase.h"
 #include "acfg.h"
 #include "wfield.h"
@@ -86,7 +86,7 @@ public:
 protected:
 	QStringList	getFields();
 	void		init();
-	Q3ValueList<qulonglong> getBindList();
+	QList<qulonglong> getBindList();
 	void		setEditorType(void);
 
 	QString		FieldName;

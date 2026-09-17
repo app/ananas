@@ -82,8 +82,7 @@ aTemplate::close()
 QString
 aTemplate::getValue( const QString &name )
 {
-	QString * pStr=values.find( name );
-	return pStr==0?(QString::null):*pStr;
+	return values.value( name, QString::null );
 }
 
 
@@ -92,7 +91,7 @@ void
 aTemplate::setValue( const QString &name, const QString &value )
 {
     values.remove( name );
-    if ( !value.isEmpty() ) values.insert( name, new QString( value ) );
+    if ( !value.isEmpty() ) values.insert( name, value );
 }
 
 

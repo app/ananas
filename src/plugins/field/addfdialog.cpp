@@ -3,7 +3,7 @@
 #include <qvariant.h>
 #include "wdbfield.h"
 
-#include <Q3ValueList>
+#include <QList>
 /*
  *  Constructs a addfdialog as a child of 'parent', with the
  *  name 'name' and widget flags set to 'f'.
@@ -107,7 +107,7 @@ void addfdialog::getData( QWidget *o )
 {
 	QString s;
 	wDBField *w = (wDBField *)o;
-	Q3ValueList<qulonglong> bindList = w->getBindList();
+	QList<qulonglong> bindList = w->getBindList();
 		s = getData(true);
 		if(s.isEmpty()) return;
 		w->setFieldName(s);

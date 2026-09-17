@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <q3listbox.h>
 //Added by qt3to4:
-#include <Q3ValueList>
+#include <QList>
 
 #include "ananas.h"
 #include "wfield.h"
@@ -96,7 +96,7 @@ void wDBField::openEditor()
 {
 /*
 	QString s;
-  QValueList<Q_ULLONG> bindList = getBindList();
+  QList<Q_ULLONG> bindList = getBindList();
   addfdialog e(this->topLevelWidget());
   getFields();
   e.setData( defDisplayFields, defFields,defId);
@@ -199,7 +199,7 @@ wDBField::getFields()
   QStringList lst, dlst;
   QString str;
   int res,i;
-  Q3ValueList<qulonglong> bindList = getBindList();
+  QList<qulonglong> bindList = getBindList();
   aCfgItem o, o_head;
   defId.clear();
   defFields.clear();
@@ -391,13 +391,13 @@ wDBField::setEditorType ()
  * 	\return \en List of binding fields id. \_en
  * 		\ru Список id забинденых полей. \_ru
  */
-Q3ValueList<qulonglong>
+QList<qulonglong>
 wDBField::getBindList()
 {
 aCfgItem obj;
 QObjectList wList;
 int id;
-Q3ValueList<qulonglong> listBindings;
+QList<qulonglong> listBindings;
 wDBField* wfield;
 QObject* wd = aWidget::parentContainer (this);
 	listBindings.clear();

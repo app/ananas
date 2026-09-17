@@ -40,6 +40,7 @@
 #include <qscriptengine.h>
 #include <qscriptenginedebugger.h>
 #include <QScriptValue>
+#include <QHash>
 
 //Added by qt3to4:
 #include <QTimerEvent>
@@ -199,7 +200,7 @@ signals:
 private:
 	QString pr_timer;
 	QString mGlobal;
-	Q3Dict <QVariant> values;
+	QHash <QString, QVariant> values;
 
 };
 

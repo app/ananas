@@ -34,7 +34,8 @@
 #define ATOOLBAR_H
 
 #include <QToolBar>
-#include <qaction.h>
+#include <QAction>
+#include <QHash>
 
 #include "acfg.h"
 #include "ananas.h"
@@ -45,7 +46,7 @@ class  QT_WIDGET_PLUGIN_EXPORT aToolBar : public QToolBar
 private:
     aCfg	*md;
     aEngine *en;
-    Q3IntDict<QAction> actions;
+    QHash<int, QAction*> actions;
 
 public:
 	aToolBar( aCfg *cfg, aCfgItem &obj, aEngine *e, QMainWindow* parent = 0, const char* name = 0 );

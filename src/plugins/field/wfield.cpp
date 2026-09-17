@@ -216,9 +216,7 @@ wField::widgetInit()
 	case Date:
 	case DateTime:
 	// used object wDateTime, inherits QDateTime
-		dateEdit->setSeparator(".");
-		dateEdit->setOrder( Q3DateEdit::DMY );
-		connect(dateEdit, SIGNAL( valueChanged ( const QDate&) ),
+		connect(dateEdit, SIGNAL( dateChanged ( const QDate&) ),
 				this, SLOT( setValue( const QDate & ) ) );
 		connect(dateEdit, SIGNAL( lostFocus() ),
 			 	this, SLOT( focusOutEvent() ) );

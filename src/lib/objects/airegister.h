@@ -29,7 +29,7 @@
 
 #ifndef AIREGISTER_H
 #define AIREGISTER_H
-#include	<q3valuelist.h>
+#include	<QList>
 #include	<qstringlist.h>
 #include	<qvariant.h>
 #include	<qdatetime.h>

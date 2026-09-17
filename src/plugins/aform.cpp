@@ -51,7 +51,7 @@
 //--#include <qfocusdata.h>
 #include <qlabel.h>
 #include <QMainWindow>
-#include <q3datetimeedit.h>
+#include <QDateEdit>
 #include <qstatusbar.h>
 #include <qlineedit.h>
 #include <qlayout.h>
@@ -65,7 +65,7 @@
 #include <qwidget.h>
 //Added by qt3to4:
 #include <QKeyEvent>
-#include <Q3ValueList>
+#include <QList>
 #include <q3mimefactory.h>
 
 #include "aform.h"
@@ -1390,7 +1390,7 @@ aForm::on_valueChanged( const QString & name, const QVariant & val )
 
 //	if ( engine->project.interpreter()->functions(this).findIndex("on_valuechanged")!=-1)
 //	{
-//		Q3ValueList<QVariant> lst;
+//		QList<QVariant> lst;
 //		lst << name;
 //		lst << val;
 //		engine->project.interpreter()->call("on_valuechanged",QVariantList(lst), this);
@@ -1412,7 +1412,7 @@ aForm::on_tabvalueChanged(int row, int col)
 
 //	if ( engine->project.interpreter()->functions(this).findIndex("on_tabupdate")!=-1)
 //	{
-//		Q3ValueList<QVariant> lst;
+//		QList<QVariant> lst;
 //		lst << row;
 //		lst << col;
 //		lst << sender()->name();
@@ -1456,7 +1456,7 @@ aForm::on_dbtablerow( QSqlRecord *r )
 void
 aForm::on_event( const QString &source, const QString &data )
 {
-//	Q3ValueList<QVariant> lst;
+//	QList<QVariant> lst;
 //	lst << source;
 //	lst << data;
 //	if ( engine->project.interpreter()->functions(this).findIndex("on_event")!=-1) {
@@ -1488,7 +1488,7 @@ aForm::on_tabselected( qulonglong uid )
 void
 aForm::on_tablerow( qulonglong uid )
 {
-//	Q3ValueList<QVariant> lst;
+//	QList<QVariant> lst;
 //	lst << sender()->name();
 //	lst << QString("%1").arg(uid);
 //	if ( engine->project.interpreter()->functions(this).findIndex("on_tabrowselected")!=-1) {

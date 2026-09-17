@@ -30,7 +30,6 @@
 #define AOOTEMPLATE_H
 
 #include <qstring.h>
-#include <q3ptrlist.h>
 #include <q3valuestack.h>
 #include <qdom.h>
 #include <QMap>

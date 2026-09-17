@@ -32,7 +32,7 @@
 #include <q3sqlpropertymap.h>
 #include <qmessagebox.h>
 #include <qaction.h>
-#include <q3datetimeedit.h>
+#include <QDateEdit>
 //Added by qt3to4:
 #include <q3mimefactory.h>
 #include "adatabase.h"
@@ -72,15 +72,15 @@ wJournal::initObject( aDatabase *adb )
 
 	if(((aDocJournal*)dbobj)->type()==0 && toolbar)
 	{
-		date_from = new Q3DateEdit(toolbar);
-		date_to = new Q3DateEdit(toolbar);
+		date_from = new QDateEdit(toolbar);
+		date_to = new QDateEdit(toolbar);
 		QDate current = QDate::currentDate();
 		date_to->setMinimumWidth(100);
 		date_from->setMinimumWidth(100);
 		date_to->setDate(current);
 		date_from->setDate(current.addMonths(-1));
-		connect(date_from, SIGNAL(valueChanged(const QDate &)), this, SLOT(setFilterByDate()));
-		connect(date_to, SIGNAL(valueChanged(const QDate &)), this, SLOT(setFilterByDate()));
+		connect(date_from, SIGNAL(dateChanged(const QDate &)), this, SLOT(setFilterByDate()));
+		connect(date_to, SIGNAL(dateChanged(const QDate &)), this, SLOT(setFilterByDate()));
 	}
 	else
 	{

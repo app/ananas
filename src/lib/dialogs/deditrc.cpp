@@ -1,6 +1,6 @@
 #include "deditrc.h"
 
-#include <q3filedialog.h>
+#include <QFileDialog>
 //#include <qstring.h>
 #include <qvariant.h>
 #include <qimage.h>
@@ -98,13 +98,12 @@ void dEditRC::onOK()
 
 void dEditRC::onRCFile()
 {
-		Q3FileDialog fd( QString::null,
-  			tr("ananas config resource (*.rc)"),
-			0, 0, TRUE );
-		fd. setMode ( Q3FileDialog::AnyFile );
-		fd.setSelection( QDir::convertSeparators(eRCFile->text()));
+		QFileDialog fd( 0, tr("Select ananas config resource"),
+  			QString(), tr("ananas config resource (*.rc)") );
+		fd.setFileMode ( QFileDialog::AnyFile );
+		fd.selectFile( QDir::convertSeparators(eRCFile->text()));
 		if ( fd.exec() == QDialog::Accepted ) {
-			eRCFile->setText(QDir::convertSeparators(fd.selectedFile()));
+			eRCFile->setText(QDir::convertSeparators(fd.selectedFiles().value(0)));
 			setdata(eRCFile->text(),it);
 		} else {
 			return;
@@ -114,13 +113,12 @@ void dEditRC::onRCFile()
 
 void dEditRC::onCFGFile()
 {
-		Q3FileDialog fd( QString::null,
-  			tr("ananas config file (*.cfg)"),
-			0, 0, TRUE );
-		fd. setMode ( Q3FileDialog::AnyFile );
-		fd.setSelection( QDir::convertSeparators(eCfgName->text()));
+		QFileDialog fd( 0, tr("Select ananas config file"),
+  			QString(), tr("ananas config file (*.cfg)") );
+		fd.setFileMode ( QFileDialog::AnyFile );
+		fd.selectFile( QDir::convertSeparators(eCfgName->text()));
 		if ( fd.exec() == QDialog::Accepted ) {
-			eCfgName->setText(QDir::convertSeparators(fd.selectedFile()));
+			eCfgName->setText(QDir::convertSeparators(fd.selectedFiles().value(0)));
 		} else {
 			return;
 		}

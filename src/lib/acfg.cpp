@@ -141,7 +141,6 @@ aCfg::aCfg() : QObject(0, "Metadata"), xml( md_root )
 {
 	setCompressed( false );
 	setModified( false );
-	idcache.setAutoDelete( TRUE );
 	createNew();
 }
 
@@ -300,6 +299,8 @@ aCfg::init(){
 	md = rootnode.namedItem( md_metadata ).toElement();
 	iface = rootnode.namedItem( md_interface ).toElement();
 	actions = rootnode.namedItem( md_actions ).toElement();
+	for ( QHash<int, aCfgItemContaner*>::iterator it = idcache.begin(); it != idcache.end(); ++it )
+		delete it.value();
 	idcache.clear();
 	cur = rootnode.firstChild();
 	while (!cur.isNull()) {
@@ -551,7 +552,7 @@ aCfg::find(long id)
 	if ( id == mdc_interface ) return iface;
 	if ( id == mdc_actions ) return actions;
 
-	ic = idcache.find( idl );
+	ic = idcache.value( idl, 0 );
 	if (ic) i = ic->item;
 //	if (!i.isNull()) printf("!founded id=%li\n", id);
 //	else printf("!NOT founded id=%li\n", id);

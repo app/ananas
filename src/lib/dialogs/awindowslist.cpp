@@ -96,11 +96,12 @@ aWindowsList::remove( int id, qulonglong ido )
 void
 aWindowsList::remove( QWidget *window )
 {
-    Q3DictIterator<QWidget> it( list );
-    for ( ; it.current(); ++it )
+    QHashIterator<QString, QWidget*> it( list );
+    while ( it.hasNext() )
     {
-	if ( it.current() == window ) {
-	    list.remove( it.currentKey() );
+	it.next();
+	if ( it.value() == window ) {
+	    list.remove( it.key() );
 	    break;
 	}
     }
@@ -119,7 +120,7 @@ aWindowsList::remove( QWidget *window )
 bool
 aWindowsList::find( int id, qulonglong ido )
 {
-    if ( !list.find( conv( id, ido ) ) ) return FALSE;
+    if ( !list.contains( conv( id, ido ) ) ) return FALSE;
     return TRUE;
 }
 
@@ -135,8 +136,8 @@ aWindowsList::find( int id, qulonglong ido )
 bool
 aWindowsList::find( QWidget *window )
 {
-    Q3DictIterator<QWidget> it( list );
-    for ( ; it.current(); ++it ) if ( it.current() == window ) return TRUE;
+    QHashIterator<QString, QWidget*> it( list );
+    while ( it.hasNext() ) { it.next(); if ( it.value() == window ) return TRUE; }
     return FALSE;
 }
 
@@ -154,7 +155,7 @@ aWindowsList::find( QWidget *window )
 QWidget *
 aWindowsList::get( int id, qulonglong ido )
 {
-    return list.find( conv( id, ido ) );
+    return list.value( conv( id, ido ), 0 );
 }
 
 

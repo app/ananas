@@ -35,7 +35,7 @@
 #include <qwidgetplugin.h>
 #include <qpushbutton.h>
 #include <qlabel.h>
-#include <q3datetimeedit.h>
+#include <QDateEdit>
 #include <qcheckbox.h>
 #include "qlineedit.h"
 //Added by qt3to4:

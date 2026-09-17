@@ -40,7 +40,6 @@
 #define QListView Q3ListView
 #define QListViewItem Q3ListViewItem
 #define QPopupMenu QMenu
-#define QHeader Q3Header
 
 class QWidget;
 

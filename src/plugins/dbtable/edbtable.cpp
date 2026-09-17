@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include "wdbtable.h"
 //Added by qt3to4:
-#include <Q3ValueList>
+#include <QList>
 #include <Q3SqlFieldInfo>
 
 /*
@@ -276,7 +276,7 @@ void eDBTable::ColumnUpd()
 {
 QStringList lst;
 int id;
-Q3ValueList<int> listTableId;
+QList<int> listTableId;
 	id = table->getTableId(ComboBoxTable->currentItem()-1);
 	listTableId = table->getBindList();
 	if(listTableId.find(id)!=listTableId.end())

@@ -78,7 +78,7 @@ public:
 	virtual ERR_Code addUser( qulonglong userId );
 	virtual ERR_Code delUser( qulonglong userId );
 
-//	QValueList< aUser *> getUsers( bool assigned);
+//	QList< aUser *> getUsers( bool assigned);
 
 	bool hasUser( qulonglong userId);
 
@@ -90,7 +90,7 @@ public:
 	//virtual ERR_Code setLastName( const QString & );
 
 //irtual Q_ULLONG getUserId( const QString &login, const QString &password );
-//irtual ERR_Code getRoles(QValueList<aRole> *lst);
+//irtual ERR_Code getRoles(QList<aRole> *lst);
 	bool First();
 	bool Next();
 	bool Last();

@@ -30,11 +30,10 @@
 #include <stdlib.h>
 #include <qfile.h>
 #include <qstringlist.h>
-#include <q3textstream.h>
+#include <QTextStream>
 //#include <QTextStream>
 #include <qpixmap.h>
 #include <q3dragobject.h>
-#include <Q3MimeSourceFactory>
 
 #include "acfg.h"
 #include "acfgrc.h"
@@ -90,7 +89,6 @@ Ananas resource file object.
 */
 aCfgRc::aCfgRc()
 {
-	values.setAutoDelete( TRUE );
 	filename = QString::null;
 }
 
@@ -115,17 +113,17 @@ aCfgRc::read(const QString &fname)
 	values.clear();
 	if ( file.open( QIODevice::ReadOnly ) )
 	{
-		Q3TextStream stream( &file );
+		QTextStream stream( &file );
 		QString line, k, v;
 
-		stream.setEncoding(Q3TextStream::UnicodeUTF8);
-		while ( !stream.eof() ) {
+		stream.setCodec("UTF-8");
+		while ( !stream.atEnd() ) {
 			line = stream.readLine(); // line of text excluding '\n'
 			if ( line.trimmed().startsWith("#") ) // skip comments line
 				continue;
 			k = line.section("=",0,0);
 			v = line.section("=",1,100); if ( v.isNull() ) v = "";
-			values.insert( k, new QString( v ) );
+			values.insert( k, v );
 		}
 		file.close();
 		return 0;
@@ -153,13 +151,15 @@ aCfgRc::write(const QString &fname)
 
 	if ( file.open( QIODevice::WriteOnly ) )
 	{
-		Q3TextStream stream( &file );
-		Q3DictIterator<QString> it( values );
+		QTextStream stream( &file );
+		QHashIterator<QString, QString> it( values );
 //		int i, vc;
 
-		stream.setEncoding(Q3TextStream::UnicodeUTF8);
-		for( ; it.current(); ++it )
-		stream << it.currentKey() << "=" << *it.current() << endl;
+		stream.setCodec("UTF-8");
+		while ( it.hasNext() ) {
+			it.next();
+			stream << it.key() << "=" << it.value() << "\n";
+		}
 //			cout << endl;
 //		vc = values.count();
 //		for ( i = 0; i< vc; i++) stream << *it << "\n";
@@ -205,9 +205,8 @@ aCfgRc::write()
 QString
 aCfgRc::value(const QString &name, const QString &defValue)
 {
-	QString *s;
-	s = values.find( name );
-	if ( s ) return *s; else return defValue;
+	if ( values.contains( name ) ) return values.value( name );
+	else return defValue;
 }
 
 
@@ -236,8 +235,7 @@ aCfgRc::value(const QString &name, const QString &defValue)
 void
 aCfgRc::setValue(const QString &name, const QString &value)
 {
-	if (values.find( name )) values.replace( name, new QString( value ));
-	else values.insert( name, new QString( value ));
+	values.insert( name, value );
 }
 
 

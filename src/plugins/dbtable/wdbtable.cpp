@@ -38,7 +38,7 @@
 #include <Q3HBoxLayout>
 #include <QKeyEvent>
 #include <Q3SqlPropertyMap>
-#include <Q3ValueList>
+#include <QList>
 #include <Q3SqlCursor>
 #include <QPixmap>
 #include <QFrame>
@@ -442,7 +442,7 @@ aCfgItem o_table, o = tables;
 QString str;
 QStringList listIdTable;
 int res;
-Q3ValueList<int> vList = getBindList();
+QList<int> vList = getBindList();
 
 	if(o.isNull()) return;
 	QString objClass = md->objClass(o);
@@ -1259,7 +1259,7 @@ aEditorFactory::setMd(aCfg * cfg)
  *	\~
  *	\return \~english list of id binding table. \~russian список таблиц \~
  */
-Q3ValueList<int>
+QList<int>
 wDBTable::getBindList()
 {
 aCfgItem obj;

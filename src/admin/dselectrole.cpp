@@ -41,8 +41,8 @@ dSelectRole::setData( aUser *user )
  usr = user;
  listBox1->clear();
  listId.clear();
- Q3ValueList<aRole*> list = user->getRoles(false);
- Q3ValueList<aRole*>::iterator it;
+ QList<aRole*> list = user->getRoles(false);
+ QList<aRole*>::iterator it;
  for ( it = list.begin(); it != list.end(); ++it )
  {
   listBox1->insertItem( (*it)->sysValue("name").toString() );

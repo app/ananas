@@ -811,7 +811,7 @@ aWidget::value( const QString & nameWidget )
 		} else if (!strcmp(w->className(),"QCheckBox")){
 			res=((QCheckBox*)w)->text();
 		} else if (!strcmp(w->className(),"QDateEdit")){
-			res=((Q3DateEdit*)w)->date().toString(Qt::ISODate);
+			res=((QDateEdit*)w)->date().toString(Qt::ISODate);
 		}
 	} else {
 	//	debug_message(tr("Error! Can't find widget by name==`%s`\n"),(const char*) name.local8Bit());
@@ -862,7 +862,7 @@ aWidget::setValue( const QString & nameWidget, const QVariant &value )
 		} else if (!strcmp(w->className(),"QCheckBox")){
 			((QCheckBox*)w)->setText(value.toString() );
 		} else if (!strcmp(w->className(),"QDateEdit")){
-			((Q3DateEdit*)w)->setDate( value.toDate() );
+			((QDateEdit*)w)->setDate( value.toDate() );
 		}
 	} else {
 		//debug_message(tr("aForm::SetValue() Error! Can't find widget by name==`%s`\n"),(const char*) name.local8Bit());

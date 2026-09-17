@@ -34,7 +34,7 @@
 #include 	"adatabase.h"
 #include 	"acfg.h"
 #include 	"aobject.h"
-#include 	<q3valuelist.h>
+#include 	<QList>
 //class aDatabase;
 //class aRole;
 //class aObject;
@@ -75,7 +75,7 @@ public:
 	virtual ERR_Code delRole( qulonglong roleId );
 	virtual ERR_Code UpdateRole();
 
-	Q3ValueList< aRole *> getRoles( bool assigned);
+	QList< aRole *> getRoles( bool assigned);
 
 	bool hasRole( qulonglong roleId);
 //	virtual ERR_Code setPassword( const QString & );
@@ -84,7 +84,7 @@ public:
 	//virtual ERR_Code setLastName( const QString & );
 
 	virtual qulonglong getUserId( const QString &login, const QString &password );
-	//virtual ERR_Code getRoles(QValueList<aRole> *lst);
+	//virtual ERR_Code getRoles(QList<aRole> *lst);
 	bool First();
 	bool Next();
 	bool Last();

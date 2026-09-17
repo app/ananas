@@ -64,9 +64,6 @@ aDataTable::aDataTable( aCfgItem context, aDatabase *adb )
 		init (context, adb );
 	}
 	selected = false;
-	p_cat.setAutoDelete ( true );
-	p_reg.setAutoDelete ( true );
-	p_doc.setAutoDelete ( true );
 }
 
 
@@ -91,9 +88,6 @@ aDataTable::aDataTable( const QString &tname, aDatabase *adb )
 	tableName = tname;
 	mdobjId = 0;
 	selected = false;
-	p_cat.setAutoDelete ( true );
-	p_reg.setAutoDelete ( true );
-	p_doc.setAutoDelete ( true );
 
 }
 
@@ -105,13 +99,18 @@ aDataTable::aDataTable( const QString &tname, aDatabase *adb )
  *	\~
  *
  */
+static void clearObjectHash( QHash<QString, QObject*> &h )
+{
+	for ( QHash<QString, QObject*>::iterator it = h.begin(); it != h.end(); ++it )
+		delete it.value();
+	h.clear();
+}
+
 aSQLTable::~aSQLTable()
 {
-//	delete p_reg;
-//	delete p_cat;
-	p_reg.clear();
-	p_cat.clear();
-	p_doc.clear();
+	clearObjectHash( p_reg );
+	clearObjectHash( p_cat );
+	clearObjectHash( p_doc );
 }
 
 /*!
@@ -130,9 +129,7 @@ aDataTable::init( aCfgItem context, aDatabase *adb )
 {
 	db = adb;
 	fnames.clear();
-	fnames.setAutoDelete( true );
 	userFilter.clear();
-	userFilter.setAutoDelete( true );
 	setObject( context );
 
 }
@@ -175,9 +172,9 @@ aDataTable::setObject( aCfgItem context )
 	mapDim.clear();
 	mapSum.clear();
 	//TODO:  test to memory leak
-	p_cat.clear();
-	p_reg.clear();
-	p_doc.clear();
+	clearObjectHash( p_cat );
+	clearObjectHash( p_reg );
+	clearObjectHash( p_doc );
 //	printf("before delete p_cat\n");
 //	if(p_cat)
 	//delete p_cat;
@@ -234,7 +231,7 @@ aSQLTable::insertFieldInfo(aCfgItem cobj, bool calculated)
 			fdbname = QString("uf%1").arg( fid );
                         if ( objt[0]=='O' )
 			{
-				fnames.insert( fname, new QString(fdbname) );
+				fnames.insert( fname, fdbname );
         			fdbname = QString("text_uf%1").arg( fid );
                 		append( Q3SqlFieldInfo( fdbname, QVariant::String ) );
 		             //   setGenerated( fdbname, false );
@@ -260,7 +257,7 @@ aSQLTable::insertFieldInfo(aCfgItem cobj, bool calculated)
                 		append( Q3SqlFieldInfo( fdbname, QVariant::String ) );
 		                setCalculated( fdbname, calculated );
 		               // setGenerated( fdbname, false );
-				fnames.insert( fname, new QString(fdbname) );
+				fnames.insert( fname, fdbname );
 				int ftid = objt.section(" ", 1, 1 ).toInt();
 				aCfgItem fto = md->find( ftid );
 				if ( !fto.isNull() )
@@ -296,7 +293,7 @@ aSQLTable::insertFieldInfo(aCfgItem cobj, bool calculated)
                         }
 			else
 			{
-				fnames.insert( fname, new QString(fdbname) );
+				fnames.insert( fname, fdbname );
 			}
 	}
 }
@@ -440,12 +437,12 @@ aDataTable::value ( const QString & name )
 	QString fname;
         QVariant v;
 
-	if ( !fnames[name] )
+	if ( !fnames.contains(name) )
 	{
 		aLog::print(aLog::Error, QObject::tr("aDataTable get value of unknown field `%1'").arg(name));
 		return QVariant::Invalid;
 	}
-	fname = * fnames[ name ];
+	fname = fnames.value( name );
 
         //v = QSqlCursor::value( fname );
 
@@ -522,8 +519,8 @@ bool
 aDataTable::setValue ( const QString & name, QVariant value )
 {
 	QString fname;
-	if ( !fnames[name] ) return false;
-	fname = * fnames[ name ];
+	if ( !fnames.contains(name) ) return false;
+	fname = fnames.value( name );
 	if ( contains( fname ) ) {
 		Q3SqlCursor::setValue( fname, value );
 	}
@@ -644,13 +641,12 @@ aDataTable::setFilter( const QString& name, const QVariant& value )
 {
 
 	aLog::print(aLog::Debug, QObject::tr("aDataTable set filter %1='%2'").arg(name).arg(value.toString()));
-	if ( !fnames[name] )
+	if ( !fnames.contains(name) )
 	{
 		aLog::print(aLog::Error, QObject::tr("aDataTable set filter %1='%2', %3 not exist").arg(name).arg(value.toString()).arg(name));
 		return false;
 	}
-	QVariant *v = new QVariant(value);
-	userFilter.replace(*fnames[name], v );
+	userFilter.insert( fnames.value(name), value );
 	Q3SqlCursor::setFilter(getFilter());
 	return true;
 }
@@ -665,32 +661,31 @@ aDataTable::getFilter()
 {
 	QString filter = "", fid, type;
 	aCfgItem field;
-	Q3DictIterator<QVariant>it( userFilter );
-	if ( it.toFirst() )
+	QHashIterator<QString, QVariant> it( userFilter );
+	bool first = true;
+	while ( it.hasNext() )
 	{
-		fid = it.currentKey().mid(2);
+		it.next();
+		fid = it.key().mid(2);
 		field = md->find(fid.toLong() );
 		if ( !field.isNull() )
 		{
 			type = md->attr( field, mda_type );
-			if ( type[0] == 'N' || type[0] == 'O' )
-				filter = it.currentKey() + "=" + it.current()->toString();
+			if ( first )
+			{
+				if ( type[0] == 'N' || type[0] == 'O' )
+					filter = it.key() + "=" + it.value().toString();
+				else
+					filter = it.key() + "='" + it.value().toString() + "'";
+				first = false;
+			}
 			else
-				filter = it.currentKey() + "='" + it.current()->toString() + "'";
-		}
-	}
-	++it;
-	for (;it.current();++it)
-	{
-		fid = it.currentKey().mid(2);
-		field = md->find(fid.toLong() );
-		if ( !field.isNull() )
-		{
-			type = md->attr( field, mda_type );
-			if ( type[0] == 'N' || type[0] == 'O' )
-				filter += " and " + it.currentKey() + "=" + it.current()->toString();
-			else
-				filter += " and " + it.currentKey() + "='" + it.current()->toString() + "'";
+			{
+				if ( type[0] == 'N' || type[0] == 'O' )
+					filter += " and " + it.key() + "=" + it.value().toString();
+				else
+					filter += " and " + it.key() + "='" + it.value().toString() + "'";
+			}
 		}
 	}
 	return filter;
@@ -706,32 +701,31 @@ aDataTable::getNFilter()
 {
 	QString filter = "", fid, type;
 	aCfgItem field;
-	Q3DictIterator<QVariant>it( userFilter );
-	if ( it.toFirst() )
+	QHashIterator<QString, QVariant> it( userFilter );
+	bool first = true;
+	while ( it.hasNext() )
 	{
-		fid = it.currentKey().mid(2);
+		it.next();
+		fid = it.key().mid(2);
 		field = md->find(fid.toLong() );
 		if ( !field.isNull() )
 		{
 			type = md->attr( field, mda_type );
-			if ( type[0] == 'N' || type[0] == 'O' )
-				filter = tableName + "." + it.currentKey() + "=" + it.current()->toString();
+			if ( first )
+			{
+				if ( type[0] == 'N' || type[0] == 'O' )
+					filter = tableName + "." + it.key() + "=" + it.value().toString();
+				else
+					filter = tableName + "." + it.key() + "='" + it.value().toString() + "'";
+				first = false;
+			}
 			else
-				filter = tableName + "." + it.currentKey() + "='" + it.current()->toString() + "'";
-		}
-	}
-	++it;
-	for (;it.current();++it)
-	{
-		fid = it.currentKey().mid(2);
-		field = md->find(fid.toLong() );
-		if ( !field.isNull() )
-		{
-			type = md->attr( field, mda_type );
-			if ( type[0] == 'N' || type[0] == 'O' )
-				filter += " and " + tableName + "." + it.currentKey() + "=" + it.current()->toString();
-			else
-				filter += " and " + tableName + "." + it.currentKey() + "='" + it.current()->toString() + "'";
+			{
+				if ( type[0] == 'N' || type[0] == 'O' )
+					filter += " and " + tableName + "." + it.key() + "=" + it.value().toString();
+				else
+					filter += " and " + tableName + "." + it.key() + "='" + it.value().toString() + "'";
+			}
 		}
 	}
 	return filter;
@@ -745,16 +739,16 @@ aDataTable::getNFilter()
 void
 aDataTable::printRecord(){
 	unsigned int i;
-        Q3DictIterator<QString> it( fnames );
 	QString fname, sname;
 
 	for (i=0; i< count(); i++){
 		fname = "";
 		sname = field( i ).name();
-		it.toFirst();
-	        for( ; it.current(); ++it ){
-		    if ( *it.current() == sname ) {
-			fname = it.currentKey();
+		QHashIterator<QString, QString> it( fnames );
+		while ( it.hasNext() ) {
+		    it.next();
+		    if ( it.value() == sname ) {
+			fname = it.key();
 			break;
 		    }
 		}
@@ -1113,8 +1107,8 @@ aDataTable::Update()
  */
 QString
 aDataTable::sqlFieldName ( const QString & userFieldName ) const {
-	if (fnames[userFieldName] ) {
-		return *fnames[ userFieldName ];
+	if ( fnames.contains(userFieldName) ) {
+		return fnames.value( userFieldName );
 	}
 	// return QString::QString("");
 	return QString("");

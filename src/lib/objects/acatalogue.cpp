@@ -34,7 +34,7 @@
 #include	"acatalogue.h"
 #include 	"alog.h"
 //Added by qt3to4:
-#include <Q3ValueList>
+#include <QList>
 
 
 /*!\en
@@ -577,9 +577,9 @@ aCatalogue::delElement()
  */
 void
 aCatalogue::getMarkDeletedList(qulonglong idg,
-				Q3ValueList<qulonglong> &listDelId)
+				QList<qulonglong> &listDelId)
 {
-	Q3ValueList<qulonglong> lst;
+	QList<qulonglong> lst;
 	aSQLTable * tg = table ( md_group );
 	if ( !tg ) return;
 	qulonglong tmp;
@@ -602,7 +602,7 @@ aCatalogue::getMarkDeletedList(qulonglong idg,
 				lst << GroupSysValue("id").toULongLong();
 				}while(NextInGroupTable());
 
-				Q3ValueList<qulonglong>::iterator it = lst.begin();
+				QList<qulonglong>::iterator it = lst.begin();
 				while(it!= lst.end())
 				{
 					getMarkDeletedList((*it),listDelId);
@@ -642,7 +642,7 @@ aCatalogue::isElementMarkDeleted()
  *\_ru
  */
 qulonglong
-aCatalogue::delGroup(qulonglong idg, Q3ValueList<qulonglong> &listDelId)
+aCatalogue::delGroup(qulonglong idg, QList<qulonglong> &listDelId)
 {
 	aSQLTable * tg = table ( md_group );
 	if ( !tg ) return 0;

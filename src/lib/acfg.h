@@ -40,7 +40,7 @@ Ananas configuration objects.
 
 #include <qdom.h>
 //#include <qdict.h>
-#include <q3intdict.h>
+#include <QHash>
 #include "acfgrc.h"
 
 #ifdef __BORLANDC__
@@ -485,7 +485,7 @@ private:
     aCfgItem rootnode, cfginfo, md,
     iface,
     actions;
-    Q3IntDict <aCfgItemContaner> idcache;
+    QHash<int, aCfgItemContaner*> idcache;
     long nextID();
     void init();
 

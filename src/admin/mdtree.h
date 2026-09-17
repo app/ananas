@@ -37,8 +37,6 @@
 #include "auser.h"
 #include "arole.h"
 
-#define QIntDict Q3IntDict
-#define QValueList Q3ValueList
 
 //#include "usersform.h"
 //#include "rolesform.h"
@@ -151,8 +149,6 @@ public slots:
 	void itemSetPermission();
 private slots:
 	void on_collapsed( Q3ListViewItem *item );
-private:
-	QIntDict<QWidget> editors;
 };
 
 #endif

@@ -30,7 +30,7 @@
 #ifndef ASQLTABLE_H
 #define ASQLTABLE_H
 #include <q3sqlcursor.h>
-#include <q3dict.h>
+#include <QHash>
 #include "acfg.h"
 //#include "aaregister.h"
 //#include "adatarecord.h"
@@ -124,14 +124,14 @@ private:
 	aCfgItem		obj;
 	aCfgItem		init_obj;
 	aCfg*			md;
-	Q3Dict<QObject> p_cat;
-	Q3Dict<QObject> p_doc;
-	Q3Dict<QObject> p_reg;
+	QHash<QString, QObject*> p_cat;
+	QHash<QString, QObject*> p_doc;
+	QHash<QString, QObject*> p_reg;
 	QMap<int,aCfgItem> mapCat, mapReg, mapDoc;
 	QMap<int,QString> mapDim,mapSum;
 	QStringList fildsList;
-	Q3Dict<QString> fnames;
-	Q3Dict<QVariant> userFilter;
+	QHash<QString, QString> fnames;
+	QHash<QString, QVariant> userFilter;
 //	QDict<aDataField> dataRecord;
 //	aDataRecord dataRecord;
 //	QSqlRecord r;

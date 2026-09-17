@@ -23,7 +23,7 @@
 #include "acombobox.h"
 //Added by qt3to4:
 #include <QPixmap>
-#include <Q3StrList>
+#include <QStringList>
 #include <QEvent>
 
 AComboBox::AComboBox( QWidget* parent, const char* name ):QComboBox( parent, name ) {
@@ -46,12 +46,12 @@ AComboBox::insertStringList( const QStringList &list, int index ) {
 };
 
 /*--void
-AComboBox::insertStrList( const Q3StrList &list, int index ){
+AComboBox::insertStrList( const QStringList &list, int index ){
 	QComboBox::insertStrList( list, index );
 };
 
 void
-AComboBox::insertStrList( const Q3StrList *list, int index ){
+AComboBox::insertStrList( const QStringList *list, int index ){
 	QComboBox::insertStrList( list, index );
 };
 

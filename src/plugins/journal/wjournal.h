@@ -30,7 +30,7 @@
 #ifndef WJOURNAL_H
 #define WJOURNAL_H
 #include <qwidgetplugin.h>
-#include <q3datetimeedit.h>
+#include <QDateEdit>
 #include "awidget.h"
 
 class QWidget;
@@ -83,7 +83,7 @@ protected slots:
 private:
 	QDialog *dSelectType;
 	QToolBar *toolbar;
-	Q3DateEdit *date_from, *date_to;
+	QDateEdit *date_from, *date_to;
 	qulonglong docUid;
 	int docId;
 };

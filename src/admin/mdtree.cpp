@@ -357,11 +357,11 @@ aListViewItem::loadTree()
 void
 aListViewItem::loadUsrRoles ( aListViewItem *parent )
 {
-	QValueList<aRole*> list = user->getRoles(true);
+	QList<aRole*> list = user->getRoles(true);
 	aCfgItem cobj;
 	//listId.clear();
-//	QValueList<aRole*> list = user->getRoles(false);
-	QValueList<aRole*>::iterator it;
+//	QList<aRole*> list = user->getRoles(false);
+	QList<aRole*>::iterator it;
 	for ( it = list.begin(); it != list.end(); ++it )
 	{
 		cobj = md->find ( mdc_metadata );

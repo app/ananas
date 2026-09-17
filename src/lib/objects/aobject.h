@@ -31,6 +31,7 @@
 #define AOBJECT_H
 
 #include <qdatetime.h>
+#include <QHash>
 #include "acfg.h"
 #include "asqltable.h"
 
@@ -161,7 +162,7 @@ protected:
 
 private:
 	bool vInited, selectFlag, filtred;
-	Q3Dict <aDataTable> dbtables;
+	QHash<QString, aDataTable*> dbtables;
 
 //	QDict <aDataRecord> attributes;
 };

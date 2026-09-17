@@ -27,7 +27,7 @@
 #include "qcombobox.h"
 //Added by qt3to4:
 #include <QPixmap>
-#include <Q3StrList>
+#include <QStringList>
 #include <QEvent>
 #include <Q3ListBox>
 
@@ -69,8 +69,8 @@ public slots:
     int		count() const;
 
     void	insertStringList( const QStringList &, int index=-1 );
-    //--void	insertStrList( const Q3StrList &, int index=-1 );
-    //--void	insertStrList( const Q3StrList *, int index=-1 );
+    //--void	insertStrList( const QStringList &, int index=-1 );
+    //--void	insertStrList( const QStringList *, int index=-1 );
     //--void	insertStrList( const char **, int numStrings=-1, int index=-1);
 
     void	insertItem( const QString &text, int index=-1 );

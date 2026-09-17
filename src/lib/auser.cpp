@@ -29,7 +29,7 @@
 
 #include	"auser.h"
 //Added by qt3to4:
-#include <Q3ValueList>
+#include <QList>
 //#include 	"ananas.h"
 
 
@@ -85,10 +85,10 @@ aUser::initObject()
  * \param assibned 	\en true for return assigned roles, false for retun unassigned roles\_en
  * 			\ru true для возврата назначенных ролей, false для возврата неназначенных ролей \_ru
  */
-Q3ValueList< aRole *>
+QList< aRole *>
 aUser::getRoles(bool assigned)
 {
-	Q3ValueList<aRole*> list;
+	QList<aRole*> list;
 	qulonglong rid;
 	aRole *rl = new aRole(db);
 	rl->Select();

@@ -31,7 +31,7 @@
 //#include <qsinputdialogfactory.h>
 
 #include <qobject.h>
-#include <q3valuelist.h>
+#include <QList>
 #include <qstringlist.h>
 #include <qstring.h>
 #include <stdlib.h>
@@ -390,7 +390,7 @@ aEngine::on_systemstart(){
 void
 aEngine::on_event( const QString &data )
 {
-//	Q3ValueList<QVariant> lst;
+//	QList<QVariant> lst;
 //	lst <<  sender()->name();
 //	lst << data;
 //	if (project.interpreter()->functions().findIndex("on_event")!=-1) {
@@ -910,10 +910,7 @@ aEngine::sourcePreprocessor( const QString &src )
 QVariant
 aEngine::value( const QString &name )
 {
-	QVariant v, *pv;
-	pv = values.find( name );
-	if ( pv ) return *pv;
-	return v;
+	return values.value( name );
 }
 
 
@@ -928,7 +925,7 @@ void
 aEngine::setValue( const QString &name, QVariant value )
 {
     values.remove( name );
-    if ( !value.isValid() ) values.insert( name, new QVariant( value ) );
+    if ( !value.isValid() ) values.insert( name, value );
 }
 
 

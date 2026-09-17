@@ -33,7 +33,7 @@
 #include "ananasglobal.h"
 
 #include <qobject.h>
-#include <q3dict.h>
+#include <QHash>
 //Added by qt3to4:
 #include <QPixmap>
 
@@ -66,7 +66,7 @@ public:
 
 private:
 	QString filename;
-	Q3Dict <QString> values;
+	QHash <QString, QString> values;
 };
 
 #endif

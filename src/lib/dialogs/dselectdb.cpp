@@ -43,7 +43,7 @@ void dSelectDB::languageChange()
 //#include "acfgobj.h"
 #include <qdir.h>
 #include <qstring.h>
-#include <q3filedialog.h>
+#include <QFileDialog>
 #include <qlineedit.h>
 #include <qstring.h>
 #include <qdom.h>
@@ -466,11 +466,12 @@ void dSelectDB::exportItem()
 			return;
 		}
 
-		Q3FileDialog *fdlg = new Q3FileDialog(this, "fileDialog",true); // create modal dialog
-		fdlg->setMode ( Q3FileDialog::AnyFile );
+		QFileDialog *fdlg = new QFileDialog(this); // create modal dialog
+		fdlg->setObjectName( "fileDialog" );
+		fdlg->setFileMode ( QFileDialog::AnyFile );
 		if(fdlg->exec()==QDialog::Accepted)
 		{
-			filename = fdlg->selectedFile();
+			filename = fdlg->selectedFiles().value(0);
 		}
 		else
 		{

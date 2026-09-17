@@ -36,8 +36,9 @@
 #include <QPixmap>
 
 aToolBar::aToolBar( aCfg *cfg, aCfgItem &obj, aEngine *e, QMainWindow* parent , const char* name )
-: QToolBar( parent, name )
+: QToolBar( parent )
 {
+	setObjectName( name );
 	md = cfg;
 	en = e;
 	ReadTool( obj );
@@ -67,13 +68,12 @@ aToolBar::ReadTool( aCfgItem &obj )
 	QAction *a = new QAction(
 		QIcon(pix), // pixmap
 		md->attr( aobj, mda_name), // name
-		aKey, // key sequence
-		this, // owner
-		md->attr( aobj, mda_name) // name
+		this // owner
 	);	// create new action
+	if ( !aKey.isEmpty() ) a->setShortcut( QKeySequence( aKey ) );
 	actions.insert( pid, a );	// add action to dict
-	a->addTo( this );	// put action into toolbar
-	connect( a, SIGNAL(activated()), this, SLOT(on_Item()) );	// connect to slot
+	addAction( a );	// put action into toolbar
+	connect( a, SIGNAL(triggered()), this, SLOT(on_Item()) );	// connect to slot
 	aobj = md->nextSibling( aobj );	// get next action
     }
 }
@@ -81,10 +81,11 @@ aToolBar::ReadTool( aCfgItem &obj )
 void
 aToolBar::on_Item()
 {
-    Q3IntDictIterator<QAction> it( actions );	//dict iterator
-    for ( ; it.current(); ++it ) {	// foreach action
-	if ( it.current() == sender() ) {	// sender object
-	    en->on_MenuBar( it.currentKey() );	// call slot
+    QHashIterator<int, QAction*> it( actions );	//dict iterator
+    while ( it.hasNext() ) {	// foreach action
+	it.next();
+	if ( it.value() == sender() ) {	// sender object
+	    en->on_MenuBar( it.key() );	// call slot
 	    break;	// break cycle
 	}
     }

@@ -11,7 +11,7 @@
 #include <q3mimefactory.h>
 #include <Q3GridLayout>
 #include <QFrame>
-#include <Q3ValueList>
+#include <QList>
 #include <QPixmap>
 #include <QLabel>
 #include <QKeyEvent>
@@ -473,12 +473,12 @@ CatalogForm::loadElements( qulonglong idGroup )
 void
 CatalogForm::onLoadElements( Q3ListViewItem *item )
 {
-	Q3ValueList<Q3ListViewItem*> lst = map_gr.values();
+	QList<Q3ListViewItem*> lst = map_gr.values();
 	int ind = lst.findIndex(item);
 	qulonglong key;
 	if(ind!=-1)
 	{
-		Q3ValueList<qulonglong> listKey = map_gr.keys();
+		QList<qulonglong> listKey = map_gr.keys();
 		key = listKey[ind];
 		loadElements(key);
 	}
@@ -547,12 +547,12 @@ CatalogForm::new_item( Q3ListViewItem * parentItem )
 long
 CatalogForm::getGroupId( Q3ListViewItem * item )
 {
-	Q3ValueList<Q3ListViewItem*> lst = map_gr.values();
+	QList<Q3ListViewItem*> lst = map_gr.values();
 	int ind = lst.findIndex(item);
 	qulonglong key=0;
 	if(ind!=-1)
 	{
-		Q3ValueList<qulonglong> listKey = map_gr.keys();
+		QList<qulonglong> listKey = map_gr.keys();
 		key = listKey[ind];
 	}
 return key;
@@ -678,9 +678,9 @@ void CatalogForm::del_item( Q3ListViewItem * item )
 		id = getGroupId(item);
 		if(id)
 		{
-			Q3ValueList<qulonglong> listDeletedId;
+			QList<qulonglong> listDeletedId;
 			cat->delGroup(id, listDeletedId);
-			Q3ValueList<qulonglong>::iterator it = listDeletedId.begin();
+			QList<qulonglong>::iterator it = listDeletedId.begin();
 			while(it!= listDeletedId.end())
 			{
 				if(map_el.contains(*it)) map_el.remove(*it);
@@ -717,9 +717,9 @@ void CatalogForm::mark_deleted( Q3ListViewItem * item )
 	if(id)
 	{
 		loadElements(id); // populate items in group
-		Q3ValueList<qulonglong> listDeletedId;
+		QList<qulonglong> listDeletedId;
 		cat->getMarkDeletedList(id,listDeletedId);
-		Q3ValueList<qulonglong>::iterator it = listDeletedId.begin();
+		QList<qulonglong>::iterator it = listDeletedId.begin();
 		while(it != listDeletedId.end()) //first delete elements in this group
 		{
 			if(map_el.contains(*it))
@@ -775,10 +775,10 @@ void CatalogForm::undo_mark_deleted( Q3ListViewItem * item )
 		{
 		  // cat->select(QString("id=%1").arg(id),md_group);
 		   //if(cat->FirstInGroupTable())
-			Q3ValueList<qulonglong> listDeletedId;
+			QList<qulonglong> listDeletedId;
 		   //	cat->setMarkDeletedGroup(id, listDeletedId,false);
 	   		cat->getMarkDeletedList(id, listDeletedId);
-			Q3ValueList<qulonglong>::iterator it = listDeletedId.begin();
+			QList<qulonglong>::iterator it = listDeletedId.begin();
 			while(it != listDeletedId.end()) //first delete elements in this group
 			{
 				if(map_el.contains(*it))
@@ -926,12 +926,12 @@ void CatalogForm::select( Q3ListViewItem * item )
  */
 qulonglong CatalogForm::getElementId( Q3ListViewItem * item )
 {
-	Q3ValueList<Q3ListViewItem*> lst = map_el.values();
+	QList<Q3ListViewItem*> lst = map_el.values();
 	int ind = lst.findIndex(item);
 	qulonglong key=0;
 	if(ind!=-1)
 	{
-		Q3ValueList<qulonglong> listKey = map_el.keys();
+		QList<qulonglong> listKey = map_el.keys();
 		key = listKey[ind];
 	}
 return key;

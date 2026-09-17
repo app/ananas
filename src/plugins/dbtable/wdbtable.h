@@ -37,7 +37,7 @@
 #include <Q3SqlEditorFactory>
 #include <QContextMenuEvent>
 #include <QFrame>
-#include <Q3ValueList>
+#include <QList>
 #include <QPixmap>
 #include <Q3SqlCursor>
 #include <QKeyEvent>
@@ -156,7 +156,7 @@ public:
 	virtual int Select( ANANAS_UID db_uid );
 	aCfg*	getMd();
 public slots:
-	Q3ValueList<int> getBindList();
+	QList<int> getBindList();
 	void 	setWFieldEditor();
 	void	setAvailableTables();
 	void 	lineUpdate(QSql::Op mode);
@@ -295,7 +295,7 @@ private:
 	bool inEditMode;
 	//aDBTablePrivate impl;
 //	void updateProp(void);
-	Q3ValueList<int> listBindings;
+	QList<int> listBindings;
 	aCfgItem obj;
         QString vName, vEditFormName;
 	QString	vDefineCols;

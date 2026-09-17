@@ -9,7 +9,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-export QTDIR=/usr/lib/x86_64-linux-gnu/qt5
+export QTDIR=/usr/lib/x86_64-linux-gnu/qt6
 
 CFLAGS = -Wall -g
 
@@ -34,7 +34,7 @@ build-stamp: configure-stamp
 
 	# Add here commands to compile the package.
 
-	$(MAKE) -e QT_VER=5
+	$(MAKE) -e QT_VER=6
 	touch $@
 
 clean:
@@ -58,13 +58,13 @@ install: build
 	# which are the paths ananas.pri adds to INCLUDEPATH.
 	mkdir -p $(CURDIR)/debian/libqdataschema/usr/lib
 	mkdir -p $(CURDIR)/debian/libqdataschema/usr/bin
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/include/x86_64-linux-gnu/qt5/qdataschema
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/qt5/include/qdataschema
+	mkdir -p $(CURDIR)/debian/libqdataschema/usr/include/x86_64-linux-gnu/qt6/qdataschema
+	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/qt6/include/qdataschema
 
 	cp -df ./lib/* $(CURDIR)/debian/libqdataschema/usr/lib/
 	cp -df ./bin/* $(CURDIR)/debian/libqdataschema/usr/bin/
-	cp -f ./src/lib/*.h $(CURDIR)/debian/libqdataschema/usr/include/x86_64-linux-gnu/qt5/qdataschema/
-	cp -f ./src/lib/*.h $(CURDIR)/debian/libqdataschema/usr/share/qt5/include/qdataschema/
+	cp -f ./src/lib/*.h $(CURDIR)/debian/libqdataschema/usr/include/x86_64-linux-gnu/qt6/qdataschema/
+	cp -f ./src/lib/*.h $(CURDIR)/debian/libqdataschema/usr/share/qt6/include/qdataschema/
 
 # Build architecture-independent files here.
 binary-indep: build install

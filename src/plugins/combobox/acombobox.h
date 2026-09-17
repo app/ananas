@@ -113,8 +113,8 @@ public slots:
     virtual void setValidator( const QValidator * );
     const QValidator * validator() const;
 
-    //--virtual void setListBox( Q3ListBox * );
-    //--Q3ListBox *	listBox() const;
+    //--virtual void setListBox( QListWidget * );
+    //--QListWidget *	listBox() const;
 
     virtual void setLineEdit( QLineEdit *edit );
     QLineEdit*	lineEdit() const;

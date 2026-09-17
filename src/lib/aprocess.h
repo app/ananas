@@ -1,5 +1,5 @@
 /****************************************************************************
-** Thin compatibility wrapper around QProcess, replacing the Qt3 Q3Process
+** Thin compatibility wrapper around QProcess, replacing the Qt3 QProcess
 ** API used by the Ananas container/report code.
 **********************************************************************/
 

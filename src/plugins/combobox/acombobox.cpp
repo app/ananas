@@ -203,11 +203,11 @@ AComboBox::validator() const{
 }
 
 /*--void
-AComboBox::setListBox( Q3ListBox * lb){
+AComboBox::setListBox( QListWidget * lb){
 	QComboBox::setListBox( lb );
 }
 
-Q3ListBox *
+QListWidget *
 AComboBox::listBox() const {
 	return QComboBox::listBox();
 }*/

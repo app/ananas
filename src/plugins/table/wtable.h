@@ -34,11 +34,10 @@
 #include <qwidget.h>
 #include <qwidgetplugin.h>
 #include <qobject.h>
-#include <q3scrollview.h>
-#include <q3table.h>
+#include <QTableWidget>
+#include <QHeaderView>
 #include <qlabel.h>
 #include <qevent.h>
-#include <q3datatable.h>
 #include "acfg.h"
 #include "aobject.h"
 #include "awidget.h"
@@ -60,7 +59,7 @@
  */
 
 
-class QT_WIDGET_PLUGIN_EXPORT wTable : public Q3Table
+class QT_WIDGET_PLUGIN_EXPORT wTable : public QTableWidget
 {
 	Q_OBJECT
 

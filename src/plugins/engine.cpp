@@ -86,8 +86,8 @@ aObjectsFactory::aObjectsFactory( aEngine *e )
         if ( ! db ) return;
 
 
-        // QJSEngine has no native-function constructor hook (QScriptEngine::
-        // newFunction); register the meta objects directly instead.
+        // The old QtScript engine had a native-function constructor hook;
+        // QJSEngine does not, so register the meta objects directly instead.
         engine->code->globalObject().setProperty("QObject",
                                           engine->code->newQMetaObject(&QObject::staticMetaObject));
         engine->code->globalObject().setProperty("MetaObject",

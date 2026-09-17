@@ -30,9 +30,13 @@ podman run --rm -it \
     -v /tmp/.X11-unix:/tmp/.X11-unix:z \
     -e DISPLAY="${DISPLAY:-}" \
     -e APP="$APP" \
+    -e QT_X11_NO_MITSHM=1 \
     "$IMAGE" \
     bash -c '
         set -e
+        # MIT-SHM is not usable across the container boundary; disable it or the
+        # window stays blank with BadAccess/BadDrawable X errors.
+        export QT_X11_NO_MITSHM=1
         DEB="$(ls /dist/ananas_*.deb | head -1)"
         # --force-depends: libqdataschema/mysql-client are provided by the image
         dpkg -i --force-depends "$DEB" >/dev/null 2>&1

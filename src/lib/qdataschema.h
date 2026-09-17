@@ -65,7 +65,7 @@ public:
 
     int execList( const QStringList &query, bool inTransaction = false );
 
-    QDS_SQLTable *table( const QString &name = QString::null );
+    QDS_SQLTable *table( const QString &name = QString() );
     QString tableName( const QString &name );
     QString tableNameStripPrefix( const QString &name );
 

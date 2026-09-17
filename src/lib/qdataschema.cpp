@@ -413,11 +413,11 @@ QDataSchema::uid( int otype )
     // sqlite
         query.sprintf("select last_insert_rowid()");
     }
-    if ( drv == "QMYSQL3") {
+    if ( drv == "QMYSQL") {
     // mysql
         query.sprintf("select last_insert_id()");
     }
-    if ( drv == "QPSQL7" ) {
+    if ( drv == "QPSQL" ) {
     // pgsql
         query.sprintf("select currval('uniques_id_seq')");
     }
@@ -1204,7 +1204,7 @@ QDataSchema::checkSqlError( QSqlQuery &query )
 #if QT_VERSION<0x040000
         fprintf(stderr, err.ascii());
 #else
-        fprintf(stderr, "%s\n", toChar(err.toAscii()));
+        fprintf(stderr, "%s\n", toChar(err));
 #endif
         return 1;
     }
@@ -1240,7 +1240,7 @@ QDataSchema::execList( const QStringList &queryList, bool inTransaction )
 #if QT_VERSION<0x040000
                     printf("ERROR ON QUERY %i:%s\n", i, (const char *) queryList[i] );
 #else
-                    printf("ERROR ON QUERY %i:%s\n", i, (const char *) queryList[i].toAscii() );
+                    printf("ERROR ON QUERY %i:%s\n", i, (const char *) queryList[i].toLatin1() );
 #endif
                     break;
                 }

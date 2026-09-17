@@ -34,7 +34,9 @@ int main(int argc, char * argv[])
 #else
     QCoreApplication app(argc,argv);
 #endif
+#if QT_VERSION<0x050000
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF-8"));
+#endif
 
     QStringList l;
     QString dbtype="QSQLITE";

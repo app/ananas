@@ -143,7 +143,10 @@ toLower(const QString &s)
 char
 toAscii(QChar c)
 {
-#if QT_VERSION>=0x040000
+#if QT_VERSION>=0x050000
+// QT5 code
+    return c.toLatin1();
+#elif QT_VERSION>=0x040000
 // QT4 code
     return c.toAscii();
 #else

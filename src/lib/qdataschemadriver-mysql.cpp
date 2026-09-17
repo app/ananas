@@ -59,7 +59,7 @@ QDataSchemaDriverMySQL::~QDataSchemaDriverMySQL()
 QString
 QDataSchemaDriverMySQL::sqlDriverName()
 {
-	return "QMYSQL3";
+	return "QMYSQL";
 }
 
 

@@ -21,9 +21,9 @@
 
 #if QT_VERSION>=0x040000
 // QT4 code    
-    #include <Qt/QtCore>
-    #include <Qt/QtSql>
-    #include <Qt/QtXml>
+    #include <QtCore>
+    #include <QtSql>
+    #include <QtXml>
     #include <QCoreApplication>
     #include <QStringList>
     #define QSqlFieldInfo QSqlField

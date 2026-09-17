@@ -71,7 +71,7 @@ QDataSchemaDriverPostgreSQL::~QDataSchemaDriverPostgreSQL()
 QString
 QDataSchemaDriverPostgreSQL::sqlDriverName()
 {
-    return "QPSQL7";
+    return "QPSQL";
 }
 
 

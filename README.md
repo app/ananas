@@ -23,8 +23,9 @@ ananas-port/
 │   ├── docker/Containerfile.qt4-legacy
 │   ├── docker/Containerfile.qt5
 │   ├── scripts/build-qt4.sh
-│   └── scripts/build-qt5.sh
-└── dist/                       # build output (created by the script)
+│   ├── scripts/build-qt5.sh
+│   └── scripts/build-qt5-qdataschema.sh
+└── dist/                       # build output (created by the scripts)
 ```
 
 ## Source repositories
@@ -68,6 +69,23 @@ The resulting Debian package is copied to `dist/`:
 dist/ananas_0.9.6-1_amd64.deb
 ```
 
+### Building the libqdataschema package
+
+`ananas` depends on `libqdataschema (>= 1.0.0)`, so to install it on the host
+build the matching package first (same image as the main package):
+
+```sh
+bash tools/scripts/build-qt5-qdataschema.sh
+```
+
+This produces `dist/libqdataschema_1.0.0-1_amd64.deb`. Install both on a Qt5
+host:
+
+```sh
+sudo apt install ./dist/libqdataschema_1.0.0-1_amd64.deb \
+                 ./dist/ananas_0.9.6-1_amd64.deb
+```
+
 ### Choosing a branch
 
 `build-qt5.sh` builds `port` by default and `build-qt4.sh` builds `qtscript`.
@@ -77,6 +95,13 @@ works):
 ```sh
 ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh
 ANANAS_BRANCH=port bash tools/scripts/build-qt4.sh
+```
+
+`build-qt5-qdataschema.sh` builds the `qt5` branch; override it with
+`QDS_BRANCH`:
+
+```sh
+QDS_BRANCH=qt5 bash tools/scripts/build-qt5-qdataschema.sh
 ```
 
 ### Building the images only

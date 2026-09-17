@@ -33,6 +33,9 @@ and an external `libqdataschema`.
   - `scripts/smoke-qt5.sh`: clean Qt5 build + `ananas-test` 7/7.
   - `scripts/run-qt5.sh` installs the package in the image; the packaged
     `ananas-administrator` starts (manual GUI smoke pending).
+  - `scripts/build-qt5-qdataschema.sh` builds the matching
+    `dist/libqdataschema_1.0.0-1_amd64.deb` (Qt5), so both packages install
+    together on a Qt5 host.
 - **Phases 3–6: pending.**
 
 ## Handoff (next session)
@@ -47,6 +50,8 @@ and an external `libqdataschema`.
   - Qt4 regression bench: `bash tools/scripts/smoke-qt4.sh`
   - Qt5 build + tests: `bash tools/scripts/smoke-qt5.sh`
   - package: `ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh`
+  - package `libqdataschema` (ananas dependency):
+    `bash tools/scripts/build-qt5-qdataschema.sh`
   - run the app: `bash tools/scripts/run-qt5.sh ananas-administrator`
 - Images:
   - `ananas-qt4-builder`: Ubuntu 14.04 + Qt4 + QtScript + `libqdataschema`
@@ -170,7 +175,9 @@ vendored Designer (`src/designer`) is still Qt4 and out of scope (Phase 6).
 - Added `docker/Containerfile.qt5` (Ubuntu 24.04 LTS) + `scripts/build-qt5.sh`,
   `scripts/smoke-qt5.sh`, `scripts/run-qt5.sh`.
 - Built `libqdataschema` for Qt5 in lockstep (branch `qt5`): `QChar::toAscii`,
-  `QString::null`, driver names `QMYSQL3`/`QPSQL7` → `QMYSQL`/`QPSQL`.
+  `QString::null`, driver names `QMYSQL3`/`QPSQL7` → `QMYSQL`/`QPSQL`, and
+  modernized its Debian packaging (compat 9, Qt5 paths, no doxygen docs) so
+  `build-qt5-qdataschema.sh` emits an installable `libqdataschema` `.deb`.
 
 ### 2.2 Includes
 

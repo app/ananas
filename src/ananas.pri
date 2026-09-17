@@ -27,5 +27,5 @@ INCLUDEPATH +=$$[QT_INSTALL_DATA]/include/qdataschema
 
 # Qt6 uic defaults to pointer-to-member connections, which fail to compile for
 # forms whose slots live in the derived class (not in the base widget). Keep
-# the Qt5 string-based connection syntax. Qt5 uic has no such option.
-greaterThan(QT_MAJOR_VERSION, 5): QMAKE_UIC_FLAGS += -c string
+# the string-based connection syntax.
+QMAKE_UIC_FLAGS += -c string

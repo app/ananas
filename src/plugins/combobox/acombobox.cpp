@@ -233,7 +233,6 @@ AComboBox::lineEdit() const{
 void
 AComboBox::setAutoCompletion( bool val ){
 	v_autoCompletion = val;
-#if QT_VERSION >= 0x060000
 	if ( val ) {
 		if ( !completer() ) {
 			QCompleter *c = new QCompleter( model(), this );
@@ -244,18 +243,11 @@ AComboBox::setAutoCompletion( bool val ){
 	} else {
 		setCompleter( 0 );
 	}
-#else
-	QComboBox::setAutoCompletion( val );
-#endif
 }
 
 bool
 AComboBox::autoCompletion() const{
-#if QT_VERSION >= 0x060000
 	return v_autoCompletion;
-#else
-	return QComboBox::autoCompletion();
-#endif
 }
 
 bool

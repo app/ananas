@@ -41,9 +41,20 @@
 #include <qfile.h>
 #include <qstringlist.h>
 #include <QTextStream>
+#include <QDir>
 
 #include "acfg.h"
 #include "alog.h"
+
+QString
+aExpandHome(const QString &path)
+{
+	if ( path.isEmpty() ) return path;
+	if ( path == "~" ) return QDir::homePath();
+	if ( path.startsWith("~/") || path.startsWith("~\\") )
+		return QDir::homePath() + path.mid(1);
+	return path;
+}
 
 #ifdef _MSC_VER
 #define vsnprintf _vsnprintf

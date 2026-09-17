@@ -36,6 +36,7 @@ default-character-set=utf8
 
 */
 #include <QObject>
+#include <QDir>
 #include <qfile.h>
 #include <qdom.h>
 #include <qstringlist.h>
@@ -573,7 +574,18 @@ aDatabase::prepareDatabaseConnect ( aCfgRc* dbParams )
         if ( qds==0 ) qds = new QDataSchema ( qds_dbtype, "ANANAS" );
         //qds->setNameSpace("qds_");
 
-        qds->db()->setDatabaseName ( dbParams->value ( "dbname" ) );
+        // For the internal (SQLite) database a relative dbname is resolved
+        // against the scheme workdir (with "~" expanded), so a packaged scheme
+        // can keep its data in a per-user location.
+        QString dbname = aExpandHome ( dbParams->value ( "dbname" ) );
+        if ( dbtype == "internal" && QDir::isRelativePath ( dbname ) ) {
+                QString workdir = aExpandHome ( dbParams->value ( "workdir" ) );
+                if ( !workdir.isEmpty() ) {
+                        QDir().mkpath ( workdir );
+                        dbname = QDir ( workdir ).filePath ( dbname );
+                }
+        }
+        qds->db()->setDatabaseName ( dbname );
         qds->db()->setUserName ( dbParams->value ( "dbuser" ) );
         qds->db()->setPassword ( dbParams->value ( "dbpass" ) );
         qds->db()->setHostName ( dbParams->value ( "dbhost","localhost" ) );

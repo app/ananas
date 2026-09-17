@@ -488,7 +488,7 @@ aReport::path2workdir()
 #endif
 	if(md!=NULL)
 	{
-		res = md->rc.value("workdir");
+		res = aExpandHome( md->rc.value("workdir") );
 	}
 	aLog::print(aLog::Debug, tr("aReport working dir = %1").arg(res));
 	return res;

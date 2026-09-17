@@ -28,6 +28,7 @@
 **********************************************************************/
 
 #include "ananas.h"
+#include "acfgrc.h"
 #include "dselectdb.h"
 #include "dlogin.h"
 
@@ -59,6 +60,15 @@ ananas_login( QString &rcfile, QString &username, QString &userpassword, aDataba
     if (dselectdb.exec()==QDialog::Accepted) rcfile = dselectdb.rcfile;
   }
   if ( !rcfile.isEmpty() ) {
+    // The internal (SQLite) database needs no credentials, so skip the login
+    // dialog and log in anonymously.
+    aCfgRc rc;
+    rc.read( rcfile );
+    if ( rc.value( "dbtype" ) == "internal" ) {
+      if ( !db ) db = aDatabase::database();
+      if ( !db->init( rcfile ) ) return false;
+      return ( db->login( "", "", appId ) );
+    }
     if (dlogin.exec()==QDialog::Accepted) {
       username = dlogin.username;
       userpassword = dlogin.password;

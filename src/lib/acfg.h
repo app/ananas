@@ -54,6 +54,9 @@ extern void (*cfg_messageproc)(int , const char *);
 void ANANAS_EXPORT cfg_message(int msgtype, const char *msgfmt,...);
 void ANANAS_EXPORT debug_message(const char *msgfmt,...);
 
+// Expand a leading "~" (or "~/...") to the user's home directory.
+QString ANANAS_EXPORT aExpandHome(const QString &path);
+
 class QObject;
 
 /*!

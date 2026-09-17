@@ -292,7 +292,7 @@ aForm::init()
 			//--form = QWidgetFactory::create( &b );
 			QFormBuilder fb;
 			fb.addPluginPath(QCoreApplication::applicationDirPath() /*"/plugins/designer"*/);
-                        fb.addPluginPath("/usr/lib/ananas/");
+                        fb.addPluginPath("/usr/lib/ananas/designer");
                         /*QList<QDesignerCustomWidgetInterface*> l = fb.customWidgets();
 			int i;
 			for (i=0; i<l.size(); i++)

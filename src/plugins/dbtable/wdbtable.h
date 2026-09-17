@@ -231,7 +231,7 @@ signals:
  *	\~
  */
 	void updateCurr(int row, int col);
-	void currentChanged( const QSqlRecord *record );
+	void currentChanged( QSqlRecord *record );
 
 	//signals from context menu for connecting to wJournal
 	void insertRequest();

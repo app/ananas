@@ -129,14 +129,14 @@ wField::widgetInit()
     lineEdit->hide();
 	disconnect( lineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( setValue( const QString & ) ) );
-	disconnect( lineEdit, SIGNAL( lostFocus() ), this, SLOT( focusOutEvent()) );
+	disconnect( lineEdit, SIGNAL( editingFinished() ), this, SLOT( focusOutEvent()) );
   //  lineEdit->disconnect();
     lineEdit->setReadOnly(false);
     layout()->removeWidget(lineEdit);
     dateEdit->hide();// = new QDateEdit(this);
-    disconnect(dateEdit, SIGNAL( valueChanged ( const QDate&) ),
+    disconnect(dateEdit, SIGNAL( dateChanged ( const QDate&) ),
 				this, SLOT( setValue( const QDate & ) ) );
-    disconnect(dateEdit, SIGNAL( lostFocus() ),
+    disconnect(dateEdit, SIGNAL( editingFinished() ),
 			 	this, SLOT( focusOutEvent() ) );
     layout()->removeWidget(dateEdit);
     objLabel->hide();// = new QLabel(this);
@@ -187,7 +187,7 @@ wField::widgetInit()
 		}
 		connect( lineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( setValue( const QString & ) ) );
-		connect( lineEdit, SIGNAL( lostFocus() ), this, SLOT( focusOutEvent()) );
+		connect( lineEdit, SIGNAL( editingFinished() ), this, SLOT( focusOutEvent()) );
 
 		setFocusProxy(lineEdit);
 		layout()->addWidget( lineEdit );
@@ -207,7 +207,7 @@ wField::widgetInit()
 		}
 		connect( lineEdit, SIGNAL( textChanged( const QString & ) ),
 				this, SLOT( setValue( const QString & ) ) );
-		connect( lineEdit, SIGNAL( lostFocus() ), this, SLOT( focusOutEvent()) );
+		connect( lineEdit, SIGNAL( editingFinished() ), this, SLOT( focusOutEvent()) );
 
 		setFocusProxy(lineEdit);
 		layout()->addWidget( lineEdit );
@@ -219,7 +219,7 @@ wField::widgetInit()
 	// used object wDateTime, inherits QDateTime
 		connect(dateEdit, SIGNAL( dateChanged ( const QDate&) ),
 				this, SLOT( setValue( const QDate & ) ) );
-		connect(dateEdit, SIGNAL( lostFocus() ),
+		connect(dateEdit, SIGNAL( editingFinished() ),
 			 	this, SLOT( focusOutEvent() ) );
 
 		setFocusProxy( dateEdit );
@@ -264,7 +264,7 @@ wField::widgetInit()
 		break;
 
 	case Boolean:
-//		connect( checkBox, SIGNAL( lostFocus() ), this, SLOT( focusOutEvent()) );
+//		connect( checkBox, SIGNAL( editingFinished() ), this, SLOT( focusOutEvent()) );
 		connect( checkBox, SIGNAL( valueChanged ( const QString & ) ),
 				this, SLOT( setValue( const QString & ) ) );
 

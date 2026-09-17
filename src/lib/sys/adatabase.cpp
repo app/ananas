@@ -37,6 +37,9 @@ default-character-set=utf8
 */
 #include <QObject>
 #include <QDir>
+#include <QFileInfo>
+#include <QTextStream>
+#include <QStringConverter>
 #include <qfile.h>
 #include <qdom.h>
 #include <qstringlist.h>
@@ -496,6 +499,69 @@ aDatabase::init( const QString &rcname, const QString &dbname )
 	return init( &cfg.rc, dbname );
 }
 
+
+// Copy the scheme's report templates into the (writable) workdir, without
+// overwriting files that already exist there.
+static void
+aProvisionTemplates( aCfgRc *rc )
+{
+	const QString cfgFile = aExpandHome ( rc->value ( "configfile" ) );
+	const QString workdir = aExpandHome ( rc->value ( "workdir" ) );
+	if ( cfgFile.isEmpty() || workdir.isEmpty() ) return;
+
+	QDir schemeDir ( QFileInfo ( cfgFile ).absolutePath() );
+	if ( !schemeDir.exists() ) return;
+	QDir().mkpath ( workdir );
+
+	const QStringList templates = schemeDir.entryList ( QStringList() << "templ_*", QDir::Files );
+	for ( int i = 0; i < templates.count(); i++ ) {
+		const QString dst = QDir ( workdir ).filePath ( templates[i] );
+		if ( !QFile::exists ( dst ) )
+			QFile::copy ( schemeDir.filePath ( templates[i] ), dst );
+	}
+}
+
+
+// Execute the scheme's initial data script (rc "initdata"), used once when the
+// internal database is created.
+static void
+aLoadInitData( aDatabase *db, aCfgRc *rc )
+{
+	QString init = aExpandHome ( rc->value ( "initdata" ) );
+	if ( init.isEmpty() ) return;
+
+	if ( QDir::isRelativePath ( init ) ) {
+		const QString cfgFile = aExpandHome ( rc->value ( "configfile" ) );
+		init = QDir ( QFileInfo ( cfgFile ).absolutePath() ).filePath ( init );
+	}
+	QFile f ( init );
+	if ( !f.open ( QIODevice::ReadOnly ) ) {
+		aLog::print ( aLog::Error, QObject::tr ( "aDatabase can't open init data %1" ).arg ( init ) );
+		return;
+	}
+	QTextStream ts ( &f );
+	ts.setEncoding ( QStringConverter::Utf8 );
+	QStringList stmts;
+	const QStringList lines = ts.readAll().split ( '\n' );
+	for ( int i = 0; i < lines.count(); i++ ) {
+		const QString s = lines[i].trimmed();
+		if ( !s.isEmpty() ) stmts << s;
+	}
+
+	int loaded = 0;
+	for ( int i = 0; i < stmts.count(); i++ ) {
+		QSqlQuery q = db->db()->exec ( stmts[i] );
+		if ( q.lastError().type() != QSqlError::NoError ) {
+			aLog::print ( aLog::Error, QObject::tr ( "aDatabase init data error: %1" )
+				      .arg ( q.lastError().databaseText() ) );
+		} else {
+			loaded++;
+		}
+	}
+	aLog::print ( aLog::Info, QObject::tr ( "aDatabase initial data: %1/%2 statement(s) from %3" )
+		      .arg ( loaded ).arg ( stmts.count() ).arg ( init ) );
+}
+
 /**
  * \en
  *      \brief Creates database on SQL server.
@@ -526,6 +592,10 @@ aDatabase::init ( aCfgRc *rc, const QString &dbname )
         if ( !rc ) return false;
         if ( !prepareDatabaseConnect ( rc ) ) return false;
 
+        const bool internal = ( rc->value ( "dbtype" ) == "internal" );
+        const bool firstRun = internal && !QFile::exists ( qds->db()->databaseName() );
+        aProvisionTemplates ( rc );
+
         qds_dd ( cfg );
         qds->setDataDictionary ( dd );
         if ( qds->open() )
@@ -535,6 +605,7 @@ aDatabase::init ( aCfgRc *rc, const QString &dbname )
                 // freshly installed scheme (e.g. inventory on internal SQLite)
                 // works on first run.
                 createdb ( true );
+                if ( firstRun ) aLoadInitData ( this, rc );
         }
         else
         {

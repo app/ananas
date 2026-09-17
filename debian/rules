@@ -9,7 +9,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-export QTDIR=/usr/share/qt4
+export QTDIR=/usr/lib/x86_64-linux-gnu/qt5
 
 CFLAGS = -Wall -g
 
@@ -34,8 +34,7 @@ build-stamp: configure-stamp
 
 	# Add here commands to compile the package.
 
-	$(MAKE) -e QT_VER=4 
-	$(MAKE) doc
+	$(MAKE) -e QT_VER=5
 	touch $@
 
 clean:
@@ -51,33 +50,21 @@ clean:
 install: build
 	dh_testdir
 	dh_testroot
-	dh_clean -k 
+	dh_prep
 	dh_installdirs
 
-	# Add here commands to install the package into debian/qdataschema
-	$(MAKE) install -e QT_VER=4 \
-	INSTALL_ROOT=$(CURDIR)/debian/qdataschema \
-	LIBDIR=/usr/lib \
-	BINDIR=/usr/bin \
-	DOCDIR=/usr/share/doc/qdataschema \
-	INCLUDEDIR=/usr/include/qdataschema
-
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/bin
+	# Install the Qt5 build artifacts. Headers go to both the Qt5 module
+	# header dir ($$[QT_INSTALL_HEADERS]) and $$[QT_INSTALL_DATA]/include,
+	# which are the paths ananas.pri adds to INCLUDEPATH.
 	mkdir -p $(CURDIR)/debian/libqdataschema/usr/lib
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/qt4/lib
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/qt4/bin
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/qt4/include/qdataschema
+	mkdir -p $(CURDIR)/debian/libqdataschema/usr/bin
+	mkdir -p $(CURDIR)/debian/libqdataschema/usr/include/x86_64-linux-gnu/qt5/qdataschema
+	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/qt5/include/qdataschema
 
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/doc/qdataschema/html
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/doc/qdataschema/html-ru
-	mkdir -p $(CURDIR)/debian/libqdataschema/usr/share/doc/qdataschema/example
 	cp -df ./lib/* $(CURDIR)/debian/libqdataschema/usr/lib/
-	cp -df ./bin/* $(CURDIR)/debian/libqdataschema/usr/share/qt4/bin/
-	cp -f ./src/lib/*.h $(CURDIR)/debian/libqdataschema/usr/share/qt4/include/qdataschema
-	cp -f ./doc/html/* $(CURDIR)/debian/libqdataschema/usr/share/doc/qdataschema/html/
-	cp -f ./doc/html-ru/* $(CURDIR)/debian/libqdataschema/usr/share/doc/qdataschema/html-ru/
-	cp -Rdf ./src/example/* $(CURDIR)/debian/libqdataschema/usr/share/doc/qdataschema/example/
-	cd $(CURDIR)/debian/libqdataschema/usr/share/qt4/lib/ && ln -s ../../../lib/* ./
+	cp -df ./bin/* $(CURDIR)/debian/libqdataschema/usr/bin/
+	cp -f ./src/lib/*.h $(CURDIR)/debian/libqdataschema/usr/include/x86_64-linux-gnu/qt5/qdataschema/
+	cp -f ./src/lib/*.h $(CURDIR)/debian/libqdataschema/usr/share/qt5/include/qdataschema/
 
 # Build architecture-independent files here.
 binary-indep: build install

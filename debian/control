@@ -2,11 +2,11 @@ Source: libqdataschema
 Section: libs
 Priority: optional
 Maintainer: Andrey Paskal (apaskal) <apaskal@gmail.com>
-Build-Depends: debhelper (>= 5), qt4-dev-tools, libqt4-dev, qt4-qmake, libmysqlclient-dev, wget, doxygen
+Build-Depends: debhelper (>= 9), qtbase5-dev, qtbase5-dev-tools, qttools5-dev, libmysqlclient-dev
 Standards-Version: 3.7.2
 
 Package: libqdataschema
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libqtcore4, mysql-client (>=4.1), mysql-server (>=4.1)
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: QT Data Schema library. Provide Application to database server structure verification and syncronysation. Support MySQL, PostgreSQL, SQLite.
 Description-ru:  Библиотека для управления схемами баз данных на основе метаданных. Поддерживает MySQL, PostgreSQL, SQLite.

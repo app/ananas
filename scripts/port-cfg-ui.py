@@ -21,6 +21,10 @@ import sys
 import tempfile
 from xml.sax.saxutils import unescape
 
+# saxutils.unescape() only handles &amp; &lt; &gt; by default; some schemes also
+# escape the quotes.
+UNESCAPE_ENTITIES = {"&quot;": '"', "&apos;": "'"}
+
 
 def escape_text(text):
     # The original files escape only '&' and '<' (not '>'); keep that style.
@@ -74,7 +78,7 @@ def run_uic3(raw):
 
 
 def process_block(inner):
-    raw = unescape(inner)
+    raw = unescape(inner, UNESCAPE_ENTITIES)
     # Qt3 forms use <!DOCTYPE UI>/<UI ...>; Qt4/Qt6 forms use lowercase <ui>.
     if re.search(r"<!DOCTYPE\s+UI\b|<\s*UI\b", raw):
         raw = run_uic3(raw)

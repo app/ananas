@@ -3,11 +3,12 @@
 Containers and scripts used to build the legacy Ananas sources
 (`ananas-legacy-qt4`) on a modern host with Podman.
 
-Two build images exist:
+Three build images exist:
 
 - `ananas-qt4-builder` (Ubuntu 14.04, Qt4) — the historical regression bench;
-- `ananas-qt5-builder` (Ubuntu 24.04, Qt 5.15) — the current target after the
-  Qt4→Qt5 port (see `docs/PORTING.md`).
+- `ananas-qt5-builder` (Ubuntu 24.04, Qt 5.15) — intermediate target;
+- `ananas-qt6-builder` (Ubuntu 24.04, Qt 6.4) — the current target (see
+  `docs/PORTING.md`).
 
 ## Layout
 
@@ -22,9 +23,12 @@ ananas-port/
 ├── tools/                      # this repository
 │   ├── docker/Containerfile.qt4-legacy
 │   ├── docker/Containerfile.qt5
+│   ├── docker/Containerfile.qt6
 │   ├── scripts/build-qt4.sh
 │   ├── scripts/build-qt5.sh
-│   └── scripts/build-qt5-qdataschema.sh
+│   ├── scripts/build-qt6.sh
+│   ├── scripts/build-qt5-qdataschema.sh
+│   └── scripts/build-qt6-qdataschema.sh
 └── dist/                       # build output (created by the scripts)
 ```
 
@@ -39,8 +43,8 @@ The sources are taken from GitHub:
 | `ananas-legacy-qdataschema` | `https://github.com/app/qdataschema.git`     |
 
 The Qt4 build requires the `origin/qtscript` ref in `ananas-legacy-qt4` and the
-`origin/newname` ref in `ananas-legacy-qdataschema`. The Qt5 build uses the
-local `port` branch of `ananas-legacy-qt4` and the local `qt5` branch of
+`origin/newname` ref in `ananas-legacy-qdataschema`. The Qt5/Qt6 builds use the
+local `port` branch of `ananas-legacy-qt4` and the local `qt5` / `qt6` branch of
 `ananas-legacy-qdataschema`.
 
 ## Requirements
@@ -56,7 +60,10 @@ local `port` branch of `ananas-legacy-qt4` and the local `qt5` branch of
 Run the whole pipeline (build the image, then compile and package):
 
 ```sh
-# Qt5 (current)
+# Qt6 (current)
+bash tools/scripts/build-qt6.sh
+
+# Qt5 (intermediate)
 bash tools/scripts/build-qt5.sh
 
 # Qt4 (legacy regression bench)
@@ -75,11 +82,12 @@ dist/ananas_0.9.6-1_amd64.deb
 build the matching package first (same image as the main package):
 
 ```sh
-bash tools/scripts/build-qt5-qdataschema.sh
+bash tools/scripts/build-qt6-qdataschema.sh   # Qt6
+bash tools/scripts/build-qt5-qdataschema.sh   # Qt5
 ```
 
-This produces `dist/libqdataschema_1.0.0-1_amd64.deb`. Install both on a Qt5
-host:
+This produces `dist/libqdataschema_1.0.0-1_amd64.deb`. Install both on a Qt6
+(or Qt5) host:
 
 ```sh
 sudo apt install ./dist/libqdataschema_1.0.0-1_amd64.deb \
@@ -88,25 +96,27 @@ sudo apt install ./dist/libqdataschema_1.0.0-1_amd64.deb \
 
 ### Choosing a branch
 
-`build-qt5.sh` builds `port` by default and `build-qt4.sh` builds `qtscript`.
-Override with the `ANANAS_BRANCH` environment variable (any local branch or ref
-works):
+`build-qt6.sh`/`build-qt5.sh` build `port` by default and `build-qt4.sh` builds
+`qtscript`. Override with the `ANANAS_BRANCH` environment variable (any local
+branch or ref works):
 
 ```sh
+ANANAS_BRANCH=port bash tools/scripts/build-qt6.sh
 ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh
 ANANAS_BRANCH=port bash tools/scripts/build-qt4.sh
 ```
 
-`build-qt5-qdataschema.sh` builds the `qt5` branch; override it with
+The qdataschema scripts build the `qt6`/`qt5` branch; override with
 `QDS_BRANCH`:
 
 ```sh
-QDS_BRANCH=qt5 bash tools/scripts/build-qt5-qdataschema.sh
+QDS_BRANCH=qt6 bash tools/scripts/build-qt6-qdataschema.sh
 ```
 
 ### Building the images only
 
 ```sh
+podman build --no-cache -t ananas-qt6-builder -f tools/docker/Containerfile.qt6 .
 podman build --no-cache -t ananas-qt5-builder -f tools/docker/Containerfile.qt5 .
 podman build --no-cache -t ananas-qt4-builder -f tools/docker/Containerfile.qt4-legacy .
 ```
@@ -114,6 +124,7 @@ podman build --no-cache -t ananas-qt4-builder -f tools/docker/Containerfile.qt4-
 ### Running a shell in a build image
 
 ```sh
+podman run --rm -it -v "$PWD":/workspace:z ananas-qt6-builder bash
 podman run --rm -it -v "$PWD":/workspace:z ananas-qt5-builder bash
 podman run --rm -it -v "$PWD":/workspace:z ananas-qt4-builder bash
 ```
@@ -127,10 +138,12 @@ Used while porting the codebase (see `docs/PORTING.md`).
 bash tools/scripts/port-metrics.sh
 
 # Build (clean) and run the QtTest suite headlessly under Xvfb
+bash tools/scripts/smoke-qt6.sh     # Ubuntu 24.04 / Qt6
 bash tools/scripts/smoke-qt5.sh     # Ubuntu 24.04 / Qt5
 bash tools/scripts/smoke-qt4.sh     # Ubuntu 14.04 / Qt4
 
 # Install the built .deb in the matching container and run the application
+bash tools/scripts/run-qt6.sh ananas-administrator
 bash tools/scripts/run-qt5.sh ananas-administrator
 bash tools/scripts/run-qt4.sh ananas-administrator
 ```
@@ -146,6 +159,18 @@ speeds up repeated and clean builds. All build/smoke scripts print `ccache -s`
 at the end.
 
 ## How it works
+
+Qt6 (`Containerfile.qt6`, Ubuntu 24.04):
+
+1. Installs `qt6-base-dev`, `qt6-tools-dev` (Designer), `qt6-declarative-dev`
+   (QtQml/QJSEngine), the Qt6 SQL drivers and the Debian packaging tools;
+   symlinks `qmake`/`lrelease` to their Qt6 locations.
+2. Builds `libqdataschema` from the `qt6` branch of the
+   `ananas-legacy-qdataschema` checkout and installs it under
+   `/usr/lib` + the Qt6 header paths.
+3. `build-qt6.sh` exports the requested branch with `git archive` (so the host
+   working tree is left untouched), injects the SQL driver dependencies and
+   runs `dpkg-buildpackage`.
 
 Qt5 (`Containerfile.qt5`, Ubuntu 24.04):
 

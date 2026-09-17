@@ -19,14 +19,14 @@ if [[ -n "$MISSING" ]]; then
     exit 1
 fi
 
-echo "===> 1. Сборка Podman-образа (Ubuntu 24.04 + Qt5 + QtScript + libqdataschema)..."
-podman build -t ananas-qt5-builder -f "$WORKSPACE_DIR/tools/docker/Containerfile.qt5" "$WORKSPACE_DIR"
+echo "===> 1. Сборка Podman-образа (Ubuntu 24.04 + Qt6 + QJSEngine + libqdataschema)..."
+podman build -t ananas-qt6-builder -f "$WORKSPACE_DIR/tools/docker/Containerfile.qt6" "$WORKSPACE_DIR"
 
 echo "===> 2. Сборка ananas-legacy-qt4 (ветка ${BRANCH})..."
 podman run --rm \
   -v "$WORKSPACE_DIR":/workspace:z \
   -e BRANCH="$BRANCH" \
-  ananas-qt5-builder \
+  ananas-qt6-builder \
   bash -c '
     set -e
     export CCACHE_DIR=/workspace/tmp/ccache
@@ -40,7 +40,7 @@ podman run --rm \
     echo "libqdataschema 1 libqdataschema (>= 1.0.0)" > debian/shlibs.local
 
     # Runtime SQL drivers are dlopen()ed, so shlibs cannot see them.
-    sed -i "s/^Depends: \\(.*\\)libqdataschema$/Depends: \\1libqdataschema, libqt5sql5-sqlite, libqt5sql5-mysql, libqt5sql5-psql/" debian/control
+    sed -i "s/^Depends: \\(.*\\)libqdataschema$/Depends: \\1libqdataschema, libqt6sql6-sqlite, libqt6sql6-mysql, libqt6sql6-psql/" debian/control
 
     echo "Запуск компиляции..."
     # -d: libqdataschema установлена в образ вручную и не зарегистрирована в dpkg

@@ -43,33 +43,48 @@ and an external `libqdataschema`.
     against the `applications/inventory` scheme (SQLite): slot binding via
     `newQObject`, global function call, `QVariant` bridging and `isError()`
     detection all pass.
-- **Phases 4–6: pending.**
+- **Phase 4 (Qt5 → Qt6): done.**
+  - `docker/Containerfile.qt6` (Ubuntu 24.04 + Qt 6.4) and `scripts/build-qt6.sh`
+    produce a Qt6-only `dist/ananas_0.9.6-1_amd64.deb`; the SQL driver packages
+    are added by the build script (they are dlopen()ed).
+  - `libqdataschema` is ported to Qt6 on the `qt6` branch
+    (`scripts/build-qt6-qdataschema.sh`).
+  - `scripts/smoke-qt6.sh`: clean Qt6 build + `ananas-test` 7/7; the scripting
+    integration harness passes on the inventory scheme under Qt 6.4.2.
+  - `qmake` still drives the build (`qmake6`); CMake is Phase 5.
+- **Phases 5–6: pending.**
 
 ## Handoff (next session)
 
 - Branch: `ananas-legacy-qt4` @ `port` (from `origin/qtscript`); the `qtscript`
   branch is the untouched rollback point. The Phase 1 result is
   `port` @ `b2f77d0`. Tooling lives in the `tools` repo (`main`), sources in
-  `ananas-legacy-qt4` / `ananas-legacy-qdataschema` (branch `qt5`).
-- Phases 1–3 are done; the next step is Phase 4 (Qt5 → Qt6).
+  `ananas-legacy-qt4` / `ananas-legacy-qdataschema` (branch `qt6`).
+- Phases 1–4 are done; the next step is Phase 5 (build/packaging: qmake→CMake,
+  debian/ refresh, drop outdated packaging).
 - Commands:
   - burndown: `bash tools/scripts/port-metrics.sh`
   - Qt4 regression bench: `bash tools/scripts/smoke-qt4.sh`
   - Qt5 build + tests: `bash tools/scripts/smoke-qt5.sh`
-  - package: `ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh`
-  - package `libqdataschema` (ananas dependency):
+  - Qt6 build + tests (current): `bash tools/scripts/smoke-qt6.sh`
+  - package Qt6: `ANANAS_BRANCH=port bash tools/scripts/build-qt6.sh`
+  - package Qt5: `ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh`
+  - package `libqdataschema` (ananas dependency), per Qt version:
+    `bash tools/scripts/build-qt6-qdataschema.sh` /
     `bash tools/scripts/build-qt5-qdataschema.sh`
-  - run the app: `bash tools/scripts/run-qt5.sh ananas-administrator`
+  - run the app: `bash tools/scripts/run-qt6.sh ananas-administrator`
 - Images:
   - `ananas-qt4-builder`: Ubuntu 14.04 + Qt4 + QtScript + `libqdataschema`
     (`ananas-legacy-qdataschema@newname`).
   - `ananas-qt5-builder`: Ubuntu 24.04 + Qt 5.15 + QtQml (QJSEngine) +
     `libqdataschema` (`ananas-legacy-qdataschema@qt5`).
+  - `ananas-qt6-builder`: Ubuntu 24.04 + Qt 6.4 + QtQml (QJSEngine) +
+    `libqdataschema` (`ananas-legacy-qdataschema@qt6`).
   - ccache at `<workspace>/tmp/ccache`.
 - Known caveat: the rewritten `wDBTable`/`wTable`/`awidget` have no functional
   tests; only the schema/DB dialogs were smoke-tested manually.
-- The Qt5 `.deb` targets Ubuntu 24.04 and cannot be installed on the Qt4
-  (trusty) image.
+- The Qt5/Qt6 `.deb`s target Ubuntu 24.04; the Qt6 package cannot be installed
+  on a Qt5-only host and vice versa.
 
 ## Decisions
 
@@ -266,12 +281,36 @@ Note: this phase is Qt4→Qt5 only; the Qt5→Qt6 items (`QTextCodec`, `QRegExp`
 - Compatibility note: `aEngine::code` changes type, a source-level break for any
   plugin touching it (none in-tree; Qt4 ABI is incompatible anyway).
 
-## Phase 4 — Qt5 → Qt6
+## Phase 4 — Qt5 → Qt6 (done)
 
-- `QTextCodec`→`QStringConverter`/`Qt5Compat`; `Qt::SplitBehavior`;
-  `QLibraryInfo`; drop `QDesktopWidget`; `QAction` in QtGui; `qmake`→CMake.
-- Port `libqdataschema` to Qt6 (drivers, `QSqlTableModel` aliases).
-- Add `docker/Containerfile.qt6` + `scripts/build-qt6.sh`.
+- `QRegExp`/`QRegExpValidator` → `QRegularExpression`/
+  `QRegularExpressionValidator` (`setMinimal(true)` →
+  `InvertedGreedinessOption`, `indexIn`/`matchedLength` → match objects).
+- `QTextStream::setCodec` → `setEncoding(QStringConverter::Utf8)`; `QTextCodec`
+  dropped (the text extension maps `QStringConverter` encodings).
+- `Qt::WindowFlags` defaults `0` → `Qt::WindowFlags()` (Qt6 makes the int
+  conversion an error).
+- `QString::sprintf` → `arg()`, `trUtf8` → `tr`,
+  `QDateTime::toTime_t` → `toSecsSinceEpoch`.
+- `QTime` stopwatch → `QElapsedTimer` (`aTime`).
+- `QMap::insertMulti` → `QMultiMap` (`AMetaObject` children).
+- `QSqlField::type()` compared against `QMetaType` (Qt6) / `QVariant` (Qt5).
+- `QComboBox::setAutoCompletion`/`autoCompletion` reimplemented via
+  `QCompleter`.
+- `QPrinter::pageRect()` → `pageLayout().paintRectPixels()`;
+  `QPalette::Background` → `Window`; `QShortcut` moved to QtGui;
+  `qBinaryFind` → `std::lower_bound`.
+- Qt6 moc emits a default-constructor metatype for every `Q_OBJECT` class, so
+  the declared-but-undefined `aForm()`/`aRole()`/`aUser()` ctors are now
+  defined.
+- `uic` on Qt6 defaults to pointer-to-member connections, which cannot compile
+  for forms whose slots live in the derived class; `ananas.pri` sets
+  `QMAKE_UIC_FLAGS += -c string` (Qt6 only).
+- Ported `libqdataschema` to Qt6 (`qt6` branch): `QString::sprintf`,
+  `QTextStream::setEncoding`, `QMetaType` field types, Qt6 debian paths.
+- Added `docker/Containerfile.qt6`, `scripts/build-qt6.sh`, `smoke-qt6.sh`,
+  `run-qt6.sh`, `build-qt6-qdataschema.sh`.
+- `qmake6` still drives the build; CMake is Phase 5.
 
 ## Phase 5 — Build and packaging
 

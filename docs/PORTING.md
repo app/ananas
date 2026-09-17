@@ -331,6 +331,35 @@ Note: this phase is Qt4→Qt5 only; the Qt5→Qt6 items (`QTextCodec`, `QRegExp`
   not used; distribution packages will keep using the native tooling
   (debhelper/`rpmbuild`) and call CMake for build+install.
 
+## Inventory scheme packaging (Ubuntu)
+
+The Ubuntu package ships the inventory business scheme so it can be selected at
+Ananas startup.
+
+- Schemes: `applications/inventory/inventory.cfg` (main) and
+  `inventory-demo.cfg` (demo, differs only in data). Both were authored with
+  the Qt3 designer; their embedded forms were converted to Qt4/Qt6 with
+  `scripts/port-cfg-ui.py` (Qt4 `uic3` + Qt6 normalization: `QLayoutWidget`,
+  `Q3Frame`/`Q3Table` custom widgets, `qPixmapFromMimeSource`, `cstring`).
+- The scheme's 28 report templates (`templ_*.odt/.ods/.xml`) come from the Qt3
+  tree (`ananas-legacy-qt3/applications/inventory`).
+- Demo data: the MySQL dump was converted to a SQLite INSERT-only script with
+  `scripts/port-demo-sql.py` (explicit column lists, since the current metadata
+  tables have extra columns).
+- Packaging: schemes + templates + demo data go to
+  `/usr/share/ananas/applications/inventory/`; `inventory.rc` /
+  `inventory-demo.rc` to `/etc/ananas/`; a system QSettings registry
+  (`/etc/xdg/ananasgroup/ananas.conf`) makes both appear in the startup dialog.
+- Runtime (`aDatabase::init`): the database structure is created/updated on
+  open; for internal (SQLite) schemes a relative `dbname` is resolved against
+  `workdir` (with `~` expanded), the scheme templates are copied into the
+  writable `workdir` without overwriting, and the rc `initdata` script is run
+  once when the database is first created. Internal schemes skip the login
+  dialog.
+- Verified: both schemes build a 35-table SQLite DB under `~/.ananas/...`, the
+  demo loads its data, templates are provisioned once, and a second run does
+  not duplicate data or overwrite templates.
+
 ## Phase 6 — Designer (deferred, out of scope)
 
 - Options: (a) metadata editor + stock Qt Designer with our widget plugins;

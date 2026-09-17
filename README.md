@@ -145,6 +145,19 @@ bash tools/scripts/run-qt6.sh ananas-administrator
 The smoke script takes an optional path to `ananas-legacy-qt4` as its first
 argument; the run script takes the application name instead.
 
+### Scheme conversion helpers
+
+Used to port the inventory business scheme (see `docs/PORTING.md`):
+
+```sh
+# Convert the Qt3 forms embedded in a scheme .cfg to Qt4/Qt6 (runs uic3 in
+# the Qt4 image); result is written back into the .cfg.
+bash tools/scripts/port-cfg-ui.sh ananas-legacy-qt4/applications/inventory/inventory.cfg
+
+# Convert a MySQL dump into a SQLite-compatible INSERT-only script.
+python3 tools/scripts/port-demo-sql.py <dump.sql> <out.sql>
+```
+
 ### Build caching
 
 The image ships `ccache` (on `PATH` ahead of `gcc`/`g++`). The cache directory

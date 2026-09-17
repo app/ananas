@@ -12,6 +12,20 @@ Baseline: the project builds today from the `qtscript` branch in the Ubuntu
 Stack: C++ / Qt4 with heavy Qt3Support, QtScript, a vendored Qt Designer fork,
 and an external `libqdataschema`.
 
+## Status
+
+- **Phase 0 (infrastructure): done.**
+- **Phase 1 (Qt4 without Qt3Support): done.**
+  - `Q3*` identifiers, `<q3*.h>` includes, `QT += qt3support` and Q3 widgets in
+    `.ui` are all **0** (see `scripts/port-metrics.sh`).
+  - `scripts/smoke-qt4.sh`: build ok, `ananas-test` 7/7.
+  - `scripts/build-qt4.sh` produces `dist/ananas_0.9.6-1_amd64.deb` with no
+    `libqt4-qt3support` dependency.
+  - `scripts/run-qt4.sh` runs the packaged app in the trusty container
+    (`ananas-administrator` starts and shows the schema/DB dialogs).
+  - Branch `port` (from `origin/qtscript`).
+- **Phases 2–6: pending.**
+
 ## Decisions
 
 - Target: **Qt5/Qt6, C++** (keep the C++/Qt architecture).

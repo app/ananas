@@ -88,6 +88,9 @@ bash tools/scripts/port-metrics.sh
 
 # Build in place and run the QtTest suite headlessly (Xvfb)
 bash tools/scripts/smoke-qt4.sh
+
+# Install the built .deb in the trusty container and run the application
+bash tools/scripts/run-qt4.sh ananas-administrator
 ```
 
 Both scripts take an optional path to `ananas-legacy-qt4` as their first

@@ -38,16 +38,11 @@
 #include <qstringlist.h>
 #include <qworkspace.h>
 #include <QMainWindow>
-#include <q3vbox.h>
 #include <qapplication.h>
 #include <qsettings.h>
 //Added by qt3to4:
 #include <QPixmap>
-#include <QActionGroup>
-#include <Q3GridLayout>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
-#include <Q3PopupMenu>
+#include <QMenu>
 #include "ananas.h"
 #include "amenubar.h"
 #include "atoolbar.h"
@@ -55,13 +50,9 @@
 #include "engine.h"
 
 
-class Q3VBoxLayout;
-class Q3HBoxLayout;
-class Q3GridLayout;
 class QAction;
-class QActionGroup;
 class QToolBar;
-class Q3PopupMenu;
+class QMenu;
 
 /*!
  * \ru
@@ -80,7 +71,7 @@ public:
 	aCfg *md;
 
 	AMenuBar* menubar;
-	Q3PopupMenu *windowsMenu;
+	QMenu *windowsMenu;
 	QWorkspace* ws;
 	aWindowsList* wl;
 	QString rcfile;
@@ -91,13 +82,13 @@ public slots:
 	void initMenuBar();
 	void initStatusBar();
 	void initActionBar();
-	void InsertMainMenu(QString text, QObject *pop);
+	void InsertMainMenu(QString text, QMenu *pop);
 	void Exit(int code);
 	void close();
 	void helpAbout();
 	void statusMessage( const QString &msg );
 	void windowsMenuAboutToShow();
-	void windowsMenuActivated( int id );
+	void windowsMenuActivated();
 	void tileHorizontal();
 	void setBackground( const QPixmap &pix );
 

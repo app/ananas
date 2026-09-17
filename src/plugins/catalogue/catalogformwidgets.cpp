@@ -27,7 +27,7 @@
 **
 **********************************************************************/
 
-#include <q3popupmenu.h>
+#include <QMenu>
 #include <qtimer.h>
 #include <qmessagebox.h>
 //Added by qt3to4:
@@ -270,25 +270,25 @@ void
 aListView::showMenu( Q3ListViewItem* item, const QPoint& p, int col)
 {
 	delete menu;
-	menu = new Q3PopupMenu();
+	menu = new QMenu();
 	if(toSelect)
 	{
-		menu->insertItem(tr("Select"),	this,	SLOT(select()));
-		menu->insertSeparator();
+		menu->addAction(tr("Select"),	this,	SLOT(select()));
+		menu->addSeparator();
 	}
-	menu->insertItem(tr("Edit"), 	this, 	SLOT(edit()));
-	menu->insertSeparator();
-	menu->insertItem(tr("New element"),	this, 	SLOT(newItem()));
-	menu->insertItem(tr("New group"),	this, 	SLOT(newGroup()));
-	menu->insertSeparator();
+	menu->addAction(tr("Edit"), 	this, 	SLOT(edit()));
+	menu->addSeparator();
+	menu->addAction(tr("New element"),	this, 	SLOT(newItem()));
+	menu->addAction(tr("New group"),	this, 	SLOT(newGroup()));
+	menu->addSeparator();
 	//menu->setItemEnabled(menu->idAt(3),false);
-	menu->insertItem(tr("Undo mark delete"),	this,	SLOT(undoMarkDeleted()));
-	menu->insertItem(tr("Delete (mark deleted)"),this, 	SLOT(markDeleted()));
-	menu->insertItem(tr("Delete (phisical)"),	this, 	SLOT(delItem()));
+	menu->addAction(tr("Undo mark delete"),	this,	SLOT(undoMarkDeleted()));
+	menu->addAction(tr("Delete (mark deleted)"),this, 	SLOT(markDeleted()));
+	menu->addAction(tr("Delete (phisical)"),	this, 	SLOT(delItem()));
 	parentItem = item;
 	if(col==-1) col = 0;
 	columnClicked = col;
-	menu->popup( p );
+	menu->exec( p );
 }
 
 void

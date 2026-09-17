@@ -43,7 +43,7 @@
 #include <QPixmap>
 #include <QFrame>
 #include <q3mimefactory.h>
-#include <Q3PopupMenu>
+#include <QMenu>
 #include <QEvent>
 #include <Q3SqlFieldInfo>
 #include <QPointer>
@@ -1699,25 +1699,23 @@ wDBTable::contentsContextMenuEvent ( QContextMenuEvent * e )
     		IdDelete,
 		};
 
-		QPointer<Q3PopupMenu> popupForDoc = new Q3PopupMenu( this );
-		int id[ 3 ];
-		id[ IdInsert ] 	= popupForDoc->insertItem( tr( "New" ) );
-		id[ IdUpdate ] 	= popupForDoc->insertItem( tr( "Edit" ) );
-		id[ IdDelete ] 	= popupForDoc->insertItem( tr( "Delete" ) );
+		QMenu popupForDoc( this );
+		QAction *actInsert = popupForDoc.addAction( tr( "New" ) );
+		QAction *actUpdate = popupForDoc.addAction( tr( "Edit" ) );
+		QAction *actDelete = popupForDoc.addAction( tr( "Delete" ) );
 
 		if ( !sqlCursor() || isReadOnly() || !numCols() ) {
-			popupForDoc->setItemEnabled(id[ IdInsert ], false );
-			popupForDoc->setItemEnabled(id[ IdUpdate ], false );
-			popupForDoc->setItemEnabled(id[ IdDelete ], false );
+			actInsert->setEnabled( false );
+			actUpdate->setEnabled( false );
+			actDelete->setEnabled( false );
 		}
 
-		int r = popupForDoc->exec( e->globalPos() );
-		delete (Q3PopupMenu*) popupForDoc;
-		if(r==id[IdInsert]) {
+		QAction *r = popupForDoc.exec( e->globalPos() );
+		if(r==actInsert) {
 			beginInsert();
-		} else if(r==id[IdUpdate]) {
+		} else if(r==actUpdate) {
 			keyPressEvent( new QKeyEvent( QEvent::KeyPress, Qt::Key_F2, 0, Qt::NoButton));
-		} else if(r==id[IdDelete]) {
+		} else if(r==actDelete) {
 			Q3DataTable::deleteCurrent();
 		}
 	}
@@ -1732,27 +1730,25 @@ wDBTable::contentsContextMenuEvent ( QContextMenuEvent * e )
 	    		IdDelete,
 	    		IdView,
 			IdRefresh };
-		QPointer<Q3PopupMenu> popup = new Q3PopupMenu( this );
-		int id[ 5 ];
-		id[ IdInsert ] = popup->insertItem( tr( "New" ) );
-		id[ IdUpdate ] = popup->insertItem( tr( "Edit" ) );
-		id[ IdDelete ] = popup->insertItem( tr( "Delete" ) );
-		id[ IdView ] = popup->insertItem( tr( "View" ) );
-		id[ IdRefresh ] = popup->insertItem( tr( "Refresh" ) );
-		int r = popup->exec( e->globalPos() );
-		delete (Q3PopupMenu*) popup;
-		if(r==id[IdInsert])
+		QMenu popup( this );
+		QAction *actInsert = popup.addAction( tr( "New" ) );
+		QAction *actUpdate = popup.addAction( tr( "Edit" ) );
+		QAction *actDelete = popup.addAction( tr( "Delete" ) );
+		QAction *actView = popup.addAction( tr( "View" ) );
+		QAction *actRefresh = popup.addAction( tr( "Refresh" ) );
+		QAction *r = popup.exec( e->globalPos() );
+		if(r==actInsert)
 			emit(insertRequest());
 		else
-			if(r==id[IdUpdate])
+			if(r==actUpdate)
 				emit(updateRequest());
 			else
-				if(r==id[IdDelete])
+				if(r==actDelete)
 					emit(deleteRequest());
 				else
-					if(r==id[IdView])
+					if(r==actView)
 						emit(viewRequest());
-						if(r==id[IdRefresh])
+						if(r==actRefresh)
 							{
 								//recalculate();
 								refresh();

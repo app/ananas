@@ -48,7 +48,7 @@ void dSelectDB::languageChange()
 #include <qstring.h>
 #include <qdom.h>
 //Added by qt3to4:
-#include <Q3PopupMenu>
+#include <QMenu>
 
 #include "deditrc.h"
 #include "dimportdb.h"
@@ -364,24 +364,24 @@ void dSelectDB::createMenu()
 {
 
 	menuBar = new QMenuBar(this);
-	Q3PopupMenu *menuFile = new Q3PopupMenu(this);
-	menuFile->insertItem(tr("E&xit"), this, SLOT(onCancel()));
+	QMenu *menuFile = new QMenu(tr("Program"), this);
+	menuFile->addAction(tr("E&xit"), this, SLOT(onCancel()));
 
-	Q3PopupMenu *menuEdit = new Q3PopupMenu(this);
-	menuEdit->insertItem(tr("New &group"), this, SLOT(newGroup()));
-	menuEdit->insertItem(tr("&New shema"), this, SLOT(newItem()));
-	menuEdit->insertSeparator();
-	menuEdit->insertItem(tr("Edi&t"),  this, SLOT(editItem()));
-	menuEdit->insertSeparator();
-	menuEdit->insertItem(tr("&Delete"),  this, SLOT(deleteItem()));
+	QMenu *menuEdit = new QMenu(tr("Actions"), this);
+	menuEdit->addAction(tr("New &group"), this, SLOT(newGroup()));
+	menuEdit->addAction(tr("&New shema"), this, SLOT(newItem()));
+	menuEdit->addSeparator();
+	menuEdit->addAction(tr("Edi&t"),  this, SLOT(editItem()));
+	menuEdit->addSeparator();
+	menuEdit->addAction(tr("&Delete"),  this, SLOT(deleteItem()));
 
-	Q3PopupMenu *menuAction = new Q3PopupMenu(this);
-	menuAction->insertItem(tr("&Import"),  this, SLOT(importItem()));
-	menuAction->insertItem(tr("&Export"),  this, SLOT(exportItem()));
+	QMenu *menuAction = new QMenu(tr("Service"), this);
+	menuAction->addAction(tr("&Import"),  this, SLOT(importItem()));
+	menuAction->addAction(tr("&Export"),  this, SLOT(exportItem()));
 
-	menuBar->insertItem(tr("Program"), menuFile);
-	menuBar->insertItem(tr("Actions"), menuEdit);
-	menuBar->insertItem(tr("Service"), menuAction);
+	menuBar->addMenu(menuFile);
+	menuBar->addMenu(menuEdit);
+	menuBar->addMenu(menuAction);
 	layout()->setMenuBar(menuBar);
 	menuBar->show();
 }

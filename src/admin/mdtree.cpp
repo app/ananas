@@ -765,24 +765,24 @@ void
 aMetadataTreeView::ContextMenu()
 {
 
-	QPopupMenu *m=new QPopupMenu( this, "PopupMenu" );
+	QMenu *m=new QMenu( this ); m->setObjectName("PopupMenu");
 	Q_CHECK_PTR(m);
 
 /*    	QLabel *caption = new QLabel( "<font color=darkblue><u><b>"
 		"Context Menu</b></u></font>", this );
 		caption->setAlignment( Qt::AlignCenter );
-    	m->insertItem( caption );
-    	m->insertItem( "&New",  this, SLOT( itemNew() ), CTRL+Key_N );
-		m->insertItem( "&Rename", this, SLOT( itemRename() ), CTRL+Key_O);
-		m->insertItem( "&Edit",  this, SLOT( itemEdit() ), CTRL+Key_N );
-    	m->insertItem( "&Delete", this, SLOT( itemDelete() ), CTRL+Key_O );*/
+    	m->addAction( caption );
+    	m->addAction( "&New",  this, SLOT( itemNew() ), CTRL+Key_N );
+		m->addAction( "&Rename", this, SLOT( itemRename() ), CTRL+Key_O);
+		m->addAction( "&Edit",  this, SLOT( itemEdit() ), CTRL+Key_N );
+    	m->addAction( "&Delete", this, SLOT( itemDelete() ), CTRL+Key_O );*/
 	
 	aListViewItem *i = (aListViewItem *) selectedItem();
 	if(!i) return;
 		
 	QLabel *caption = new QLabel( tr("<font color=darkblue><u><b>" "Context Menu</b></u></font>"), this );
 	caption->setAlignment( Qt::AlignCenter );
-//	m->insertItem( caption );
+//	m->addAction( caption );
 	
 	QString oclass = md->objClass(i->obj);
 	printf("popup oclass==`%s'\n",oclass.ascii());
@@ -790,36 +790,36 @@ aMetadataTreeView::ContextMenu()
 	if(oclass == md_user)
 	{
 	
-		m->insertItem( tr("&Add Role"),  this, SLOT( addRole() ), Qt::CTRL+Qt::Key_A );
+		m->addAction( tr("&Add Role"),  this, SLOT( addRole() ), Qt::CTRL+Qt::Key_A );
 	}
 	if(oclass == md_roles)
 	{
-		m->insertItem( tr("&New Role"),  this, SLOT( newRole() ), Qt::CTRL+Qt::Key_N );
+		m->addAction( tr("&New Role"),  this, SLOT( newRole() ), Qt::CTRL+Qt::Key_N );
 	}
 	if( oclass == md_role)
 	{
 		
-		m->insertItem( tr("&Edit Role"),  this, SLOT( editRole() ), Qt::CTRL+Qt::Key_E );
-		m->insertItem( tr("&Delete Role"),  this, SLOT( delRole() ), Qt::CTRL+Qt::Key_D );
+		m->addAction( tr("&Edit Role"),  this, SLOT( editRole() ), Qt::CTRL+Qt::Key_E );
+		m->addAction( tr("&Delete Role"),  this, SLOT( delRole() ), Qt::CTRL+Qt::Key_D );
 	}
 	
 	if(oclass==md_rl_users)
 	{
-		m->insertItem( tr("&Add User"),  this, SLOT( addUser() ), Qt::CTRL+Qt::Key_A );
+		m->addAction( tr("&Add User"),  this, SLOT( addUser() ), Qt::CTRL+Qt::Key_A );
 	}
 	if(oclass==md_users )
 	{
-		m->insertItem( tr("&New User"),  this, SLOT( newUser() ), Qt::CTRL+Qt::Key_N );
+		m->addAction( tr("&New User"),  this, SLOT( newUser() ), Qt::CTRL+Qt::Key_N );
 	}
 	
 	if(oclass==md_user)
 	{
-		m->insertItem( tr("&Edit User "), this, SLOT( editUser() ), Qt::CTRL+Qt::Key_E );
-		m->insertItem( tr("&Delete User"), this, SLOT( delUser() ), Qt::CTRL+Qt::Key_D );
+		m->addAction( tr("&Edit User "), this, SLOT( editUser() ), Qt::CTRL+Qt::Key_E );
+		m->addAction( tr("&Delete User"), this, SLOT( delUser() ), Qt::CTRL+Qt::Key_D );
 	}
 	if(oclass==md_usr_role || oclass==md_rl_user)
 	{
-		m->insertItem( tr("&Remove"), this, SLOT( itemDelete() ), Qt::CTRL+Qt::Key_R );
+		m->addAction( tr("&Remove"), this, SLOT( itemDelete() ), Qt::CTRL+Qt::Key_R );
 	}
 	if(	oclass	  == md_catalogue 
 		|| oclass == md_document
@@ -828,11 +828,11 @@ aMetadataTreeView::ContextMenu()
 		|| oclass == md_iregister
 		|| oclass == md_report )
 	{
-		m->insertItem( tr("&Set permissions"), this, SLOT( itemSetPermission() ), Qt::CTRL+Qt::Key_S );
+		m->addAction( tr("&Set permissions"), this, SLOT( itemSetPermission() ), Qt::CTRL+Qt::Key_S );
 	}
 
 	ContextMenuAdd(m);
-//	m->insertItem( tr("&New"),  this, SLOT( itemNew() ), CTRL+Key_N );
+//	m->addAction( tr("&New"),  this, SLOT( itemNew() ), CTRL+Key_N );
 	m->exec( QCursor::pos() );
 	delete m;
 }

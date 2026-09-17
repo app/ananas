@@ -32,13 +32,14 @@
 #define ATREEITEMS_H
 #include <Qt3Support>
 //#include <qpopupmenu.h>
+#include <QMenu>
 #include <qlistview.h>
 //#include <qintdict.h>
 #include "acfg.h"
 
 #define QListView Q3ListView
 #define QListViewItem Q3ListViewItem
-#define QPopupMenu Q3PopupMenu
+#define QPopupMenu QMenu
 #define QHeader Q3Header
 
 class QWidget;

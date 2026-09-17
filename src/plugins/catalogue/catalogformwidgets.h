@@ -38,6 +38,7 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qevent.h>
+#include <QMenu>
 #include <q3popupmenu.h>
 //Added by qt3to4:
 #include <QFrame>
@@ -114,7 +115,7 @@ public:
 	aListView(QWidget* parent = 0, const char* name = 0, Qt::WFlags f = 0);
 	~aListView();
 
-	Q3PopupMenu *menu;
+	QMenu *menu;
 	void setDestination(const bool dest);
 	bool getDestination();
 protected:

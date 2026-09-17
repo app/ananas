@@ -39,7 +39,8 @@
 //Added by qt3to4:
 #include <QFrame>
 #include <QPixmap>
-#include <Q3PopupMenu>
+#include <QMenu>
+#include <QVBoxLayout>
 
 #include "mainform.h"
 
@@ -59,11 +60,13 @@ MainForm::MainForm( QWidget* parent, const char* name, Qt::WFlags fl )
     : QMainWindow( parent, fl )
 {
 //    QApopupmenu *popup;
-    Q3VBox	*vb = new Q3VBox(this);
+    QFrame	*vb = new QFrame(this);
+    QVBoxLayout	*vbl = new QVBoxLayout( vb );
 
     setWindowIcon( rcIcon("a-system.png"));
     vb->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
     ws = new QWorkspace( vb );
+    vbl->addWidget( ws );
     wl = new aWindowsList();
     ws->setScrollBarsEnabled( TRUE );
     setCentralWidget( vb );
@@ -131,13 +134,13 @@ MainForm::initEngine()
 void
 MainForm::initMenuBar()
 {
-	Q3PopupMenu *m;
-	m = new Q3PopupMenu();
-	windowsMenu = new Q3PopupMenu();
+	QMenu *m;
+	m = new QMenu( this );
+	windowsMenu = new QMenu( this );
     	connect( windowsMenu, SIGNAL( aboutToShow() ),
 	     this, SLOT( windowsMenuAboutToShow() ) );
-	m->insertItem(rcIcon("a-system.png"), tr( "About" ), this, SLOT( helpAbout() ));
-	//windowsMenu->insertItem(rcIcon("a-system.png"), tr( "Windows" ), this, SLOT( windowsMenuAboutToShow() ));
+	m->addAction(rcIcon("a-system.png"), tr( "About" ), this, SLOT( helpAbout() ));
+	//windowsMenu->addAction(rcIcon("a-system.png"), tr( "Windows" ), this, SLOT( windowsMenuAboutToShow() ));
         menubar = new AMenuBar( md, this, "menubar");
 	InsertMainMenu( tr("&Help"), m );
     	InsertMainMenu( tr("&Windows"), windowsMenu );
@@ -181,8 +184,8 @@ MainForm::helpAbout()
 			   ).arg(ananas_libversion()).arg( AExtensionFactory::keys().join(", ") ) );
 }
 
-void MainForm::InsertMainMenu(QString text, QObject *pop){
-    menubar->insertItem(text, (Q3PopupMenu *) pop);
+void MainForm::InsertMainMenu(QString text, QMenu *pop){
+    menubar->insertItem(text, pop);
 
 }
 
@@ -210,7 +213,7 @@ MainForm::close()
 void
 MainForm::statusMessage( const QString &msg )
 {
- 	statusBar()->message( msg );
+ 	statusBar()->showMessage( msg );
 }
 
 void
@@ -242,37 +245,38 @@ MainForm::~MainForm()
  */
 void MainForm::languageChange()
 {
-    setCaption(QString( tr("Ananas")+" "+ananas_libversion() )+": "+md->info( md_info_name ) );
-//    setCaption( tr( "Ananas VERSION" ) );
+    setWindowTitle(QString( tr("Ananas")+" "+ananas_libversion() )+": "+md->info( md_info_name ) );
+//    setWindowTitle( tr( "Ananas VERSION" ) );
 }
 
 void MainForm::windowsMenuAboutToShow()
 {
     windowsMenu->clear();
-    int cascadeId = windowsMenu->insertItem(tr("&Cascade"), ws, SLOT(cascade() ) );
-    int tileId = windowsMenu->insertItem(tr("&Tile"), ws, SLOT(tile() ) );
-    int horTileId = windowsMenu->insertItem(tr("Tile &horizontal"), this, SLOT(tileHorizontal() ) );
+    QAction *cascadeAction = windowsMenu->addAction(tr("&Cascade"), ws, SLOT(cascade() ) );
+    QAction *tileAction = windowsMenu->addAction(tr("&Tile"), ws, SLOT(tile() ) );
+    QAction *horTileAction = windowsMenu->addAction(tr("Tile &horizontal"), this, SLOT(tileHorizontal() ) );
     if ( ws->windowList().isEmpty() ) {
-	windowsMenu->setItemEnabled( cascadeId, FALSE );
-	windowsMenu->setItemEnabled( tileId, FALSE );
-	windowsMenu->setItemEnabled( horTileId, FALSE );
+	cascadeAction->setEnabled( false );
+	tileAction->setEnabled( false );
+	horTileAction->setEnabled( false );
     }
-    windowsMenu->insertSeparator();
+    windowsMenu->addSeparator();
     QWidgetList windows = ws->windowList();
     if(windows.count()==0) return;
     int i=0, count = windows.count();
 
     do
     {
-	int id=0;
 	if(windows.at(i) && windows.at(i)->isHidden())
 	{
 		++i;
 		continue;
 	}
-	id = windowsMenu->insertItem(windows.at(i)->caption(), this, SLOT( windowsMenuActivated( int ) ) );
-	windowsMenu->setItemParameter( id, i );
-	windowsMenu->setItemChecked( id, ws->activeWindow() == windows.at(i) );
+	QAction *a = windowsMenu->addAction(windows.at(i)->windowTitle() );
+	a->setData( i );
+	a->setCheckable( true );
+	a->setChecked( ws->activeWindow() == windows.at(i) );
+	connect( a, SIGNAL( triggered() ), this, SLOT( windowsMenuActivated() ) );
 	++i;
     }while( i < count );
 }
@@ -311,9 +315,11 @@ void MainForm::tileHorizontal()
     }
 }
 
-void MainForm::windowsMenuActivated( int id )
+void MainForm::windowsMenuActivated()
 {
+    QAction *a = qobject_cast<QAction*>( sender() );
+    if ( !a ) return;
+    int id = a->data().toInt();
     QWidget* w = ws->windowList().at( id );
-    if ( w ) w->showNormal();
-    w->setFocus();
+    if ( w ) { w->showNormal(); w->setFocus(); }
 }

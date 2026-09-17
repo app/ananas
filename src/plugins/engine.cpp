@@ -53,7 +53,7 @@
 #include <qapplication.h>
 //Added by qt3to4:
 #include <QTimerEvent>
-#include <Q3PopupMenu>
+#include <QMenu>
 
 #include "ananas.h"
 #include "wcatalogeditor.h"
@@ -112,7 +112,7 @@ aObjectsFactory::aObjectsFactory( aEngine *e )
         engine->code->globalObject().setProperty("MetaGlobal",
                                           engine->code->newQMetaObject(&AMetaGlobal::staticMetaObject, ctor));
         engine->code->globalObject().setProperty("PopupMenu",
-                                          engine->code->newQMetaObject(&Q3PopupMenu::staticMetaObject, ctor));
+                                          engine->code->newQMetaObject(&QMenu::staticMetaObject, ctor));
         engine->code->globalObject().setProperty("Document",
                                           engine->code->newQMetaObject(&aDocument::staticMetaObject, ctor));
         engine->code->globalObject().setProperty("Catalogue",
@@ -143,7 +143,7 @@ aObjectsFactory::aObjectsFactory( aEngine *e )
 //	registerClass("MetaGlobal",&AMetaGlobal::staticMetaObject);
 //
 //
-//	registerClass("PopupMenu",&Q3PopupMenu::staticMetaObject);
+//	registerClass("PopupMenu",&QMenu::staticMetaObject);
 //	registerClass("Document",&aDocument::staticMetaObject);
 //	registerClass("Catalogue",&aCatalogue::staticMetaObject);
 //	registerClass("CatalogEditor",&wCatalogEditor::staticMetaObject);
@@ -184,7 +184,7 @@ aObjectsFactory::create( const QString &className,
 //	context=context;
 	if (className=="PopupMenu") {
 //			return new QApopupmenu();
-			res = new Q3PopupMenu();
+			res = new QMenu();
 	}else if (className=="Document") {
 		if (arguments.size()>0) {
 			res = new aDocument(arguments[0].toString(), db );

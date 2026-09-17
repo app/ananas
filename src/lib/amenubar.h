@@ -33,9 +33,8 @@
 #ifndef AMENUBAR_H
 #define AMENUBAR_H
 
-#include <qmenubar.h>
-//Added by qt3to4:
-#include <Q3PopupMenu>
+#include <QMenuBar>
+#include <QMenu>
 
 #include	"acfg.h"
 
@@ -52,30 +51,15 @@ class  ANANAS_EXPORT AMenuBar : public QMenuBar
 	~AMenuBar();
 
 	void ReadMenu( aCfgItem obj );
-	void ReadMenu( Q3PopupMenu *parent, aCfgItem obj );
+	void ReadMenu( QMenu *parent, aCfgItem obj );
+
+	QMenu *insertItem ( const QString & text, QMenu * popup );
+
+    signals:
+	void activated( int id );
 
     public slots:
-	void on_Item(){};
-
-	int insertItem ( const QString & text, Q3PopupMenu * popup, int id = -1, int index = -1 );
-/*
-	int insertItem ( const QString & text, const QObject * receiver, const char * member, const QKeySequence & accel = 0, int id = -1, int index = -1 );
-	int insertItem ( const QPixmap & pixmap, const QObject * receiver, const char * member, const QKeySequence & accel = 0, int id = -1, int index = -1 );
-	int insertItem ( const QIconSet & icon, const QPixmap & pixmap, const QObject * receiver, const char * member, const QKeySequence & accel = 0, int id = -1, int index = -1 );
-	int insertItem ( const QString & text, int id = -1, int index = -1 );
-	int insertItem ( const QIconSet & icon, const QString & text, int id = -1, int index = -1 );
-	int insertItem ( const QIconSet & icon, const QString & text, QPopupMenu * popup, int id = -1, int index = -1 );
-	int insertItem ( const QPixmap & pixmap, int id = -1, int index = -1 );
-	int insertItem ( const QIconSet & icon, const QPixmap & pixmap, int id = -1, int index = -1 );
-	int insertItem ( const QPixmap & pixmap, QPopupMenu * popup, int id = -1, int index = -1 );
-	int insertItem ( const QIconSet & icon, const QPixmap & pixmap, QPopupMenu * popup, int id = -1, int index = -1 );
-	int insertItem ( QWidget * widget, int id = -1, int index = -1 );
-	int insertItem ( const QIconSet & icon, QCustomMenuItem * custom, int id = -1, int index = -1 );
-	int insertItem ( QCustomMenuItem * custom, int id = -1, int index = -1 );
-	int insertSeparator ( int index = -1 );
-*/
-private:
-	Q3IntDict <aCfgItem> cfgItems;
+	void on_Item();
 };
 
 

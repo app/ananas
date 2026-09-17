@@ -3,6 +3,8 @@
 .ui
 .qmake.stash
 moc_predefs.h
+/cmake-build
+/test*.cfg
 *.so
 *.so.1*
 *.o

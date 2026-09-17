@@ -1,0 +1,46 @@
+FROM ubuntu:14.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 1. Удаляем устаревшие конфиги ESM и формируем чистый sources.list
+#    (trusty больше не лежит на old-releases.ubuntu.com, но доступен на archive/security)
+RUN rm -rf /etc/apt/sources.list.d/* && \
+    echo "deb http://archive.ubuntu.com/ubuntu/ trusty main restricted universe multiverse" > /etc/apt/sources.list && \
+    echo "deb http://archive.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb http://security.ubuntu.com/ubuntu/ trusty-security main restricted universe multiverse" >> /etc/apt/sources.list
+
+# 2. Обновляем индексы и устанавливаем пакеты, нужные для сборки ananas (ветка qtscript)
+RUN apt-get update && apt-get install -y --force-yes \
+    build-essential \
+    devscripts \
+    debhelper \
+    dh-make \
+    fakeroot \
+    libqt4-dev \
+    qt4-dev-tools \
+    qt4-qmake \
+    libqt4-qt3support \
+    libqtwebkit-dev \
+    libqt4-script \
+    libqt4-scripttools \
+    libqtassistantclient-dev \
+    libmysqlclient-dev \
+    wget \
+    unzip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Сборка и установка libqdataschema (ветка newname даёт libqdataschema.so)
+COPY ananas-legacy-qdataschema /tmp/qdataschema
+RUN cd /tmp/qdataschema && \
+    git checkout -q origin/newname && \
+    make -e QMAKE=qmake-qt4 QT_VER=4 && \
+    mkdir -p /usr/include/qt4/qdataschema /usr/share/qt4/include/qdataschema && \
+    cp -df lib/* /usr/lib/ && \
+    cp -df bin/* /usr/bin/ && \
+    cp -f src/lib/*.h /usr/include/qt4/qdataschema/ && \
+    cp -f src/lib/*.h /usr/share/qt4/include/qdataschema/ && \
+    ldconfig && \
+    rm -rf /tmp/qdataschema
+
+WORKDIR /workspace

@@ -29,15 +29,21 @@
 
 #ifndef ASQLTABLE_H
 #define ASQLTABLE_H
-#include <q3sqlcursor.h>
+
+#include <QSqlRecord>
+#include <QSqlQuery>
+#include <QSqlField>
+#include <QSqlIndex>
+#include <QSqlError>
+#include <QList>
 #include <QHash>
+#include <QStringList>
+
+#include "ananasglobal.h"
 #include "acfg.h"
-//#include "aaregister.h"
-//#include "adatarecord.h"
 
-// temporray define for old definitions
+// temporary define for old definitions
 #define aSQLTable aDataTable
-
 
 class aDatabase;
 class aSQLField;
@@ -46,12 +52,16 @@ class aSQLField;
  *	\~english
  *	Provides browsing and editing Ananas's sql tables mantained by Ananas.Designer.
  *	\~russian
- *	\brief Определяет программный интерфейс модели данных aDataTable. Наследует QSqlCursor.
+ *	\brief Определяет программный интерфейс модели данных aDataTable.
  *
  *	Позволяет работать с табличными представлениями данных, определенных метаданными бизнес схемы.
+ *
+ *	Реализован поверх QSqlQuery/QSqlRecord: выборка буферизуется в память,
+ *	навигация выполняется по индексу, запись/обновление/удаление — через
+ *	подготовленные запросы. Больше не наследует Q3SqlCursor.
  *	\~
  */
-class  ANANAS_EXPORT aDataTable : public Q3SqlCursor
+class  ANANAS_EXPORT aDataTable
 {
 public:
 	aDatabase*	db;
@@ -71,8 +81,31 @@ public:
 	long getMdObjId();
 	qulonglong getIdd();
 	void		printRecord();
-	//QDict<QVariant> getUserFilter();
-	//void		setUserFilter( QDict<QVariant> );
+
+	/* schema */
+	void		append( const QSqlField & field );
+	void		append( const QString & name, QVariant::Type type = QVariant::Invalid );
+	void		insert( int pos, const QSqlField & field );
+	void		remove( int pos );
+	void		clear();
+	void		setGenerated( const QString & name, bool generated ) ANANAS_DEPRECATED;
+	void		setCalculated( const QString & name, bool calculated );
+	bool		isCalculated( const QString & name ) const;
+	bool		contains( const QString & name ) const;
+	int		count() const;
+	QString		fieldName( int i ) const;
+	QSqlField	field( int i ) const;
+	QSqlField	field( const QString & name ) const;
+	QString		name() const { return tableName; }
+	int		position( const QString & name ) const { return m_schema.indexOf( name ); }
+	QString		filter() const { return m_filter; }
+	bool		isReadOnly() const { return m_readOnly; }
+	void		setReadOnly( bool ro ) { m_readOnly = ro; }
+	bool		canInsert() const;
+	bool		canUpdate() const { return canInsert(); }
+	bool		canDelete() const { return canInsert(); }
+	QSqlIndex	primaryIndex( bool prime = true ) const;
+	QSqlError	lastError() const { return m_lastError; }
 
 	virtual QVariant value ( int i );
 	virtual QVariant value ( const QString & name );
@@ -82,8 +115,13 @@ public:
 	virtual void setSysValue ( const QString & name, QVariant value );
 	virtual bool sysFieldExists( const QString & name );
 
-	virtual QSqlRecord *primeInsert();
-//	virtual QSqlRecord *primeUpdate();
+	virtual QSqlRecord *primeInsert() ANANAS_DEPRECATED;
+	virtual QSqlRecord *primeUpdate() ANANAS_DEPRECATED;
+	virtual QSqlRecord *primeDelete() ANANAS_DEPRECATED;
+	virtual QSqlRecord *editBuffer( bool copy = false );
+	virtual int insert();
+	virtual int update();
+	virtual int del();
 
 	virtual bool select( const QString & filter="", bool usefltr = true );
 	virtual bool select( qulonglong id );
@@ -92,7 +130,7 @@ public:
 	virtual void		setFilter( const QString& );
 	virtual QString		getFilter();
 	virtual QString		getNFilter();
-	virtual bool		exec( QString query );
+	virtual bool		exec( QString query ) ANANAS_DEPRECATED;
 	virtual QStringList	getUserFields();
 	virtual ERR_Code 	setMarkDeleted( bool Deleted );
 	virtual bool 		isMarkDeleted();
@@ -108,7 +146,10 @@ public:
 	virtual bool prev ();
 	virtual bool first ();
 	virtual bool last ();
-
+	int		at() const { return m_index; }
+	int		size() const { return m_rows.size(); }
+	bool		isValid() const;
+	bool		isNull( int i ) const;
 
 protected:
 	QVariant calcFieldValue( const QString &name );
@@ -120,7 +161,12 @@ protected:
 	long		mdobjId;
 
 private:
-//	bool fNewNotUpdated;
+	bool		doSelect( const QString & where );
+	void		loadCurrent();
+	QVariant	currentValue( const QString & name ) const;
+	QSqlRecord	*prepareInsertBuffer();
+	QSqlRecord	*prepareUpdateBuffer();
+
 	aCfgItem		obj;
 	aCfgItem		init_obj;
 	aCfg*			md;
@@ -132,9 +178,17 @@ private:
 	QStringList fildsList;
 	QHash<QString, QString> fnames;
 	QHash<QString, QVariant> userFilter;
-//	QDict<aDataField> dataRecord;
-//	aDataRecord dataRecord;
-//	QSqlRecord r;
+
+	QSqlRecord		m_schema;	// field list (real columns + virtual calculated fields)
+	QHash<QString, bool>	m_calculated;
+	QSqlRecord		m_dbRecord;	// real table columns (driver record)
+	QSqlRecord		m_current;	// current row values (editable)
+	QSqlRecord		m_editBuffer;	// buffer for insert/update/delete
+	QList<QSqlRecord>	m_rows;		// buffered result set
+	int			m_index;
+	QString			m_filter;
+	QSqlError		m_lastError;
+	bool			m_readOnly;
 };
 
 #endif

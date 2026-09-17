@@ -59,6 +59,13 @@
 #  define ANANAS_EXPORT
 #endif
 
+/* Marks API kept only for compatibility; new code should avoid it. */
+#if defined(__GNUC__)
+#  define ANANAS_DEPRECATED __attribute__((deprecated))
+#else
+#  define ANANAS_DEPRECATED
+#endif
+
 #ifdef _MSC_VER
 #define LLU_SPEC "%I64u"
 #else

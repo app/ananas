@@ -1,5 +1,5 @@
 /****************************************************************************
-** $Id: asqltable.cpp,v 1.4 2009/05/25 16:35:10 app Exp $
+** $Id: asqltable.cpp,v 1.2 2009/05/25 16:35:10 app Exp $
 **
 ** Code file of the Ananas database table of Ananas
 ** Designer and Engine applications
@@ -26,15 +26,15 @@
 ** not clear to you.
 **
 **********************************************************************/
-//#include <stream.h>
 
 #include "asqltable.h"
 #include <qdatetime.h>
-//Added by qt3to4:
 #include <QSqlError>
+#include <QSqlDriver>
+#include <QSqlDatabase>
+#include <QVariant>
+#include <QStringList>
 #include "adatabase.h"
-#include <q3sqlcursor.h>
-#include <Q3SqlFieldInfo>
 
 #include "acatalogue.h"
 #include "adocument.h"
@@ -53,17 +53,21 @@
  *	\~
  */
 aDataTable::aDataTable( aCfgItem context, aDatabase *adb )
-:Q3SqlCursor( QString::null, false, *adb->db() )
 {
 	db = adb;
 	md = &db->cfg;
 	mdobjId = 0;
+	selected = false;
+	m_index = -1;
+	m_readOnly = false;
 	tableName = db->tableDbName( db->cfg, context, &mdobjId );
 	if ( !tableName.isEmpty() ) {
-		setName( tableName, true );
-		init (context, adb );
+		QSqlDatabase *d = db->db();
+		if ( d && d->driver() )
+			m_dbRecord = d->driver()->record( tableName );
+		m_schema = m_dbRecord;
+		init( context, adb );
 	}
-	selected = false;
 }
 
 
@@ -81,14 +85,18 @@ aDataTable::aDataTable( aCfgItem context, aDatabase *adb )
  *
  */
 aDataTable::aDataTable( const QString &tname, aDatabase *adb )
-:Q3SqlCursor( tname, true, *adb->db() )
 {
 	db = adb;
 	md = &db->cfg;
 	tableName = tname;
 	mdobjId = 0;
 	selected = false;
-
+	m_index = -1;
+	m_readOnly = false;
+	QSqlDatabase *d = db->db();
+	if ( d && d->driver() )
+		m_dbRecord = d->driver()->record( tname );
+	m_schema = m_dbRecord;
 }
 
 /*!
@@ -118,10 +126,6 @@ aSQLTable::~aSQLTable()
  *	Inits table object.
  *	\~russian
  *	Инициализирует объект.
- *	\see setObject()
- *	\param context - объект метаданных, который описывает таблицу.
- *	\param adb - ссылка на объект базы данных, которой
- *	принадлежит sql таблица.
  *	\~
  */
 void
@@ -131,7 +135,6 @@ aDataTable::init( aCfgItem context, aDatabase *adb )
 	fnames.clear();
 	userFilter.clear();
 	setObject( context );
-
 }
 
 
@@ -141,11 +144,6 @@ aDataTable::init( aCfgItem context, aDatabase *adb )
  *	Sets md object to table.
  *	\~russian
  *	Задает объект метаданных для таблицы.
- *	Заполняет внутренние объекты именами полей для последующего использования в
- *	функциях SetValue() и Value(), добавляет информацию о них в sql курсор.
- *	В случае, если добавляется накопительный регистр, к объетку добавляются также виртуальные поля - ресурсы регистра
- *	После вызова этой функции с таблицей можно начинать работу.
- *	\param context - объект метаданных, который описывает таблицу.
  *	\~
  */
 void
@@ -171,19 +169,14 @@ aDataTable::setObject( aCfgItem context )
 	mapReg.clear();
 	mapDim.clear();
 	mapSum.clear();
-	//TODO:  test to memory leak
 	clearObjectHash( p_cat );
 	clearObjectHash( p_reg );
 	clearObjectHash( p_doc );
-//	printf("before delete p_cat\n");
-//	if(p_cat)
-	//delete p_cat;
 
-//	p_cat.clear();
-//	printf("after delete p_cat\n");
-//	if(p_reg)
-	//delete p_reg;
-//	p_reg.clear();
+	// rebuild field list: real columns first, then virtual calculated fields
+	m_schema = m_dbRecord;
+	m_calculated.clear();
+
 	if(md->objClass(context) == md_field && md->objClass(md->parent(context))== md_dimensions)
 	{
 		insertFieldInfo(context,false);
@@ -203,8 +196,6 @@ aDataTable::setObject( aCfgItem context )
 		insertFieldInfo(cobj);
 
 	}
-
-//	r = *this;
 }
 
 
@@ -213,8 +204,6 @@ aDataTable::setObject( aCfgItem context )
  *	Appends info about field to object.
  *	\~russian
  *	Добавляет информацию о поле к объекту.
- *	\param obj - объект метаданных, который описывает поле.
- *	\param calculatd - указывает будет ли поле вычисляемым.
  *	\~
  */
 void
@@ -233,8 +222,7 @@ aSQLTable::insertFieldInfo(aCfgItem cobj, bool calculated)
 			{
 				fnames.insert( fname, fdbname );
         			fdbname = QString("text_uf%1").arg( fid );
-                		append( Q3SqlFieldInfo( fdbname, QVariant::String ) );
-		             //   setGenerated( fdbname, false );
+                		append( QSqlField( fdbname, QVariant::String ) );
 		                setCalculated( fdbname, calculated );
 				int ftid = objt.section(" ", 1, 1 ).toInt();
 				aCfgItem fto = md->find( ftid );
@@ -254,9 +242,8 @@ aSQLTable::insertFieldInfo(aCfgItem cobj, bool calculated)
                         if ( objt[0]==' ' )
 			{
         			fdbname = QString("text_uf%1").arg( fid );
-                		append( Q3SqlFieldInfo( fdbname, QVariant::String ) );
+                		append( QSqlField( fdbname, QVariant::String ) );
 		                setCalculated( fdbname, calculated );
-		               // setGenerated( fdbname, false );
 				fnames.insert( fname, fdbname );
 				int ftid = objt.section(" ", 1, 1 ).toInt();
 				aCfgItem fto = md->find( ftid );
@@ -300,12 +287,7 @@ aSQLTable::insertFieldInfo(aCfgItem cobj, bool calculated)
 
 
 /*!
- *	\~english
- *	Gets metadata object.
- *	\~russian
- *	Получение объекта метаданных, которым инициализировали таблицу.
- *	\return объект метаданных, который описывает таблицу.
- *	\~
+ *	Gets metadata object id.
  */
 qulonglong
 aDataTable::getIdd(void)
@@ -319,14 +301,7 @@ aDataTable::getMdObjId()
 }
 
 
-
-/*!
- *	\~english
- *	Stub.
- *	\~russian
- *	Заглушка.
- *	\~
- */
+/*! Stub. */
 void
 aDataTable::appendField( aSQLField * ) // fieldinfo )
 {
@@ -334,14 +309,7 @@ aDataTable::appendField( aSQLField * ) // fieldinfo )
 }
 
 
-
-/*!
- *	\~english
- *	Stub.
- *	\~russian
- *	Заглушка.
- *	\~
- */
+/*! Stub. */
 void
 aDataTable::insertField( int /*pos*/, aSQLField * ) // fieldinfo )
 {
@@ -349,14 +317,7 @@ aDataTable::insertField( int /*pos*/, aSQLField * ) // fieldinfo )
 }
 
 
-
-/*!
- *	\~english
- *	Stub.
- *	\~russian
- *	Заглушка.
- *	\~
- */
+/*! Stub. */
 void
 aDataTable::removeField( int ) // pos )
 {
@@ -364,14 +325,7 @@ aDataTable::removeField( int ) // pos )
 }
 
 
-
-/*!
- *	\~english
- *	Stub.
- *	\~russian
- *	Заглушка.
- *	\~
- */
+/*! Stub. */
 void
 aDataTable::clearFields()
 {
@@ -379,13 +333,8 @@ aDataTable::clearFields()
 }
 
 
-
 /*!
- *	\~english
- *	Stub.
- *	\~russian
- *	Заглушка.
- *	\~
+ *	Check table structure.
  */
 bool
 aDataTable::checkStructure(  bool ) //update )
@@ -400,70 +349,170 @@ aDataTable::checkStructure(  bool ) //update )
 }
 
 
+/* ----------------------------------------------------------------------- */
+/* schema                                                                   */
+/* ----------------------------------------------------------------------- */
+
+void
+aDataTable::append( const QSqlField & field )
+{
+	if ( !m_schema.contains( field.name() ) )
+		m_schema.append( field );
+}
+
+void
+aDataTable::append( const QString & name, QVariant::Type type )
+{
+	append( QSqlField( name, type ) );
+}
+
+void
+aDataTable::insert( int pos, const QSqlField & field )
+{
+	m_schema.insert( pos, field );
+}
+
+void
+aDataTable::remove( int pos )
+{
+	m_schema.remove( pos );
+}
+
+void
+aDataTable::clear()
+{
+	m_schema.clear();
+	m_calculated.clear();
+}
+
+void
+aDataTable::setGenerated( const QString &, bool )
+{
+	// no-op: generated fields are not supported by the QSqlQuery based model
+}
+
+void
+aDataTable::setCalculated( const QString & name, bool calculated )
+{
+	m_calculated.insert( name, calculated );
+}
+
+bool
+aDataTable::isCalculated( const QString & name ) const
+{
+	return m_calculated.value( name, false );
+}
+
+bool
+aDataTable::contains( const QString & name ) const
+{
+	return m_schema.contains( name );
+}
+
+int
+aDataTable::count() const
+{
+	return m_schema.count();
+}
+
+QString
+aDataTable::fieldName( int i ) const
+{
+	return m_schema.fieldName( i );
+}
+
+QSqlField
+aDataTable::field( int i ) const
+{
+	QSqlField f = m_schema.field( i );
+	f.setValue( currentValue( f.name() ) );
+	return f;
+}
+
+QSqlField
+aDataTable::field( const QString & name ) const
+{
+	if ( !m_schema.contains( name ) )
+		return QSqlField();
+	QSqlField f = m_schema.field( name );
+	f.setValue( currentValue( name ) );
+	return f;
+}
+
+bool
+aDataTable::canInsert() const
+{
+	return !m_readOnly;
+}
+
+QSqlIndex
+aDataTable::primaryIndex( bool ) const
+{
+	QSqlIndex idx;
+	if ( db ) {
+		QSqlDatabase *d = db->db();
+		if ( d && d->driver() )
+			idx = d->driver()->primaryIndex( tableName );
+	}
+	return idx;
+}
+
+
+/* ----------------------------------------------------------------------- */
+/* values                                                                   */
+/* ----------------------------------------------------------------------- */
+
+QVariant
+aDataTable::currentValue( const QString & name ) const
+{
+	if ( m_current.contains( name ) )
+		return m_current.value( name );
+	return QVariant();
+}
+
+bool
+aDataTable::isValid() const
+{
+	return m_index >= 0 && m_index < m_rows.size();
+}
+
+bool
+aDataTable::isNull( int i ) const
+{
+	if ( !isValid() ) return true;
+	return currentValue( fieldName( i ) ).isNull();
+}
 
 /*!
- *	\~english
- *	Return field falue.
- *	\~russian
- *	Возвращает значение поля с номером \a i.
- *	\param i - номер поля.
- *	\return значение поля
- *	\~
+ *	Return field value by index.
  */
 QVariant
 aDataTable::value ( int i )
 {
- //       QVariant v = QSqlCursor::value( i );
-
-	QVariant v = sysValue(Q3SqlCursor::fieldName(i));
-	return v;
+	return sysValue( fieldName( i ) );
 }
 
 
 
 /*!
- *	\~english
- *	Return field falue.
- *	\~russian
- *	Возвращает значение поля с именем \a name.
- *	Для получения значения необходимо указывать имя поля в метаданных
- *	\param name - имя поля в метаданных.
- *	\return значение поля или QVariant::Invalid, если поля не существует.
- *	\~
+ *	Return field value by metadata name.
  */
 QVariant
 aDataTable::value ( const QString & name )
 {
-	QString fname;
-        QVariant v;
-
 	if ( !fnames.contains(name) )
 	{
 		aLog::print(aLog::Error, QObject::tr("aDataTable get value of unknown field `%1'").arg(name));
 		return QVariant::Invalid;
 	}
-	fname = fnames.value( name );
-
-        //v = QSqlCursor::value( fname );
-
-	return sysValue(fname);
+	return sysValue( fnames.value( name ) );
 }
 
 
 
 /*!
- * Return true if column name exists in database table.
- */
- /*!
- *	\~english
  *	Check field existing.
- *	\~russian
- *	Проверяет существование поля в таблице
- *	\param name - имя поля в таблице (не в метаданных!).
- *	\return \~engish true if column name exists in database table \~russian true, если столбец с данным именем есть в таблице. \~
- *	\~
  */
-
 bool
 aDataTable::sysFieldExists( const QString & name )
 {
@@ -473,13 +522,13 @@ aDataTable::sysFieldExists( const QString & name )
 
 
 /*!
- * Return value of the column of the database table.
+ *	Return value of the column of the database table.
  */
 QVariant
 aDataTable::sysValue ( const QString & name )
 {
 	if(isCalculated(name)) return calcFieldValue(name);
-	else return Q3SqlCursor::value( name );
+	else return currentValue( name );
 }
 
 
@@ -493,10 +542,9 @@ aDataTable::setSysValue ( const QString & name, QVariant value )
 	if ( name == QString("pnum") )
 	{
 		aLog::print(aLog::Info, QObject::tr("aDataTable get document prefix to `%1'").arg(value.toString()));
-	//	debug_message("document prefix set to '%s'\n",(const char*)value.toString());
 	}
-
-	Q3SqlCursor::setValue( name, value );
+	if ( m_current.contains( name ) )
+		m_current.setValue( name, value );
 }
 
 
@@ -507,7 +555,7 @@ aDataTable::setSysValue ( const QString & name, QVariant value )
 void
 aDataTable::setValue ( int i, QVariant value )
 {
-	Q3SqlCursor::setValue( i, value );
+	setSysValue( fieldName( i ), value );
 }
 
 
@@ -522,89 +570,191 @@ aDataTable::setValue ( const QString & name, QVariant value )
 	if ( !fnames.contains(name) ) return false;
 	fname = fnames.value( name );
 	if ( contains( fname ) ) {
-		Q3SqlCursor::setValue( fname, value );
+		setSysValue( fname, value );
 	}
 	else return false;
 	return true;
 }
 
 
+/* ----------------------------------------------------------------------- */
+/* edit buffer / CRUD                                                       */
+/* ----------------------------------------------------------------------- */
 
-/*!
- *
- */
+QSqlRecord *
+aDataTable::prepareInsertBuffer()
+{
+	m_editBuffer = m_dbRecord;
+	for ( int i = 0; i < m_editBuffer.count(); i++ )
+		m_editBuffer.setValue( i, QVariant() );
+	return &m_editBuffer;
+}
+
+QSqlRecord *
+aDataTable::prepareUpdateBuffer()
+{
+	m_editBuffer = m_current;
+	return &m_editBuffer;
+}
+
 QSqlRecord *
 aDataTable::primeInsert()
 {
-	QSqlRecord *rec;
-	QVariant v;
-
-	rec = Q3SqlCursor::primeInsert();
-	if ( sysFieldExists("id") ) {
-		rec->setValue("id", QVariant( db->uid( mdobjId ) ) );
-	}
-	return rec;
+	return prepareInsertBuffer();
 }
 
-
-
-/*!
- *
- *//*
 QSqlRecord *
 aDataTable::primeUpdate()
 {
-	QSqlRecord *rec;
-
-	rec = QSqlCursor::primeUpdate();
-	*rec = r;
-	return rec;
+	return prepareUpdateBuffer();
 }
-*/
+
+QSqlRecord *
+aDataTable::primeDelete()
+{
+	return prepareUpdateBuffer();
+}
+
+QSqlRecord *
+aDataTable::editBuffer( bool )
+{
+	return &m_editBuffer;
+}
+
+int
+aDataTable::insert()
+{
+	if ( m_readOnly || !db ) return 0;
+	QStringList cols;
+	QVariantList vals;
+	for ( int i = 0; i < m_editBuffer.count(); i++ ) {
+		QString fn = m_editBuffer.fieldName( i );
+		if ( !m_dbRecord.contains( fn ) ) continue;
+		cols << fn;
+		vals << m_editBuffer.value( i );
+	}
+	if ( cols.isEmpty() ) return 0;
+	QStringList ph;
+	for ( int i = 0; i < cols.size(); i++ ) ph << "?";
+	QString sql = "INSERT INTO " + tableName + " (" + cols.join( ", " ) + ") VALUES (" + ph.join( ", " ) + ")";
+	QSqlQuery q( *db->db() );
+	q.prepare( sql );
+	for ( int i = 0; i < vals.size(); i++ )
+		q.bindValue( i, vals[i] );
+	if ( !q.exec() ) {
+		m_lastError = q.lastError();
+		aLog::print(aLog::Error, QObject::tr("aDataTable insert error: %1").arg(m_lastError.text()));
+		return 0;
+	}
+	return 1;
+}
+
+int
+aDataTable::update()
+{
+	if ( m_readOnly || !db ) return 0;
+	QSqlIndex pk = primaryIndex();
+	QString keyName = ( pk.count() > 0 ) ? pk.fieldName( 0 ) : QString( "id" );
+	QVariant keyVal = m_editBuffer.value( keyName );
+	if ( !keyVal.isValid() ) keyVal = m_current.value( keyName );
+	QStringList sets;
+	for ( int i = 0; i < m_editBuffer.count(); i++ ) {
+		QString fn = m_editBuffer.fieldName( i );
+		if ( fn == keyName ) continue;
+		if ( !m_dbRecord.contains( fn ) ) continue;
+		sets << fn + "=?";
+	}
+	if ( sets.isEmpty() ) return 0;
+	QString sql = "UPDATE " + tableName + " SET " + sets.join( ", " ) + " WHERE " + keyName + "=?";
+	QSqlQuery q( *db->db() );
+	q.prepare( sql );
+	int b = 0;
+	for ( int i = 0; i < m_editBuffer.count(); i++ ) {
+		QString fn = m_editBuffer.fieldName( i );
+		if ( fn == keyName ) continue;
+		if ( !m_dbRecord.contains( fn ) ) continue;
+		q.bindValue( b++, m_editBuffer.value( i ) );
+	}
+	q.bindValue( b, keyVal );
+	if ( !q.exec() ) {
+		m_lastError = q.lastError();
+		aLog::print(aLog::Error, QObject::tr("aDataTable update error: %1").arg(m_lastError.text()));
+		return 0;
+	}
+	return 1;
+}
+
+int
+aDataTable::del()
+{
+	if ( m_readOnly || !db ) return 0;
+	QSqlIndex pk = primaryIndex();
+	QString keyName = ( pk.count() > 0 ) ? pk.fieldName( 0 ) : QString( "id" );
+	QVariant keyVal = m_editBuffer.value( keyName );
+	if ( !keyVal.isValid() ) keyVal = m_current.value( keyName );
+	QSqlQuery q( *db->db() );
+	q.prepare( "DELETE FROM " + tableName + " WHERE " + keyName + "=?" );
+	q.bindValue( 0, keyVal );
+	if ( !q.exec() ) {
+		m_lastError = q.lastError();
+		aLog::print(aLog::Error, QObject::tr("aDataTable delete error: %1").arg(m_lastError.text()));
+		return 0;
+	}
+	return 1;
+}
 
 
-/*!
- *
- */
+/* ----------------------------------------------------------------------- */
+/* select / filter                                                          */
+/* ----------------------------------------------------------------------- */
+
+bool
+aDataTable::doSelect( const QString & where )
+{
+	if ( !db ) return false;
+	QString sql = "SELECT * FROM " + tableName;
+	if ( !where.isEmpty() ) sql += " WHERE " + where;
+	QSqlQuery q( *db->db() );
+	if ( !q.exec( sql ) ) {
+		m_lastError = q.lastError();
+		aLog::print(aLog::Error, QObject::tr("aDataTable select error: %1").arg(m_lastError.text()));
+		return false;
+	}
+	m_rows.clear();
+	while ( q.next() )
+		m_rows.append( q.record() );
+	m_index = -1;
+	m_current.clear();
+	selected = true;
+	return true;
+}
+
 bool
 aDataTable::select( const QString & filter, bool usefltr )
 {
-	bool res;
-	QString flt = getFilter();
+	QString flt;
 	if ( usefltr )
 	{
-		if ( flt == "" ) flt = filter;
-		else if ( filter != "" ) flt = flt + " AND " + filter;
+		flt = getFilter();
+		if ( flt.isEmpty() ) flt = m_filter;
+		else if ( !m_filter.isEmpty() ) flt = m_filter + " AND " + flt;
+		if ( !filter.isEmpty() )
+			flt = flt.isEmpty() ? filter : flt + " AND " + filter;
 	}
 	else flt = filter;
-	res = Q3SqlCursor::select( flt );
-//	next();
-//	r = *this;
-	return res;
+	return doSelect( flt );
 }
 
 
 
-/*!
- *
- */
 bool
 aDataTable::select( qulonglong id )
 {
-	bool res;
-//	printf("aSQLTable::select %llu\n",id);
-	res = Q3SqlCursor::select( QString( "id=%1" ).arg( id ) );
-	//setSelected(true);
-//	next();
-//	r = *this;
-	return res;
+	return doSelect( QString( "id=%1" ).arg( id ) );
 }
 
 
 
-/*!
- *
- */
 void
 aDataTable::clearFilter()
 {
@@ -613,33 +763,17 @@ aDataTable::clearFilter()
 }
 
 
-/*QDict<QVariant>
-aDataTable::getUserFilter() {
-	return this.userFilter;
-};
 
-void
-setUserFilter( QDict<QVariant> newFilter) {
-	this.userFilter = newFilter;
-};
-*/
-
-/**
- *
- */
 void
 aDataTable::setFilter ( const QString & newFilter ) {
-	Q3SqlCursor::setFilter( newFilter );
+	m_filter = newFilter;
 }
 
 
-/*!
- *
- */
+
 bool
 aDataTable::setFilter( const QString& name, const QVariant& value )
 {
-
 	aLog::print(aLog::Debug, QObject::tr("aDataTable set filter %1='%2'").arg(name).arg(value.toString()));
 	if ( !fnames.contains(name) )
 	{
@@ -647,15 +781,11 @@ aDataTable::setFilter( const QString& name, const QVariant& value )
 		return false;
 	}
 	userFilter.insert( fnames.value(name), value );
-	Q3SqlCursor::setFilter(getFilter());
 	return true;
 }
 
 
 
-/*!
- *
- */
 QString
 aDataTable::getFilter()
 {
@@ -693,9 +823,6 @@ aDataTable::getFilter()
 
 
 
-/*!
- *
- */
 QString
 aDataTable::getNFilter()
 {
@@ -734,57 +861,43 @@ aDataTable::getNFilter()
 
 
 /*!
- *
+ *	Print current record.
  */
 void
 aDataTable::printRecord(){
 	unsigned int i;
 	QString fname, sname;
 
-	for (i=0; i< count(); i++){
-		fname = "";
-		sname = field( i ).name();
-		QHashIterator<QString, QString> it( fnames );
-		while ( it.hasNext() ) {
-		    it.next();
-		    if ( it.value() == sname ) {
-			fname = it.key();
-			break;
-		    }
-		}
+	for (i=0; i< (unsigned int) count(); i++){
+		fname = fieldName( i );
+		sname = fname;
 		printf("%s(%s)=%s\n",
-		( const char *) fname,
-		( const char *) sname,
-		( const char *) value( i ).toString().local8Bit() );
+		( const char *) fname.toLocal8Bit(),
+		( const char *) sname.toLocal8Bit(),
+		( const char *) value( i ).toString().toLocal8Bit() );
 	}
-
-/*	for (i=0; i< r.count(); i++){
-		fname = "";
-		sname = r.field( i )->name();
-		it.toFirst();
-	        for( ; it.current(); ++it ){
-		    if ( *it.current() == sname ) {
-			fname = it.currentKey();
-			break;
-		    }
-		}
-		printf("r:%s(%s)=%s\n",
-		( const char *) fname,
-		( const char *) sname,
-		( const char *) r.value( i ).toString().local8Bit() );
-	}
-*/
 }
 
 
 
-/*!
- *
-*/
 bool
 aDataTable::exec( QString query )
 {
-	return Q3SqlCursor::exec( query );
+	if ( !db ) return false;
+	QSqlQuery q( *db->db() );
+	if ( !q.exec( query ) ) {
+		m_lastError = q.lastError();
+		return false;
+	}
+	if ( q.isSelect() ) {
+		m_rows.clear();
+		while ( q.next() )
+			m_rows.append( q.record() );
+		m_index = -1;
+		m_current.clear();
+		selected = true;
+	}
+	return true;
 }
 
 
@@ -820,12 +933,10 @@ aDataTable::calc_obj(int fid, qulonglong idd)
 	QString t,oclass;
 	int ftid;
 	QVariant v="";
-//	printf("calculate cat %d, %llu\n",fid, idd);
 	o = mapCat[fid];
 	if( !o.isNull() )
 	{
 		aCatalogue *pCat = (aCatalogue*)p_cat[QString("%1").arg(fid)];
-//		printf("obj not null\n");
 		if(pCat==0)
 		{
 			p_cat.insert(QString("%1").arg(fid), new aCatalogue( o, db ));
@@ -835,7 +946,6 @@ aDataTable::calc_obj(int fid, qulonglong idd)
 
 		if ( pCat->selected() )
 		{
-//			printf("select ok\n");
 			v = QVariant( pCat->displayString() );
 		}
 	}
@@ -845,7 +955,6 @@ aDataTable::calc_obj(int fid, qulonglong idd)
 		if(!o.isNull())
 		{
 			aDocument *pDoc = (aDocument*)p_doc[QString("%1").arg(fid)];
-//			printf("obj not null\n");
 			if(pDoc==0)
 			{
 				p_doc.insert(QString("%1").arg(fid), new aDocument( o, db ));
@@ -912,7 +1021,6 @@ aDataTable::calcFieldValue( const QString &name )
 			}
 		}
         }
-//	printf("calculate field %s\n", name.ascii());
         return v;
 }
 
@@ -925,7 +1033,7 @@ QStringList
 aDataTable::getUserFields()
 {
    QStringList lst;
-   uint i;
+   int i;
    const QString text_uf = "text_uf";
 	for(i=0; i<count(); i++)
 	{
@@ -976,45 +1084,70 @@ aDataTable::setMarkDeleted( bool Deleted )
 }
 
 
+/* ----------------------------------------------------------------------- */
+/* navigation                                                               */
+/* ----------------------------------------------------------------------- */
+
+void
+aDataTable::loadCurrent()
+{
+	if ( isValid() )
+		m_current = m_rows.at( m_index );
+	else
+		m_current.clear();
+}
+
 bool
 aDataTable::seek ( int i, bool relative )
 {
-	bool res = Q3SqlCursor::seek( i, relative );
-//	if ( res ) r = *this;
-	return res;
+	int idx = relative ? m_index + i : i;
+	if ( idx >= 0 && idx < m_rows.size() ) {
+		m_index = idx;
+		loadCurrent();
+		return true;
+	}
+	return false;
 }
 
 bool
 aDataTable::next ()
 {
-	bool res = Q3SqlCursor::next();
-//	if ( res ) r = *this;
-	return res;
+	if ( m_index + 1 < m_rows.size() ) {
+		++m_index;
+		loadCurrent();
+		return true;
+	}
+	return false;
 }
 
 bool
 aDataTable::prev ()
 {
-	bool res = Q3SqlCursor::prev();
-//	if ( res ) r = *this;
-	return res;
+	if ( m_index - 1 >= 0 ) {
+		--m_index;
+		loadCurrent();
+		return true;
+	}
+	return false;
 }
 
 bool
 aDataTable::first ()
 {
-	bool res = Q3SqlCursor::first();
-//	if ( res ) r = *this;
-	return res;
+	if ( m_rows.isEmpty() ) return false;
+	m_index = 0;
+	loadCurrent();
+	return true;
 }
 
 
 bool
 aDataTable::last ()
 {
-	bool res = Q3SqlCursor::last();
-//	if ( res ) r = *this;
-	return res;
+	if ( m_rows.isEmpty() ) return false;
+	m_index = m_rows.size() - 1;
+	loadCurrent();
+	return true;
 }
 
 
@@ -1022,18 +1155,16 @@ aDataTable::last ()
 bool
 aDataTable::New()
 {
-	QSqlRecord *rec;
-	QVariant v;
 	qulonglong Uid = 0;
 	bool res = false;
 
-	rec = Q3SqlCursor::primeInsert();
+	prepareInsertBuffer();
 	if ( sysFieldExists("id") )
 	{
 		Uid = db->uid( mdobjId );
 		aLog::print(aLog::Debug, QString("aDataTable new record with id=%1 for meta object with id=%2").arg(Uid).arg(mdobjId));
 
-		rec->setValue("id", QVariant( Uid ) );
+		m_editBuffer.setValue("id", QVariant( Uid ) );
 	}
 	if ( insert() )
 	{
@@ -1054,35 +1185,26 @@ aDataTable::New()
 bool
 aDataTable::Copy()
 {
-	QSqlRecord *rec = new QSqlRecord( *editBuffer(true) );
+	QSqlRecord rec = m_current;
 	if ( New() )
 	{
-		for ( unsigned int i=0; i<rec->count(); i++ )
+		for ( int i=0; i<rec.count(); i++ )
 		{
-			if ( rec->field( i ).name() != QString("id")  )
-			{
-				setValue( i, rec->value( i ) );
-//				printf("field %s, before %s, after %s\n",rec->field( i )->name().ascii(), rec->value( i ).toString().ascii(), value( i ).toString().ascii());
-			}
+			QString fn = rec.fieldName( i );
+			if ( fn == QString("id") ) continue;
+			if ( m_current.contains( fn ) )
+				m_current.setValue( fn, rec.value( i ) );
 		}
 	}
-	delete rec;
 	return Update();
-//	Q_ULLONG Uid = db->uid( t->id );
-//	r->setValue("id",Uid);
-//	if ( t->insert() ) return Uid;
-
-//	return true;
 }
 
 
 bool
 aDataTable::Delete()
 {
-	QSqlRecord *rec;
-	rec = primeDelete();
+	prepareUpdateBuffer();
 	del();
-//	fNewNotUpdated = false;
 	return true;
 }
 
@@ -1090,15 +1212,11 @@ aDataTable::Delete()
 bool
 aDataTable::Update()
 {
-	QSqlRecord *rec;
-
-	rec = Q3SqlCursor::primeUpdate();
-	//for ( unsigned int i=0; i<rec->count(); i++ ) rec->setValue( i, value( i ) );
+	prepareUpdateBuffer();
 	update();
-	QSqlError err = lastError();
-	if(!err.type() == QSqlError::None)
+	if ( m_lastError.type() != QSqlError::NoError )
 	{
-		aLog::print(aLog::Error, QString("%1 %2").arg(err.text()).arg(err.driverText()) );
+		aLog::print(aLog::Error, QString("%1 %2").arg(m_lastError.text()).arg(m_lastError.driverText()) );
 	}
 	return true;
 }
@@ -1110,6 +1228,5 @@ aDataTable::sqlFieldName ( const QString & userFieldName ) const {
 	if ( fnames.contains(userFieldName) ) {
 		return fnames.value( userFieldName );
 	}
-	// return QString::QString("");
 	return QString("");
 }

@@ -35,7 +35,8 @@
 #include <qfile.h>
 #include <q3dict.h>
 #include <qsqlquery.h>
-#include <q3process.h>
+#include "aprocess.h"
+#include <QDir>
 #include <qdom.h>
 #include <qregexp.h>
 #include <qdatetime.h>
@@ -88,14 +89,14 @@ aOOTemplate::open( const QString &fname )
 		aLog::print(aLog::Debug, tr("aOOTemplate create temporary directory %1").arg(copyName));
 	}
 #ifndef Q_OS_WIN32
-	Q3Process process( QString("unzip") );
+	aProcess process( "unzip" );
 	process.setWorkingDirectory (templateDir);
 	process.addArgument( fname );
 	process.addArgument( "-d" );
 	process.addArgument( copyName );
 
 #else
-	Q3Process process( QString("7z") );
+	aProcess process( "7z" );
 	process.setWorkingDirectory ( templateDir);
 	//printf("working dir = `%s'\n", QString(templateDir).ascii());
 	process.addArgument( "x" );
@@ -111,7 +112,7 @@ aOOTemplate::open( const QString &fname )
 		return false;
 	}
 
-	while( process.isRunning() );
+	    process.waitForFinished();
 
 	if( !process.normalExit() )
 	{
@@ -584,13 +585,13 @@ aOOTemplate::save( const QString & fname )
 
 #ifndef Q_OS_WIN32
 
-	Q3Process process( QString("zip") );
+	aProcess process( "zip" );
 	process.setWorkingDirectory(copyName);
 	process.addArgument( "-r" );
 	process.addArgument( fname );
 	process.addArgument(".");
 #else
-	Q3Process process( QString("7z") );
+	aProcess process( "7z" );
 	process.setWorkingDirectory(copyName);
 	process.addArgument( "a" );
 	process.addArgument( "-tzip" );
@@ -607,7 +608,7 @@ aOOTemplate::save( const QString & fname )
 		return false;
 	}
 
-	while( process.isRunning() );
+	    process.waitForFinished();
 
 	if( !process.normalExit() )
 	{

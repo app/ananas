@@ -9,7 +9,7 @@
 #include "aservice.h"
 
 #include <q3mimefactory.h>
-#include <Q3GridLayout>
+#include <QGridLayout>
 #include <QFrame>
 #include <QList>
 #include <QPixmap>
@@ -265,15 +265,18 @@ CatalogForm::init()
 	StatusFrame->setFrameShadow( QFrame::Raised );
 	StatusFrame->hide();
 
-	GridLayout = new Q3GridLayout(centralWidget(), 1, 1, 11, 6, "GridLayout");
-	GridLayout->addMultiCellWidget( ListView, 2,3, 0 , 0 );
+	GridLayout = new QGridLayout(centralWidget());
+	GridLayout->setObjectName("GridLayout");
+	GridLayout->setContentsMargins( 11, 11, 11, 11 );
+	GridLayout->setSpacing( 6 );
+	GridLayout->addWidget( ListView, 2, 0, 2, 1 );
 	GridLayout->addWidget( LineEdit, 1, 0 );
 	GridLayout->addWidget( bCancel, 3, 1 );
 	QLabel *lb = new QLabel(tr("Search"),centralWidget());
 	lb->setSizePolicy( QSizePolicy( (QSizePolicy::SizeType)5, (QSizePolicy::SizeType)0, 0, 0, lb->sizePolicy().hasHeightForWidth() ) );
 	GridLayout->addWidget( lb ,0,0);
 	QSpacerItem* spacer = new QSpacerItem( 20, 390, QSizePolicy::Minimum, QSizePolicy::Expanding );
-	GridLayout->addMultiCell( spacer, 0,2,1, 1);
+	GridLayout->addItem( spacer, 0, 1, 3, 1 );
 
  	QPixmap  pix= rcIcon("cat.png");
 	if(pix.isNull())

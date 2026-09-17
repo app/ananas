@@ -40,7 +40,7 @@
 #include <QGroupBox>
 #include <qpushbutton.h>
 //Added by qt3to4:
-#include <Q3HBoxLayout>
+#include <QHBoxLayout>
 #include <QFrame>
 #include <QKeyEvent>
 
@@ -68,7 +68,7 @@ wField::wField( QWidget *parent, const char *name, Qt::WFlags fl )
 	md_fid = 0;
 	setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed ) );
 	setFocusPolicy(Qt::StrongFocus);
-	new Q3HBoxLayout( this, 0, 0 );
+	new QHBoxLayout( this );
 	lineEdit = new QLineEdit(this);
 	lineEdit->hide();
 	dateEdit = new wDateEdit(this);

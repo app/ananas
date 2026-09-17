@@ -34,7 +34,8 @@
 #include <qapplication.h>
 #include <qfile.h>
 #include <qdir.h>
-#include <q3process.h>
+#include "aprocess.h"
+#include <QDir>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -196,7 +197,7 @@ bool
 aContainer::extractManifest(const QString& archName, aCManifest *mf)
 {
 #ifndef Q_OS_WIN32
-	Q3Process process( QString("unzip") );
+	aProcess process( "unzip" );
 //	process.setWorkingDirectory (dir);
 	process.addArgument("-op");
 	process.addArgument( archName );
@@ -205,7 +206,7 @@ aContainer::extractManifest(const QString& archName, aCManifest *mf)
 	process.addArgument( tmpDirName );
 
 #else
-	Q3Process process( QString("7z") );
+	aProcess process( "7z" );
 //	process.setWorkingDirectory ( templateDir);
 //	printf("working dir = `%s'\n", QString(templateDir).ascii());
 	process.addArgument( "x" );
@@ -222,7 +223,7 @@ aContainer::extractManifest(const QString& archName, aCManifest *mf)
 		return false;
 	}
 
-	while( process.isRunning() );
+	    process.waitForFinished();
 
 	if( !process.normalExit() )
 	{
@@ -250,7 +251,7 @@ bool
 aContainer::extractData(const QString& archName)
 {
 #ifndef Q_OS_WIN32
-	Q3Process process( QString("unzip") );
+	aProcess process( "unzip" );
 //	process.setWorkingDirectory (dir);
 	process.addArgument("-op");
 	process.addArgument( archName );
@@ -258,7 +259,7 @@ aContainer::extractData(const QString& archName)
 	process.addArgument( tmpDirName );
 
 #else
-	Q3Process process( QString("7z") );
+	aProcess process( "7z" );
 //	process.setWorkingDirectory ( templateDir);
 //	printf("working dir = `%s'\n", QString(templateDir).ascii());
 	process.addArgument( "x" );
@@ -275,7 +276,7 @@ aContainer::extractData(const QString& archName)
 		return false;
 	}
 
-	while( process.isRunning() );
+	    process.waitForFinished();
 
 	if( !process.normalExit() )
 	{
@@ -301,7 +302,7 @@ aContainer::compressFile(const QString& fileName)
 
 #ifndef Q_OS_WIN32
 
-	Q3Process processUpdate( QString("zip") );
+	aProcess processUpdate( "zip" );
 	processUpdate.setWorkingDirectory(tmpDirName);
 //	processUpdate.addArgument( "-r" ); // recurce into subdirectories
 //	processUpdate.addArgument( "-0" ); // store only
@@ -310,7 +311,7 @@ aContainer::compressFile(const QString& fileName)
 	processUpdate.addArgument("-i");
 	processUpdate.addArgument(fileName);
 #else
-	Q3Process processUpdate( QString("7z") );
+	aProcess processUpdate( "7z" );
 	processUpdate.setWorkingDirectory(tmpDirName);
 	processUpdate.addArgument( "a" );
 	processUpdate.addArgument( "-tzip" );
@@ -326,7 +327,7 @@ aContainer::compressFile(const QString& fileName)
 		return false;
 	}
 
-	while( processUpdate.isRunning() );
+	    processUpdate.waitForFinished();
 
 	if( !processUpdate.normalExit() )
 	{

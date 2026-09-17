@@ -33,7 +33,8 @@
 #include <qapplication.h>
 #include <qfile.h>
 #include <qdir.h>
-#include <q3process.h>
+#include "aprocess.h"
+#include <QDir>
 #include <QTextStream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -358,14 +359,14 @@ bool
 aBackup::unzipArchive(const QString& archName, const QString& dir)
 {
 #ifndef _Windows
-	Q3Process process( QString("unzip") );
+	aProcess process( "unzip" );
 //	process.setWorkingDirectory (dir);
 	process.addArgument( archName );
 	process.addArgument( "-d" );
 	process.addArgument( dir );
 
 #else
-	Q3Process process( QString("7z") );
+	aProcess process( "7z" );
 //	process.setWorkingDirectory ( templateDir);
 //	printf("working dir = `%s'\n", QString(templateDir).ascii());
 	process.addArgument( "x" );
@@ -385,7 +386,7 @@ aBackup::unzipArchive(const QString& archName, const QString& dir)
 		return true;
 	}
 
-	while( process.isRunning() );
+	    process.waitForFinished();
 
 	if( !process.normalExit() )
 	{
@@ -415,14 +416,14 @@ aBackup::zipArchive(const QString& archName, const QString& dir)
 
 #ifndef _Windows
 
-	Q3Process processUpdate( QString("zip") );
+	aProcess processUpdate( "zip" );
 	processUpdate.setWorkingDirectory(dir);
 	processUpdate.addArgument( "-r" ); // recurce into subdirectories
 	processUpdate.addArgument( "-0" ); // store only
 	processUpdate.addArgument( archName ); // backup name
 	processUpdate.addArgument(".");
 #else
-	Q3Process processUpdate( QString("7z") );
+	aProcess processUpdate( "7z" );
 	processUpdate.setWorkingDirectory(dir);
 	processUpdate.addArgument( "a" );
 	processUpdate.addArgument( "-tzip" );
@@ -438,7 +439,7 @@ aBackup::zipArchive(const QString& archName, const QString& dir)
 		return true;
 	}
 
-	while( processUpdate.isRunning() );
+	    processUpdate.waitForFinished();
 
 	if( !processUpdate.normalExit() )
 	{
@@ -515,7 +516,7 @@ aBackup::writeXml(const QString & name2Save, QDomDocument xml)
 	if ( file.open( QIODevice::WriteOnly ) )
 	{
 		QTextStream ts( &file );
-		//--ts.setEncoding(Q3TextStream::UnicodeUTF8);
+		//--ts.setEncoding(QTextStream::UnicodeUTF8);
 		xml.save(ts, 4);
 		file.close();
 	}

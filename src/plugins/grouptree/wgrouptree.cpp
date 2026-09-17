@@ -32,7 +32,7 @@
 #include <qaction.h>
 //Added by qt3to4:
 #include <q3mimefactory.h>
-#include <Q3GridLayout>
+#include <QGridLayout>
 #include <QKeyEvent>
 #include "wgrouptree.h"
 #include "awidget.h"
@@ -89,7 +89,7 @@ wGroupTree::wGroupTree( QWidget *parent, Qt::WFlags fl )
 	root->setOpen( true );
 	root->setPixmap(0, rcIcon("wcatalogue.png"));
 
-	Q3GridLayout *l = new Q3GridLayout( this );
+	QGridLayout *l = new QGridLayout( this );
 	l->addWidget( tree, 0, 0 );
 	connect(tree, SIGNAL(selectionChanged(Q3ListViewItem*)),
 		this, SLOT( on_selectionChanged(Q3ListViewItem*)));

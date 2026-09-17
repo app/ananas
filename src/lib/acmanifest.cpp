@@ -73,7 +73,7 @@ aCManifest::write(const QString& fname)
 	if ( file.open( QIODevice::WriteOnly ) )
 	{
 		QTextStream ts( &file );
-		//--ts.setEncoding(Q3TextStream::UnicodeUTF8);
+		//--ts.setEncoding(QTextStream::UnicodeUTF8);
 		manifest.save(ts, 4);
 		file.close();
 	}

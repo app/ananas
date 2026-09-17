@@ -221,7 +221,7 @@ aCfg::write(QDomDocument doc, const QString &fname)
     QByteArray buf( xml.toString(4).utf8() );
     if ( file.open( QIODevice::WriteOnly ) ) {
 	QTextStream ts( &file );
-	//--ts.setEncoding(Q3TextStream::UnicodeUTF8);
+	//--ts.setEncoding(QTextStream::UnicodeUTF8);
 	doc.save(ts, 4);
 	//ts <<  toString(4);
 	file.close();

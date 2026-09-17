@@ -3,8 +3,7 @@
 
 #include "ui_catalogform.h"
 
-#include <Q3GridLayout>
-#include <Q3VBoxLayout>
+#include <QGridLayout>
 
 
 class CatalogForm : public QMainWindow, public Ui::CatalogForm
@@ -57,8 +56,7 @@ signals:
     void selected(Q_ULLONG);
 
 protected:
-    Q3GridLayout* GridLayout;
-    Q3VBoxLayout* layout1;
+    QGridLayout* GridLayout;
     Q_ULLONG id,idElementForm,idGroupForm;
     QStringList fieldList, fieldListGroup;
 

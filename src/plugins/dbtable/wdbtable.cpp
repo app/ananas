@@ -35,7 +35,7 @@
 #include <qmessagebox.h>
 //Added by qt3to4:
 #include <QContextMenuEvent>
-#include <Q3HBoxLayout>
+#include <QHBoxLayout>
 #include <QKeyEvent>
 #include <Q3SqlPropertyMap>
 #include <QList>
@@ -1863,7 +1863,7 @@ aSearchWidget::aSearchWidget( QWidget *parent, wDBTable *table )
 	ftext = "";
 	setFrameStyle( QFrame::PopupPanel | QFrame::Raised );
 	setFocusPolicy( Qt::StrongFocus );
-	new Q3HBoxLayout( this, 0, 0 );
+	new QHBoxLayout( this );
 	l = new QLineEdit( this );
         l->installEventFilter( this );
 	setFocusProxy( l );

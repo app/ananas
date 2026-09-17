@@ -27,7 +27,11 @@
 #include <QtGui/QTextBlock>
 #include <QtWidgets/QStyle>
 #include <QtGui/QPainter>
+#if QT_VERSION >= 0x060000
+#include <QtGui/QShortcut>
+#else
 #include <QtWidgets/QShortcut>
+#endif
 #include <QtWidgets/QScrollBar>
 #include <QtWidgets/QToolTip>
 #include <QtCore/QCoreApplication>

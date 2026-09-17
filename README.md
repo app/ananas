@@ -4,18 +4,19 @@ Containers and scripts used to build the Ananas sources
 (`ananas-legacy-qt4`) on a modern host with Podman.
 
 The active target is **Qt6** (`ananas-qt6-builder`, Ubuntu 24.04 + Qt 6.4, see
-`docs/PORTING.md`). The Qt4 and Qt5 tooling is kept under `archive/` for
+`docs/PORTING.md`). The codebase builds with **qmake** (used for packaging) and,
+alternatively, with **CMake**. The Qt4/Qt5 tooling is kept under `archive/` for
 history.
 
 ## Layout
 
 The scripts assume the following workspace layout (they resolve the workspace
-root as two levels above this repository):
+root as two levels above the scripts):
 
 ```
 ananas-port/
 ├── ananas-legacy-qt3/          # Qt3 tree (not built here)
-├── ananas-legacy-qt4/          # sources (built here)
+├── ananas-legacy-qt4/          # sources (built here; qmake + CMake)
 ├── ananas-legacy-qdataschema/  # libqdataschema sources
 ├── tools/                      # this repository
 │   ├── docker/Containerfile.qt6
@@ -53,11 +54,32 @@ the original Qt4 baseline is `qtscript` (qdataschema `newname`).
 
 ## Building
 
-Run the whole pipeline (build the image, then compile and package):
+### Debian packages (qmake + debhelper)
+
+`ananas` depends on `libqdataschema (>= 1.0.0)`, so build the dependency
+package first, then the main one:
 
 ```sh
+# 1. libqdataschema -> dist/libqdataschema_1.0.0-1_amd64.deb
+bash tools/scripts/build-qt6-qdataschema.sh
+
+# 2. ananas -> dist/ananas_0.9.6-1_amd64.deb
 bash tools/scripts/build-qt6.sh
 ```
+
+Both scripts build the `ananas-qt6-builder` image (cached) and run
+`dpkg-buildpackage` inside it. Install the two packages on a Qt6 host:
+
+```sh
+sudo apt install ./dist/libqdataschema_1.0.0-1_amd64.deb \
+                 ./dist/ananas_0.9.6-1_amd64.deb
+```
+
+> **Note:** if you have run the CMake build, remove
+> `ananas-legacy-qt4/cmake-build` before packaging. `build-qt6.sh` refuses to
+> package when ignored source-like files exist (the CMake tree contains
+> generated `ui_*.h`/`*.cpp`), as they would be silently absent from the
+> `git archive` export.
 
 ### CMake build (alternative)
 
@@ -74,30 +96,9 @@ podman run --rm -v "$PWD":/workspace:z -w /workspace/ananas-legacy-qt4 \
 ```
 
 The build tree is `cmake-build/` (gitignored); the output mirrors qmake
-(`lib/`, `lib/designer/`, `bin/`).
-
-The resulting Debian package is copied to `dist/`:
-
-```
-dist/ananas_0.9.6-1_amd64.deb
-```
-
-### Building the libqdataschema package
-
-`ananas` depends on `libqdataschema (>= 1.0.0)`, so to install it on the host
-build the matching package first (same image as the main package):
-
-```sh
-bash tools/scripts/build-qt6-qdataschema.sh
-```
-
-This produces `dist/libqdataschema_1.0.0-1_amd64.deb`. Install both on a Qt6
-host:
-
-```sh
-sudo apt install ./dist/libqdataschema_1.0.0-1_amd64.deb \
-                 ./dist/ananas_0.9.6-1_amd64.deb
-```
+(`lib/`, `lib/designer/`, `bin/`). qmake and CMake share those output
+directories, so run one clean build at a time (e.g. `smoke-qt6.sh` cleans
+`lib/` and `bin/`).
 
 ### Choosing a branch
 
@@ -134,7 +135,7 @@ Used while porting the codebase (see `docs/PORTING.md`).
 # Read-only burndown report of remaining Qt3Support/QtScript usage
 bash tools/scripts/port-metrics.sh
 
-# Build (clean) and run the QtTest suite headlessly under Xvfb
+# Build (clean, qmake) and run the QtTest suite headlessly under Xvfb
 bash tools/scripts/smoke-qt6.sh
 
 # Install the built .deb in the image and run the application
@@ -169,6 +170,10 @@ to reproduce the `port-qt5` and `qtscript` builds.
 
 ## Notes
 
+- The CMake build was added in Phase 5 (`docs/PORTING.md`); qmake remains the
+  build system used by the `.deb` packaging. Distribution packaging is
+  deferred, so `debian/` and the legacy `build/*` (RPM/Inno/menus) are kept
+  as-is.
 - `libqdataschema` is installed into the image manually and is not registered
   with `dpkg`, so the build passes `-d` to `dpkg-buildpackage` and a
   `debian/shlibs.local` entry is added to satisfy `dpkg-shlibdeps`.

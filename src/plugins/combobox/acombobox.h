@@ -29,7 +29,7 @@
 #include <QPixmap>
 #include <QStringList>
 #include <QEvent>
-#include <Q3ListBox>
+#include <QListWidget>
 
 
 /*!

@@ -29,6 +29,7 @@
 
 #include <qlabel.h>
 #include <qapplication.h>
+#include <QIcon>
 //#include <qpixmap.h>
 //#include <qpopupmenu.h>
 //#include <qstatusbar.h>
@@ -67,7 +68,7 @@
 
 //extern MainForm *mainform;
 //extern QPixmap rcIcon(const char *name);
-//extern void set_Icon(QListViewItem *item, const char *name);
+//extern void set_Icon(QTreeWidgetItem *item, const char *name);
 
 
 
@@ -107,7 +108,7 @@ aListViewItem::aListViewItem(	ananasListViewItem *parent,
 
 
 
-aListViewItem::aListViewItem(QListView *parent, aCfg *cfgmd,  aCfgItem cfgobj, const QString &name )
+aListViewItem::aListViewItem(QTreeWidget *parent, aCfg *cfgmd,  aCfgItem cfgobj, const QString &name )
 : ananasListViewItem( parent, cfgmd, cfgobj, name )
 {
         adb = aDatabase::database();
@@ -138,39 +139,14 @@ aListViewItem::~aListViewItem()
 QString
 aListViewItem::text( int column ) const
 {
-	return Q3ListViewItem::text( column );
+	return QTreeWidgetItem::text( column );
 //	if ( obj.isNull() ) return QObject::tr("Unknown object context");
-	if ( !id ) return Q3ListViewItem::text( column );
+	if ( !id ) return QTreeWidgetItem::text( column );
 	switch ( column ) {
 	case 0: return md->attr( obj, mda_name );
 	default:
 		return "";
 	}
-}
-
-
-
-int
-aListViewItem::compare( Q3ListViewItem *i, int col, bool accending ) const
-{
-	int id1 = 0, id2 = 0;
-	aListViewItem *ai = (aListViewItem *) i;
-	id1 = md->order( obj );
-	id2 = ai->md->order( ai->obj );
-	if ( md == ai->md && md->parent( obj ) == ai->md->parent( ai->obj ) && col ==0 && accending ) {
-		if ( id1 < id2 ) return -1;
-		if ( id1 == id2 ) return 0;
-		return 1;
-	}
-	return 1;
-}
-
-
-
-void
-aListViewItem::setup()
-{
-	Q3ListViewItem::setup();
 }
 
 
@@ -236,7 +212,7 @@ aListViewItem::loadTree()
 //		item = nextitem;
  //       }
 	if ( !md ) return;
-	if (id) setRenameEnabled(0, true);
+	if (id) setFlags( flags() | Qt::ItemIsEditable );
 	oclass = md->objClass( obj );
 //	printf("oclass=`%s'\n",oclass.ascii()); 
 	if ( oclass == md_roles )
@@ -268,7 +244,7 @@ aListViewItem::loadTree()
 	if ( oclass == md_metadata )
 	{
 		cobj = md->find ( mdc_metadata );
-		setPixmap(0, QPixmap(":/images/metadata.png"));
+		setIcon(0, QIcon(QPixmap(":/images/metadata.png")));
 	//	setOpen(true);
 		cobj = md->find ( obj, md_catalogues, 0 );
 		new aListViewItem( this, getLastChild(), md, cobj, QObject::tr("Catalogues"),NULL,role );
@@ -287,48 +263,48 @@ aListViewItem::loadTree()
 	if ( oclass == md_catalogues ){
 		QPixmap  pixmap = QPixmap(":/images/cat_g.png");
 		if(pixmap.isNull()) printf("image not loaded\n");
-		setPixmap(0, pixmap );
+		setIcon(0, QIcon(pixmap ));
 		ldclass = md_catalogue;
 	}
 	if ( oclass == md_documents ){
-		setPixmap(0, QPixmap(":/images/doc_g.png"));
+		setIcon(0, QIcon(QPixmap(":/images/doc_g.png")));
 		ldclass = md_document;
 	}
 	if ( oclass == md_reports ){
-		setPixmap(0, QPixmap(":/images/report_g.png"));
+		setIcon(0, QIcon(QPixmap(":/images/report_g.png")));
 		ldclass = md_report;
 	}
 	if ( oclass == md_journals ){
-		setPixmap(0, QPixmap(":/images/journ_g.png"));
+		setIcon(0, QIcon(QPixmap(":/images/journ_g.png")));
 		ldclass = md_journal;
 	}
 	if ( oclass == md_iregisters ){
-		setPixmap(0, QPixmap(":/images/reg_g.png"));
+		setIcon(0, QIcon(QPixmap(":/images/reg_g.png")));
 		ldclass = md_iregister;
 	}
 	if ( oclass == md_aregisters ){
-		setPixmap(0, QPixmap(":/images/regs_g.png"));
+		setIcon(0, QIcon(QPixmap(":/images/regs_g.png")));
 		ldclass = md_aregister;
 	}
 	if ( oclass == md_rl_users ){
-		setPixmap(0, QPixmap(":/images/users.png"));
+		setIcon(0, QIcon(QPixmap(":/images/users.png")));
 		loadRlUsers(this);
 	//	ldclass = md_rl_user;
 	}
 	if ( oclass == md_users ){
-		setPixmap(0, QPixmap(":/images/users.png"));
+		setIcon(0, QIcon(QPixmap(":/images/users.png")));
 	//	ldclass = md_rl_user;
 	}
 	if ( oclass == md_roles ){
-		setPixmap(0, QPixmap(":/images/roles.png"));
+		setIcon(0, QIcon(QPixmap(":/images/roles.png")));
 	//	ldclass = md_role;
 	}
 	if ( oclass == md_user || oclass == md_rl_user){
-		setPixmap(0, QPixmap(":/images/user.png"));
+		setIcon(0, QIcon(QPixmap(":/images/user.png")));
 	//	ldclass = md_document;
 	}
 	if ( oclass == md_role || oclass == md_usr_role){
-		setPixmap(0, QPixmap(":/images/role.png"));
+		setIcon(0, QIcon(QPixmap(":/images/role.png")));
 	//	ldclass = md_document;
 	}
 	if ( !ldclass.isEmpty() ) {
@@ -701,11 +677,11 @@ aMetadataTreeView::aMetadataTreeView(  QWidget *parent, aCfg *cfgmd )
 //	it.setTagName(md_roles);
 	
 //	conf = new aListViewItem( this, md, it, tr(QString("Roles")));
-//	conf->setOpen( TRUE );
-	connect( this, SIGNAL( contextMenuRequested( Q3ListViewItem*, const QPoint&, int) ), this, SLOT(ContextMenu() ) );
-//	connect( this, SIGNAL( returnPressed( QListViewItem* ) ), this, SLOT( itemEdit() ) );
-//	connect( this, SIGNAL( doubleClicked( QListViewItem* ) ), this, SLOT( itemEdit() ) );
-//	connect( this, SIGNAL( collapsed( QListViewItem* ) ), this, SLOT( on_collapsed( QListViewItem* ) ) );
+//	conf->setExpanded( true );
+	connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT(ContextMenu() ) );
+//	connect( this, SIGNAL( returnPressed( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
+//	connect( this, SIGNAL( doubleClicked( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
+//	connect( this, SIGNAL( collapsed( QTreeWidgetItem* ) ), this, SLOT( on_collapsed( QTreeWidgetItem* ) ) );
 }
 
 
@@ -721,10 +697,10 @@ aMetadataTreeView::aMetadataTreeView( UsersForm  *parent, aCfg *cfgmd )
 	it.setTagName(md_users);
 	
 	conf = new aListViewItem( this, md, it, tr(QString("Users")));
-	conf->setOpen( TRUE );
-	connect( this, SIGNAL( contextMenuRequested( Q3ListViewItem*, const QPoint&, int) ), this, SLOT(ContextMenu() ) );
-//	connect( this, SIGNAL( doubleClicked( QListViewItem* ) ), this, SLOT( itemEdit() ) );
-	connect( this, SIGNAL( collapsed( QListViewItem* ) ), this, SLOT( on_collapsed( QListViewItem* ) ) );
+	conf->setExpanded( true );
+	connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT(ContextMenu() ) );
+//	connect( this, SIGNAL( doubleClicked( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
+	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem* ) ), this, SLOT( on_collapsed( QTreeWidgetItem* ) ) );
 }
 
 
@@ -740,23 +716,23 @@ aMetadataTreeView::aMetadataTreeView( RolesForm *parent, aCfg *cfgmd )
 	it.setTagName(md_roles);
 	
 	conf = new aListViewItem( this, md, it, tr(QString("Roles")));
-	conf->setOpen( TRUE );
-	connect( this, SIGNAL( contextMenuRequested( Q3ListViewItem*, const QPoint&, int) ), this, SLOT(ContextMenu() ) );
-//	connect( this, SIGNAL( returnPressed( QListViewItem* ) ), this, SLOT( itemEdit() ) );
-//	connect( this, SIGNAL( doubleClicked( QListViewItem* ) ), this, SLOT( itemEdit() ) );
-	connect( this, SIGNAL( collapsed( Q3ListViewItem* ) ), this, SLOT( on_collapsed( Q3ListViewItem* ) ) );
+	conf->setExpanded( true );
+	connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT(ContextMenu() ) );
+//	connect( this, SIGNAL( returnPressed( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
+//	connect( this, SIGNAL( doubleClicked( QTreeWidgetItem* ) ), this, SLOT( itemEdit() ) );
+	connect( this, SIGNAL( itemCollapsed( QTreeWidgetItem* ) ), this, SLOT( on_collapsed( QTreeWidgetItem* ) ) );
 }
 
 
 
 void 
-aMetadataTreeView::on_collapsed( Q3ListViewItem * item )
+aMetadataTreeView::on_collapsed( QTreeWidgetItem * item )
 {
 	aListViewItem *i = (aListViewItem *) item;
 	if ( i )
 	{
 		QString oclass = md->objClass( i->obj );
-		if ( oclass == md_roles ) setOpen( i, true );
+		if ( oclass == md_roles ) i->setExpanded( true );
 	}
 }
 
@@ -777,7 +753,7 @@ aMetadataTreeView::ContextMenu()
 		m->addAction( "&Edit",  this, SLOT( itemEdit() ), CTRL+Key_N );
     	m->addAction( "&Delete", this, SLOT( itemDelete() ), CTRL+Key_O );*/
 	
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if(!i) return;
 		
 	QLabel *caption = new QLabel( tr("<font color=darkblue><u><b>" "Context Menu</b></u></font>"), this );
@@ -847,7 +823,7 @@ aMetadataTreeView::itemRename()
 void
 aMetadataTreeView::newUser()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		 i->editUser(true);
@@ -857,7 +833,7 @@ aMetadataTreeView::newUser()
 void
 aMetadataTreeView::newRole()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->editRole(true);
@@ -867,7 +843,7 @@ aMetadataTreeView::newRole()
 void
 aMetadataTreeView::editUser()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->editUser(false);
@@ -878,7 +854,7 @@ aMetadataTreeView::editUser()
 void
 aMetadataTreeView::editRole()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->editRole(false);
@@ -890,7 +866,7 @@ aMetadataTreeView::editRole()
 void
 aMetadataTreeView::delRole()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->deleteRole();
@@ -901,7 +877,7 @@ aMetadataTreeView::delRole()
 void
 aMetadataTreeView::delUser()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->deleteUser();
@@ -913,7 +889,7 @@ aMetadataTreeView::delUser()
 void
 aMetadataTreeView::addRole()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->addRole();
@@ -925,7 +901,7 @@ aMetadataTreeView::addRole()
 void
 aMetadataTreeView::addUser()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->addUser();
@@ -937,7 +913,7 @@ aMetadataTreeView::addUser()
 void
 aMetadataTreeView::itemSetPermission()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		//if ( i->id == 0 )
@@ -949,7 +925,7 @@ aMetadataTreeView::itemSetPermission()
 void
 aMetadataTreeView::itemDelete()
 {
-	aListViewItem *i = (aListViewItem *) selectedItem();
+	aListViewItem *i = (aListViewItem *) currentItem();
 	if ( i )
 	{
 		i->remove();

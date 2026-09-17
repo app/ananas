@@ -178,17 +178,17 @@ wCatalogEditor::openForm(const bool toSelect)
 	aCatalogue *cat = new aCatalogue(md->find(catId),db);
 	int count=0;
 	bool est=true;
-	QMap<qulonglong,Q3ListViewItem*> map, map_el;
+	QMap<qulonglong,QTreeWidgetItem*> map, map_el;
 	aCfgItem tmp, tmp_f,tmp_el,tmp_group, o;
-	Q3ListViewItem * item;
-	Q3ListViewItem * p_item;
+	QTreeWidgetItem * item;
+	QTreeWidgetItem * p_item;
 	qulonglong idGrForm=0, idElForm=0;
 	QStringList listPos, listPosGroup;
 	newform->ListHint->hide();
 	QPixmap pixmap(newform->getGroupPixmap());
 	QPixmap pixmap_mark_deleted(newform->getMarkDeletedPixmap());
 	tmp = md->find(catId);
-	newform->setCaption(md->attr(tmp,mda_name));
+	newform->setWindowTitle(md->attr(tmp,mda_name));
 	o = md->findChild(tmp, md_forms); // get obj forms
   	if(!o.isNull())
   	{
@@ -239,18 +239,17 @@ wCatalogEditor::openForm(const bool toSelect)
 				if(map.contains(cat->GroupSysValue("idp").toULongLong()))
 				{
 					p_item = map[(cat->GroupSysValue("idp").toULongLong())];
-					item = new Q3ListViewItem(p_item);
+					item = new QTreeWidgetItem(p_item);
 				}
 				else
 				{
-					item = new Q3ListViewItem(newform->ListView);
-					newform->ListView->insertItem(item);
+					item = new QTreeWidgetItem(newform->ListView);
 				}
 				item->setText(0, displayString);
 				if(cat->isGroupMarkDeleted())
-					item->setPixmap(0,pixmap_mark_deleted);
+					item->setIcon(0, QIcon(pixmap_mark_deleted));
 				else
-					item->setPixmap(0,pixmap);
+					item->setIcon(0, QIcon(pixmap));
 
 				map.insert(cat->GroupSysValue("id").toULongLong(),item);
 			//printf("%lu\n",cat->GroupSysValue("id").toULongLong());
@@ -264,9 +263,10 @@ wCatalogEditor::openForm(const bool toSelect)
   	listPos = cat->getUserFields();
 	checkUserFields(listPos);
 	int fid;
+	QStringList colLabels;
 	//sets column name
 	for(uint i=0; i<listPos.count(); i++)
-  	{
+   	{
 		fid = atoi(listPos[i].remove("uf",false).ascii());
 		if(!fid)
 		{
@@ -277,9 +277,11 @@ wCatalogEditor::openForm(const bool toSelect)
 		if(fid)
 		{
 			tmp = md->find(fid);
-			newform->ListView->addColumn(md->attr(tmp,mda_name));
+			colLabels << md->attr(tmp,mda_name);
 		}
   	}
+	newform->ListView->setColumnCount( colLabels.count() );
+	newform->ListView->setHeaderLabels( colLabels );
 
 	listPos.clear();
 	listPos = cat->getUserFields();

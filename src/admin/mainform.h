@@ -2,6 +2,7 @@
 #define MAINFORM_H
 
 #include <QMainWindow>
+#include <QMdiArea>
 #include <QPointer>
 
 #include "ui_mainform.h"

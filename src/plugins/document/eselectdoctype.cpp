@@ -61,17 +61,20 @@ void eSelectDocType::setJournal( aCfg *md, int id )
 	    dobj = md->find( did );
 	    if ( !dobj.isNull() ) {
 		name = md->attr( dobj, mda_name );
-		new Q3ListViewItem( listDocs, name, dlist[i] );
+		new QTreeWidgetItem( listDocs, QStringList() << name << dlist[i] );
 	    }
 	}
-	listDocs->setSelected( listDocs->firstChild(), true );
+	if ( listDocs->topLevelItem(0) ) {
+		listDocs->setCurrentItem( listDocs->topLevelItem(0) );
+		listDocs->topLevelItem(0)->setSelected(true);
+	}
     }
 }
 
 
 void eSelectDocType::accepted()
 {
-    docId = listDocs->selectedItem()->text(1).toInt();
+    docId = listDocs->currentItem()->text(1).toInt();
   //  printf("docId=%i\n", docId );
     accept();
 }

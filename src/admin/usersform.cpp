@@ -3,6 +3,7 @@
 #include <qvariant.h>
 #include <qimage.h>
 #include <qpixmap.h>
+#include <QVBoxLayout>
 
 /*
  *  Constructs a UsersForm as a child of 'parent', with the

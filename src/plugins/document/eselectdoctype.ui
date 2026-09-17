@@ -34,9 +34,9 @@
         </widget>
       </item>
       <item rowspan="3" row="0" column="0" colspan="1" >
-        <widget class="Q3ListView" name="listDocs" >
-          <property name="hScrollBarMode" >
-            <enum>Q3ScrollView::AlwaysOff</enum>
+        <widget class="QTreeWidget" name="listDocs" >
+          <property name="horizontalScrollBarPolicy" >
+            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
           <column>
             <property name="text" >

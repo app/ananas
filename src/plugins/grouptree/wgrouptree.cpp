@@ -27,39 +27,55 @@
 **
 **********************************************************************/
 
-#include <q3header.h>
 #include <qlayout.h>
 #include <qaction.h>
 //Added by qt3to4:
-#include <q3mimefactory.h>
 #include <QGridLayout>
+#include <QHeaderView>
 #include <QKeyEvent>
 #include "wgrouptree.h"
 #include "awidget.h"
 
-wGroupTreeItem::wGroupTreeItem( Q3ListView *parent, const QString &name )
-    : Q3ListViewItem( parent, name )
+static void moveItemAfter( QTreeWidgetItem *item, QTreeWidgetItem *after )
+{
+	if ( !item || !after ) return;
+	QTreeWidgetItem *container = after->parent();
+	if ( container ) {
+		container->removeChild( item );
+		container->insertChild( container->indexOfChild( after ) + 1, item );
+	} else {
+		QTreeWidget *t = after->treeWidget();
+		if ( t ) {
+			int idx = t->indexOfTopLevelItem( item );
+			if ( idx >= 0 ) t->takeTopLevelItem( idx );
+			t->insertTopLevelItem( t->indexOfTopLevelItem( after ) + 1, item );
+		}
+	}
+}
+
+wGroupTreeItem::wGroupTreeItem( QTreeWidget *parent, const QString &name )
+    : QTreeWidgetItem( parent, QStringList() << name )
 {
 	level = -1;
-	parent = 0;
 	id = 0;
 }
 
 
 wGroupTreeItem::wGroupTreeItem( wGroupTreeItem *parent, wGroupTreeItem *after, const QString &name, int newlevel, ANANAS_UID newid )
-    : Q3ListViewItem( parent, after, name )
+    : QTreeWidgetItem( parent, QStringList() << name )
 {
+	moveItemAfter( this, after );
 	level = newlevel;
 	id = newid;
 }
 
 
 wGroupTreeItem::wGroupTreeItem( wGroupTreeItem *parent, wGroupTreeItem *after, aCatGroup *g )
-    : Q3ListViewItem( parent, after )
+    : QTreeWidgetItem( parent )
 {
+	moveItemAfter( this, after );
 	level = g->Value( "Level" ).toInt();
 	id = g->getUid();
-//	setText( 0, g->Value("Name").toString()+" "+QString::number( level )+" ("+QString::number( id )+")" );
 	setText( 0, g->displayString() );
 }
 
@@ -80,19 +96,20 @@ wGroupTreeItem::parentItem()
 wGroupTree::wGroupTree( QWidget *parent, Qt::WFlags fl )
     : aWidget( parent, "wGroupTree", fl )
 {
-	tree = new Q3ListView( this );
-	tree->addColumn( "" );
+	tree = new QTreeWidget( this );
+	tree->setColumnCount( 1 );
 	tree->header()->hide();
-	tree->setSorting( 0 );
-	tree->setSelectionMode( Q3ListView::Single );
+	tree->setSortingEnabled( true );
+	tree->sortByColumn( 0, Qt::AscendingOrder );
+	tree->setSelectionMode( QAbstractItemView::SingleSelection );
 	root = new wGroupTreeItem( tree, "ROOT" );
-	root->setOpen( true );
-	root->setPixmap(0, rcIcon("wcatalogue.png"));
+	root->setExpanded( true );
+	root->setIcon(0, QIcon(rcIcon("wcatalogue.png")));
 
 	QGridLayout *l = new QGridLayout( this );
 	l->addWidget( tree, 0, 0 );
-	connect(tree, SIGNAL(selectionChanged(Q3ListViewItem*)),
-		this, SLOT( on_selectionChanged(Q3ListViewItem*)));
+	connect(tree, SIGNAL(itemSelectionChanged()),
+		this, SLOT( on_selectionChanged()));
 }
 
 
@@ -149,7 +166,7 @@ wGroupTree::buildGroupTree( aCfgItem obj, aCatGroup * cg1, wGroupTreeItem * wG )
 			t = cg2.Value("Name").toString();
 //			CHECK_POINT
 			item = new wGroupTreeItem ( wG, 0, &cg2 ); //cg2.Value("Level").toInt(), cg2.getUid() );
-			item->setPixmap( 0, rcIcon( "t_cat_g.png" ));
+			item->setIcon( 0, QIcon(rcIcon( "t_cat_g.png" )) );
 //			buildGroupTree( obj, &cg2, wG );
 //			CHECK_POINT
 			buildGroupTree( obj, &cg2, item );
@@ -253,7 +270,7 @@ wGroupTree::NewGroup()
 	dbobj->Update();
 	item = new wGroupTreeItem ( cur, 0, ( aCatGroup *) dbobj ); //level, dbobj->getUid() );
 	item->id = dbobj->getUid();
-	cur->setOpen( true );
+	cur->setExpanded( true );
 	tree->setCurrentItem( item );
 
 }
@@ -340,14 +357,12 @@ wGroupTree::updateItem( ANANAS_UID element )
 wGroupTreeItem *
 wGroupTree::findItem( ANANAS_UID id )
 {
-	wGroupTreeItem *i = 0;
-
-	Q3ListViewItemIterator it( tree );
-	while ( i = ( wGroupTreeItem *) it.current() ) {
-		if ( i->id == id ) break;
-		++it;
+	QTreeWidgetItemIterator it( tree );
+	for ( ; *it; ++it ) {
+		wGroupTreeItem *i = ( wGroupTreeItem *) *it;
+		if ( i->id == id ) return i;
 	}
-	return i;
+	return 0;
 }
 
 
@@ -358,59 +373,33 @@ QToolBar*
 wGroupTree::createToolBar( QMainWindow * owner )
 {
 	QAction *a;
-	QToolBar *t = new QToolBar( owner, "GroupTreeTools" );
+	QToolBar *t = new QToolBar( owner );
+	t->setObjectName( "GroupTreeTools" );
 
-	a = new QAction(
-	rcIcon("doc_new.png"),
-	tr("New"),
-	QKeySequence(""),//Insert"),
-	t,
-	tr("New group")
-	);
+	a = new QAction( rcIcon("doc_new.png"), tr("New"), t );
 	a->setToolTip(tr("New group (Ins)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( NewGroup() ) );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( NewGroup() ) );
 
-	a = new QAction(
-	rcIcon("doc_edit.png"),
-	tr("Edit"),
-	QKeySequence(""),//Return"),
-	t,
-	tr("Edit group")
-	);
+	a = new QAction( rcIcon("doc_edit.png"), tr("Edit"), t );
 	a->setToolTip(tr("Edit group (Enter)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( EditGroup() ) );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( EditGroup() ) );
 
-/*	a = new QAction(
-	QPixmap::fromMimeSource("doc_view.png"),
-	tr("View"),
-	QKeySequence("Shifh+Return"),
-	t,
-	tr("View element")
-	);
-	a->setToolTip(tr("View element (Shift+Enter)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( view() ) );
-*/
-	a = new QAction(
-	rcIcon("doc_delete.png"),
-	tr("Delete group"),
-	QKeySequence(""),//Delete"),
-	t,
-	tr("Delete group")
-	);
+	a = new QAction( rcIcon("doc_delete.png"), tr("Delete group"), t );
 	a->setToolTip(tr("Delete group (Delete)"));
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( DeleteGroup() ) );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( DeleteGroup() ) );
 
 
 	return 0;
 }
 
 void
-wGroupTree::on_selectionChanged( Q3ListViewItem * item)
+wGroupTree::on_selectionChanged()
 {
-	printf("wGroupTree id =%llu\n",((wGroupTreeItem*) item)->id);
-	emit(selectionChanged( ((wGroupTreeItem*) item)->id) );
+	wGroupTreeItem *item = (wGroupTreeItem*) tree->currentItem();
+	if ( !item ) return;
+	printf("wGroupTree id =%llu\n", item->id);
+	emit(selectionChanged( item->id) );
 }

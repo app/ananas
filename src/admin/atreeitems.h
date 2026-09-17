@@ -30,20 +30,14 @@
 
 #ifndef ATREEITEMS_H
 #define ATREEITEMS_H
-#include <Qt3Support>
-//#include <qpopupmenu.h>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <QMenu>
-#include <qlistview.h>
-//#include <qintdict.h>
 #include "acfg.h"
-
-#define QListView Q3ListView
-#define QListViewItem Q3ListViewItem
-#define QPopupMenu QMenu
 
 class QWidget;
 
-class ananasListViewItem : public Q3ListViewItem
+class ananasListViewItem : public QTreeWidgetItem
 {
 public:
 	int id;
@@ -51,25 +45,21 @@ public:
 	QWidget *editor;
 	aCfg *md;
 
-	ananasListViewItem( Q3ListView *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
-	ananasListViewItem( Q3ListView *parent, Q3ListViewItem *after, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
+	ananasListViewItem( QTreeWidget *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
+	ananasListViewItem( QTreeWidget *parent, QTreeWidgetItem *after, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
 	ananasListViewItem( ananasListViewItem *parent, ananasListViewItem *after, aCfg * cfgmd,
 						aCfgItem cfgobj, const QString &name = QString::null );
 
 	void clearTree();
-//	void moveUp ();
-//	void moveDown ();
 
 	ananasListViewItem *previousSibling();
 	ananasListViewItem *nextSibling();
-//	ananasListViewItem *getLastChild( QListViewItem * parent );
 	ananasListViewItem *getLastChild();
 protected:
-//	virtual void okRename( int col );
 };
 
 class ananasTreeView
-: public Q3ListView
+: public QTreeWidget
 {
     Q_OBJECT
 public:
@@ -77,11 +67,7 @@ public:
 
 	ananasTreeView( QWidget *parent, aCfg *cfgmd );
 
-	void ContextMenuAdd(  QPopupMenu * m );
-//	void deleteItem();
-//	void moveUpItem ();
-//	void moveDownItem ();
-//	void renameItem();
+	void ContextMenuAdd(  QMenu * m );
 };
 
 

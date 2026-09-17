@@ -29,7 +29,6 @@
 
 #ifndef MDTREE_H
 #define MDTREE_H
-#include <Qt3Support>
 //#include <qlistview.h>
 //#include <qintdict.h>
 #include "acfg.h"
@@ -65,8 +64,8 @@ public:
 			const QString &name = QString::null,
 			aUser *usr = NULL,
 			aRole *rl = NULL);
-//	aListViewItem(QListViewItem *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
-	aListViewItem(	QListView *parent, 
+//	aListViewItem(QTreeWidgetItem *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
+	aListViewItem(	QTreeWidget *parent, 
 			aCfg * cfgmd,
 			aCfgItem obj,
 			const QString &name = QString::null);
@@ -78,7 +77,6 @@ public:
 	aRole *role;
 	
 	void loadTree();
-	void setup();
 	void update();
 	void deleteUser();
 	void deleteRole();
@@ -102,7 +100,6 @@ public:
 
 protected:
 //	virtual void okRename( int col );
-	virtual int compare( Q3ListViewItem *i, int col, bool accending ) const;
 private:
 //	void loadDocument ();
 //	void loadJournal ();
@@ -148,7 +145,7 @@ public slots:
 	void itemDelete();
 	void itemSetPermission();
 private slots:
-	void on_collapsed( Q3ListViewItem *item );
+	void on_collapsed( QTreeWidgetItem *item );
 };
 
 #endif

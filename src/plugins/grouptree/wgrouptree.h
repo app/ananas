@@ -30,7 +30,8 @@
 #ifndef WGROUPTREE_H
 #define WGROUPTREE_H
 
-#include <q3listview.h>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
 #include <qwidgetplugin.h>
 #include <qwidget.h>
 //Added by qt3to4:
@@ -43,7 +44,7 @@ class QT_WIDGET_PLUGIN_EXPORT wGroupTree : public aWidget
 {
     Q_OBJECT
 public:
-	Q3ListView *tree;
+	QTreeWidget *tree;
 	wGroupTreeItem *root;
 
 	wGroupTree( QWidget *parent = 0, Qt::WFlags fl = 0 );
@@ -65,7 +66,7 @@ private slots:
 	void on_selected( ANANAS_UID element );
 //	void updateItem( ANANAS_UID element );
 	void updateItem( ANANAS_UID element );
-	void on_selectionChanged( Q3ListViewItem *);
+	void on_selectionChanged();
 signals:
     virtual void selected( ANANAS_UID group );
     virtual void selectionChanged( const qulonglong );
@@ -76,12 +77,12 @@ private:
 
 
 
-class wGroupTreeItem : public Q3ListViewItem
+class wGroupTreeItem : public QTreeWidgetItem
 {
 public:
 	ANANAS_UID id;
 	int level;
-    wGroupTreeItem( Q3ListView *parent, const QString &name = QString::null );
+    wGroupTreeItem( QTreeWidget *parent, const QString &name = QString::null );
     wGroupTreeItem( wGroupTreeItem *parent, wGroupTreeItem *after, const QString &name = QString::null, int newlevel = 0, ANANAS_UID newid = 0 );
     wGroupTreeItem( wGroupTreeItem *parent, wGroupTreeItem *after, aCatGroup *g = 0 );
     virtual ~wGroupTreeItem();

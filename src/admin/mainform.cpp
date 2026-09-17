@@ -3,6 +3,8 @@
 #include <qvariant.h>
 #include <qimage.h>
 #include <qpixmap.h>
+#include <QTableView>
+#include <QSqlTableModel>
 
 /*
  *  Constructs a MainForm as a child of 'parent', with the

@@ -236,7 +236,7 @@ QTextBlock TextEdit::collapsedBlockAt(const QPoint &pos, QString *text, QRect *b
                 lineRect.adjust(0, 0, -1, -1);
 
                 QRectF collapseRect(lineRect.right() + 8, lineRect.top(),
-                                    fontMetrics().width(QLatin1String(" {...}; ")),
+                                    fontMetrics().horizontalAdvance(QLatin1String(" {...}; ")),
                                     lineRect.height());
                 if (collapseRect.contains(pos)) {
                     QTextBlock result = block;
@@ -297,7 +297,7 @@ void TextEdit::paintEvent(QPaintEvent *e)
                 lineRect.adjust(0, 0, -1, -1);
 
                 QRectF collapseRect(lineRect.right() + 8, lineRect.top(),
-                                    fontMetrics().width(QLatin1String(" {...}; ")),
+                                    fontMetrics().horizontalAdvance(QLatin1String(" {...}; ")),
                                     lineRect.height());
                 painter.drawRect(collapseRect.adjusted(0, 0, 0, -1));
 
@@ -364,7 +364,7 @@ int TextEdit::extraAreaWidth(int *markWidthPtr) const {
         ++digits;
     }
     QFontMetrics fm(fontMetrics());
-    int space = fm.width(QLatin1Char('9')) * digits;
+    int space = fm.horizontalAdvance(QLatin1Char('9')) * digits;
     TextEditDocumentLayout *documentLayout = qobject_cast<TextEditDocumentLayout*>(document()->documentLayout());
     Q_ASSERT(documentLayout);
     int markWidth = 0;

@@ -17,15 +17,15 @@
     </property>
     <layout class="QGridLayout" >
       <item rowspan="1" row="0" column="0" colspan="3" >
-        <widget class="Q3TextEdit" name="textEdit1" >
+        <widget class="QTextEdit" name="textEdit1" >
           <property name="textFormat" >
             <enum>Qt::RichText</enum>
           </property>
           <property name="text" >
             <string/>
           </property>
-          <property name="wordWrap" >
-            <enum>Q3TextEdit::WidgetWidth</enum>
+          <property name="wordWrapMode" >
+            <enum>QTextOption::WordWrap</enum>
           </property>
           <property name="undoRedoEnabled" >
             <bool>false</bool>

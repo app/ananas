@@ -19,7 +19,7 @@ public:
     QString fieldName;
     aLineEdit *LineEdit;
     aListBox* ListHint;
-    Q3Frame* StatusFrame;
+    QFrame* StatusFrame;
     aCatalogue* cat;
     bool FormToSelect;
 

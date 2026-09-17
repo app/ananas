@@ -29,7 +29,7 @@
 
 /*
 */
-#include <q3textbrowser.h>
+#include <QTextBrowser>
 #include <qlayout.h>
 #include <qworkspace.h>
 #include <qimage.h>
@@ -56,7 +56,7 @@ messageproc(int n, const char *msg){
 MessagesWindow::MessagesWindow( QWidget* parent, Qt::WFlags fl )
     : Q3DockWindow( parent, "MessagesWindow", fl )
 {
-	msgBrowser = new Q3TextBrowser( this, "msgBrowser" );
+	msgBrowser = new QTextBrowser( this, "msgBrowser" );
 	boxLayout()->addWidget( msgBrowser );
 	languageChange();
 	setMinimumSize( QSize( 1, 1 ) );

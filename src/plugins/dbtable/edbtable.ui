@@ -94,7 +94,7 @@
         </layout>
       </item>
       <item row="1" column="0" >
-        <widget class="Q3GroupBox" name="groupBox2" >
+        <widget class="QGroupBox" name="groupBox2" >
           <property name="title" >
             <string>Column list</string>
           </property>
@@ -116,7 +116,7 @@
         </widget>
       </item>
       <item row="1" column="1" >
-        <widget class="Q3GroupBox" name="groupBox1" >
+        <widget class="QGroupBox" name="groupBox1" >
           <property name="title" >
             <string>Column</string>
           </property>

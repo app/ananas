@@ -41,7 +41,7 @@
 #include <Q3ValueList>
 #include <Q3SqlCursor>
 #include <QPixmap>
-#include <Q3Frame>
+#include <QFrame>
 #include <q3mimefactory.h>
 #include <Q3PopupMenu>
 #include <QEvent>
@@ -1861,11 +1861,11 @@ wDBTable::searchClose()
  *\~
  */
 aSearchWidget::aSearchWidget( QWidget *parent, wDBTable *table )
-: Q3Frame( parent )
+: QFrame( parent )
 {
 	t = table;
 	ftext = "";
-	setFrameStyle( Q3Frame::PopupPanel | Q3Frame::Raised );
+	setFrameStyle( QFrame::PopupPanel | QFrame::Raised );
 	setFocusPolicy( Qt::StrongFocus );
 	new Q3HBoxLayout( this, 0, 0 );
 	l = new QLineEdit( this );
@@ -1932,6 +1932,6 @@ aSearchWidget::eventFilter( QObject *obj, QEvent *ev )
             }
         } else {
             // pass the event on to the parent class
-            return Q3Frame::eventFilter( obj, ev );
+            return QFrame::eventFilter( obj, ev );
         }
 }

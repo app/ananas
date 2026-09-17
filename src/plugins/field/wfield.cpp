@@ -37,11 +37,11 @@
 #include <qlabel.h>
 #include <q3listbox.h>
 #include <qsizepolicy.h>
-#include <q3groupbox.h>
+#include <QGroupBox>
 #include <qpushbutton.h>
 //Added by qt3to4:
 #include <Q3HBoxLayout>
-#include <Q3Frame>
+#include <QFrame>
 #include <QKeyEvent>
 
 //--#include "command.h"
@@ -77,7 +77,7 @@ wField::wField( QWidget *parent, const char *name, Qt::WFlags fl )
 	objButton->hide();
 	objLabel = new QLabel(this);
 	objLabel->setSizePolicy( QSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred ));
-	objLabel->setFrameShape(Q3Frame::Box);
+	objLabel->setFrameShape(QFrame::Box);
 	objLabel->setText("UnknownField");
 	objLabel->show();
 	checkBox = new wCheckBox(this);
@@ -230,7 +230,7 @@ wField::widgetInit()
 
 	case Catalogue:
 		md_oid = n1;
-		objLabel->setFrameShape( Q3Frame::Box );
+		objLabel->setFrameShape( QFrame::Box );
 		objLabel->setLineWidth( 1 );
 		objLabel->setFocusPolicy(Qt::NoFocus);
 		objButton->setMaximumWidth(25);
@@ -249,7 +249,7 @@ wField::widgetInit()
 //>>>>>>> 1.49.2.4
 	// Field type = Document
 		md_oid = n1;
-		objLabel->setFrameStyle( Q3Frame::Panel | Q3Frame::Sunken );
+		objLabel->setFrameStyle( QFrame::Panel | QFrame::Sunken );
 		objLabel->setLineWidth( 1 );
 		objLabel->setFocusPolicy(Qt::NoFocus);
 		objButton->setMaximumWidth(25);
@@ -277,7 +277,7 @@ wField::widgetInit()
 
     default:
 		objLabel->setText("UnknownField");
-		objLabel->setFrameShape(Q3Frame::Box);
+		objLabel->setFrameShape(QFrame::Box);
 		setFocusPolicy(Qt::NoFocus);
 		layout()->add( objLabel );
 		objLabel->show();

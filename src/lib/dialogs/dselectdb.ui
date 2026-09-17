@@ -126,8 +126,8 @@
             </widget>
           </item>
           <item>
-            <widget class="Q3ProgressBar" name="progressBar1" >
-              <property name="percentageVisible" >
+            <widget class="QProgressBar" name="progressBar1" >
+              <property name="textVisible" >
                 <bool>true</bool>
               </property>
             </widget>

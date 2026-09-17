@@ -29,17 +29,16 @@
 **********************************************************************/
 
 #include	<qlayout.h>
-#include	<q3toolbar.h>
+#include	<QToolBar>
 #include	<qaction.h>
 #include	<q3vbox.h>
-#include	<q3simplerichtext.h>
+#include	<QTextDocument>
 #include	<qpainter.h>
-#include	<q3paintdevicemetrics.h>
 #include	<qkeysequence.h>
 #include	<qprinter.h>
-#include 	<q3process.h>
+#include 	<QProcess>
 #include 	<qmessagebox.h>
-#include 	<q3filedialog.h>
+#include 	<QFileDialog>
 //Added by qt3to4:
 #include <QPixmap>
 #include	"acfg.h"
@@ -59,24 +58,22 @@
 *	\_ru
 */
 aReportBrowser::aReportBrowser(  QWidget *parent, const char *name, Qt::WFlags f )
-:Q3MainWindow( parent, name, f )
+:QMainWindow( parent, f )
 {
+	Q_UNUSED(name);
 	QAction *a;
 
-	Q3ToolBar *t = new Q3ToolBar( this, "ReportTool" );
-	a = new QAction(
-	//QPixmap::fromMimeSource("print.png"),
-	QPixmap(":/images/print.png"),
-	tr("Print"),
-	QKeySequence("Ctrl+P"),
-	t,
-	tr("Print report")
-	);
-	a->addTo( t );
-	connect( a, SIGNAL( activated() ), this, SLOT( print() ) );
-	t->show();
+	QToolBar *t = new QToolBar( this );
+	t->setObjectName( "ReportTool" );
+	a = new QAction( QIcon(":/images/print.png"), tr("Print"), this );
+	a->setShortcut( QKeySequence("Ctrl+P") );
+	a->setStatusTip( tr("Print report") );
+	t->addAction( a );
+	connect( a, SIGNAL( triggered() ), this, SLOT( print() ) );
+	addToolBar( t );
 
-	textBrowser = new Q3TextBrowser( this, "textBrowser" );
+	textBrowser = new QTextBrowser( this );
+	textBrowser->setObjectName( "textBrowser" );
 	textBrowser->setTextFormat( Qt::RichText );
 	textBrowser->setFocus();
 //	textBrowser->showMaximized();
@@ -134,35 +131,13 @@ void
 aReportBrowser::print()
 {
 	QPrinter printer;
-	QPainter p;
 
 	if (!printer.setup()) return;
-	if ( p.begin( &printer ) ){
-            Q3PaintDeviceMetrics metrics( p.device() );
-            int dpiy = metrics.logicalDpiY();
-            int margin = (int) ( (2/2.54)*dpiy ); // 2 cm margins
-            QRect body( margin, margin, metrics.width() - 2*margin, metrics.height() - 2*margin );
-            Q3SimpleRichText richText( textBrowser->text(),
-                                      QFont(),
-                                      textBrowser->context(),
-                                      textBrowser->styleSheet(),
-                                      textBrowser->mimeSourceFactory(),
-                                      body.height() );
-            richText.setWidth( &p, body.width() );
-            QRect view( body );
-            int page = 1;
-            do {
-                richText.draw( &p, body.left(), body.top(), view, colorGroup() );
-                view.moveBy( 0, body.height() );
-                p.translate( 0 , -body.height() );
-                p.drawText( view.right() - p.fontMetrics().width( QString::number( page ) ),
-                            view.bottom() + p.fontMetrics().ascent() + 5, QString::number( page ) );
-                if ( view.top()  >= richText.height() )
-                    break;
-                printer.newPage();
-                page++;
-            } while (TRUE);
-	}
+
+	QTextDocument doc;
+	doc.setHtml( textBrowser->toHtml() );
+	doc.setPageSize( printer.pageRect().size() );
+	doc.print( &printer );
 }
 
 
@@ -446,19 +421,18 @@ aReport::show()
 		if(!ok || oowriter == "" )
 		{
 
-			Q3FileDialog dlg(0,"select_file_dialog",true);
-			dlg.addFilter( filter );
-			dlg.setMode(Q3FileDialog::ExistingFile);
-			dlg.setDir(QDir(startCatalog));
-			dlg.setCaption("Для отображения отчета необходим OpenOffice. Укажите исполняемый файл OpenOffice");
+			QFileDialog dlg( 0, tr("OpenOffice executable") );
+			dlg.setFilter( filter );
+			dlg.setFileMode( QFileDialog::ExistingFile );
+			dlg.setDirectory( startCatalog );
+			dlg.setWindowTitle("Для отображения отчета необходим OpenOffice. Укажите исполняемый файл OpenOffice");
 			if(dlg.exec()==QDialog::Accepted)
 			{
-				oowriter = dlg.selectedFile();
+				oowriter = dlg.selectedFiles().value( 0 );
 				//printf("select %s", oowriter.ascii());
-				Q3Process process( oowriter );
-				process.addArgument( "-n" );
-				process.addArgument( QDir::convertSeparators( fileName ) );
-				if( !process.start() )
+				QProcess process;
+				process.start( oowriter, QStringList() << "-n" << QDir::convertSeparators( fileName ) );
+				if( !process.waitForStarted() )
 				{
 					QMessageBox::warning(0, tr("Warning"), tr("Unable to start OpenOffice (%1)").arg(oowriter), QMessageBox::Ok,QMessageBox::NoButton);
 //			 printf("Unable to start OpenOffice Writer\n");
@@ -473,10 +447,9 @@ aReport::show()
 		else
 		{
 
-			Q3Process process( oowriter );
-			process.addArgument( "-n" );
-			process.addArgument( QDir::convertSeparators( fileName ) );
-			if( !process.start() )
+			QProcess process;
+			process.start( oowriter, QStringList() << "-n" << QDir::convertSeparators( fileName ) );
+			if( !process.waitForStarted() )
 			{
 				QMessageBox::warning(0, tr("Warning"), tr("Unable to start OpenOffice (%1)").arg(oowriter), QMessageBox::Ok,QMessageBox::NoButton);
 //			 printf("Unable to start OpenOffice Writer\n");

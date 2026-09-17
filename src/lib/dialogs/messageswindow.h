@@ -38,7 +38,7 @@
 //Added by qt3to4:
 #include <QHideEvent>
 
-class Q3TextBrowser;
+class QTextBrowser;
 
 void messageproc(int n, const char *msg);
 
@@ -51,7 +51,7 @@ public:
     MessagesWindow( QWidget* parent = 0, Qt::WFlags fl = Qt::WType_TopLevel );
     ~MessagesWindow();
 
-    Q3TextBrowser* msgBrowser;
+    QTextBrowser* msgBrowser;
 private:
     bool expanded;
 public slots:

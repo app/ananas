@@ -37,7 +37,7 @@
 #include <qaction.h>
 #include <qdir.h>
 //Added by qt3to4:
-#include <Q3Frame>
+#include <QFrame>
 #include <QPixmap>
 #include <Q3PopupMenu>
 
@@ -62,7 +62,7 @@ MainForm::MainForm( QWidget* parent, const char* name, Qt::WFlags fl )
     Q3VBox	*vb = new Q3VBox(this);
 
     setIcon( rcIcon("a-system.png"));
-    vb->setFrameStyle( Q3Frame::StyledPanel | Q3Frame::Sunken );
+    vb->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
     ws = new QWorkspace( vb );
     wl = new aWindowsList();
     ws->setScrollBarsEnabled( TRUE );

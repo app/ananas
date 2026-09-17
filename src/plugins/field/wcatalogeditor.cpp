@@ -35,7 +35,7 @@
 #include <q3listview.h>
 #include <qsizepolicy.h>
 //Added by qt3to4:
-#include <Q3Frame>
+#include <QFrame>
 #include <QPixmap>
 #include "ananas.h"
 #include "wcatalogeditor.h"
@@ -66,7 +66,7 @@ wCatalogEditor::wCatalogEditor(	wField *parent,
   md = NULL;
   QString str;
   label = new QLabel(parent, name);
-	label->setFrameShape(Q3Frame::Box);
+	label->setFrameShape(QFrame::Box);
 	w =(QWidget*) parent->parent()->parent();
 	str = parent->getFieldType();
 	catId = atoi(str.remove(0,2));// gets catalog id.

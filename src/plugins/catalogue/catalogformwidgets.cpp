@@ -31,7 +31,7 @@
 #include <qtimer.h>
 #include <qmessagebox.h>
 //Added by qt3to4:
-#include <Q3Frame>
+#include <QFrame>
 #include <QKeyEvent>
 #include <QFocusEvent>
 
@@ -68,7 +68,7 @@ aListBox::~aListBox()
  * \param fr (in, out) - status frame.
  */
 void
-aListBox::show(QWidget *wd, Q3Frame *fr)//, QLabel *lb)
+aListBox::show(QWidget *wd, QFrame *fr)//, QLabel *lb)
 {
  	setGeometry(wd->x(),
 		    wd->y()+wd->size().height()+1,

@@ -40,7 +40,7 @@
 #include <qevent.h>
 #include <q3popupmenu.h>
 //Added by qt3to4:
-#include <Q3Frame>
+#include <QFrame>
 #include <QKeyEvent>
 #include <QFocusEvent>
 //class QVBoxLayout;
@@ -52,7 +52,7 @@ public:
 	aListBox(QWidget *parent = 0, const char* name = 0, Qt::WFlags f = 0);
 	~aListBox();
 	void insertItem(const QString &s, long idx, int index = -1);
-	void show(QWidget *w, Q3Frame *fr);//, QLabel *lb);
+	void show(QWidget *w, QFrame *fr);//, QLabel *lb);
 
 	long getId(int ind) { return atol(listPrivate->text(ind).ascii()); };
 

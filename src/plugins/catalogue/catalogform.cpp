@@ -10,7 +10,7 @@
 
 #include <q3mimefactory.h>
 #include <Q3GridLayout>
-#include <Q3Frame>
+#include <QFrame>
 #include <Q3ValueList>
 #include <QPixmap>
 #include <QLabel>
@@ -255,13 +255,13 @@ CatalogForm::init()
 	ListView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 	LineEdit = new aLineEdit(centralWidget(), "lineEdit");
 	ListHint = new aListBox(centralWidget(), "listBox");
-	StatusFrame = new Q3Frame(centralWidget(), "statusFrame");
+	StatusFrame = new QFrame(centralWidget(), "statusFrame");
 
 	ListView->setRootIsDecorated( true );
 
 	StatusFrame->setGeometry( QRect( 0, 0, 50,5 ) );
-	StatusFrame->setFrameShape( Q3Frame::StyledPanel );
-	StatusFrame->setFrameShadow( Q3Frame::Raised );
+	StatusFrame->setFrameShape( QFrame::StyledPanel );
+	StatusFrame->setFrameShadow( QFrame::Raised );
 	StatusFrame->hide();
 
 	GridLayout = new Q3GridLayout(centralWidget(), 1, 1, 11, 6, "GridLayout");

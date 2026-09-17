@@ -36,7 +36,7 @@
 //Added by qt3to4:
 #include <Q3SqlEditorFactory>
 #include <QContextMenuEvent>
-#include <Q3Frame>
+#include <QFrame>
 #include <Q3ValueList>
 #include <QPixmap>
 #include <Q3SqlCursor>
@@ -51,7 +51,7 @@ class aDatabase;
 class wDBTable;
 class Q3DataTable;
 
-class aSearchWidget : public Q3Frame
+class aSearchWidget : public QFrame
 {
 Q_OBJECT
 public:

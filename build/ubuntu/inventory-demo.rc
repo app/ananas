@@ -1,0 +1,16 @@
+# Ananas inventory demo scheme (internal SQLite database with demo data).
+# Installed to /etc/ananas/ so it is offered by the scheme selection dialog
+# at Ananas startup.
+
+dbtype=internal
+dbname=inventory-demo.db
+dbuser=
+dbpass=
+dbhost=
+dbport=
+
+dbtitle=Inventory demo (Оперативный учет. Демо.)
+configfile=/usr/share/ananas/applications/inventory/inventory-demo.cfg
+workdir=~/.ananas/inventory-demo
+initdata=inventory-demo-data.sql
+debug=1

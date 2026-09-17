@@ -84,13 +84,17 @@ install: build
 	cp -f ./build/menus/kde/ananas.desktop $(CURDIR)/debian/ananas/usr/share/applications/
 	cp -f ./build/icons/*.png $(CURDIR)/debian/ananas/usr/share/pixmaps/
 
-	# inventory scheme: metadata, rc and the startup-dialog registry
+	# inventory schemes: metadata, report templates, rc files and registry
 	mkdir -p $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory
 	mkdir -p $(CURDIR)/debian/ananas/etc/ananas
 	mkdir -p $(CURDIR)/debian/ananas/etc/xdg/ananasgroup
 	cp -f ./applications/inventory/inventory.cfg $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
+	cp -f ./applications/inventory/inventory-demo.cfg $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
+	cp -f ./applications/inventory/inventory-demo-data.sql $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
+	cp -f ./applications/inventory/templ_* $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
 	cp -f ./applications/ananas-cfg.dtd $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
 	cp -f ./build/ubuntu/inventory.rc $(CURDIR)/debian/ananas/etc/ananas/inventory.rc
+	cp -f ./build/ubuntu/inventory-demo.rc $(CURDIR)/debian/ananas/etc/ananas/inventory-demo.rc
 	cp -f ./build/ubuntu/ananas.conf $(CURDIR)/debian/ananas/etc/xdg/ananasgroup/ananas.conf
 
 #	rm -Rf $(CURDIR)/debian/ananas/usr/include/ananas || :

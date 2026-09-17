@@ -137,7 +137,7 @@ void dSelectDB::init()
 	listDBRC->setSortingEnabled( false );
 	listDBRC->header()->hide();
 	listDBRC->setRootIsDecorated(1);
-	buttonOk->setEnabled( FALSE );
+	buttonOk->setEnabled( false );
 	return;
 }
 
@@ -178,7 +178,7 @@ void dSelectDB::readSettings(QStringList entryGroup)
 		{
 			if(k<0) break;
 			rc = settings.value(entryGroup[j]+"/"+eitems[k]).toString();
-			cfg = aTests::readConfig(QDir::convertSeparators(rc));
+			cfg = aTests::readConfig(QDir::toNativeSeparators(rc));
 			sn=cfg["dbtitle"];
 			if (gitem) item= new rcListViewItem( gitem, sn, rc );
 			else item= new rcListViewItem( listDBRC, sn, rc );
@@ -249,7 +249,7 @@ void dSelectDB::editItem()
 	else
 	{
 	// Resource
-		d->setdata( QDir::convertSeparators(item->rcfile), item );
+		d->setdata( QDir::toNativeSeparators(item->rcfile), item );
 		if ( d->exec() == QDialog::Accepted )
 		{
 			changes = true;

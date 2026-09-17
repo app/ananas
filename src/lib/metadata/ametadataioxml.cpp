@@ -290,7 +290,7 @@ AMetaDataIOXML::write(  const QString &name, AMetaData *md )
 
     xml.setContent(QString("<?xml version = '1.0' encoding = 'UTF-8'?>\n"));
     xml.appendChild( xml.implementation().createDocumentType("ananas_configuration",
-                     QString::null,"ananas-cfg.dtd"));
+                     QString(),"ananas-cfg.dtd"));
     rootnode = AMetaObjectToXML( md );
 //xml.createElement( md_root );
     xml.appendChild( rootnode );

@@ -25,11 +25,11 @@
 
 #include <QtGui/QTextDocument>
 #include <QtGui/QTextBlock>
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 #include <QtGui/QPainter>
-#include <QtGui/QShortcut>
-#include <QtGui/QScrollBar>
-#include <QtGui/QToolTip>
+#include <QtWidgets/QShortcut>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QToolTip>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 #include <QtCore/QDebug>

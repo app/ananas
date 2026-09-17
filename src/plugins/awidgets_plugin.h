@@ -31,6 +31,7 @@ class QT_WIDGET_PLUGIN_EXPORT aWidgetsCollection: public QObject, public QDesign
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QDesignerCustomWidgetCollectionInterface")
 
 public:
     aWidgetsCollection(QObject *parent=0);

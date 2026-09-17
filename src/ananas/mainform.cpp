@@ -32,7 +32,8 @@
 #include <qmessagebox.h>
 #include <QToolBar>
 #include <qstatusbar.h>
-#include <qworkspace.h>
+#include <QMdiArea>
+#include <QMdiSubWindow>
 #include <qapplication.h>
 #include <qaction.h>
 #include <qdir.h>
@@ -48,7 +49,7 @@
 #include "ananas.h"
 
 MainForm *mainform=NULL;
-QWorkspace *mainformws=NULL;
+QMdiArea *mainformws=NULL;
 aWindowsList *mainformwl=NULL;
 //extern void messageproc(int n, const char *msg);
 
@@ -57,7 +58,7 @@ aWindowsList *mainformwl=NULL;
  *  name 'name' and widget flags set to 'f'.
  *
  */
-MainForm::MainForm( QWidget* parent, const char* name, Qt::WFlags fl )
+MainForm::MainForm( QWidget* parent, const char* name, Qt::WindowFlags fl )
     : QMainWindow( parent, fl )
 {
 //    QApopupmenu *popup;
@@ -66,10 +67,9 @@ MainForm::MainForm( QWidget* parent, const char* name, Qt::WFlags fl )
 
     setWindowIcon( rcIcon("a-system.png"));
     vb->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
-    ws = new QWorkspace( vb );
+    ws = new QMdiArea( vb );
     vbl->addWidget( ws );
     wl = new aWindowsList();
-    ws->setScrollBarsEnabled( TRUE );
     setCentralWidget( vb );
     statusBar()->setObjectName("statusbar");
     if ( name ) setObjectName( name );
@@ -253,16 +253,16 @@ void MainForm::languageChange()
 void MainForm::windowsMenuAboutToShow()
 {
     windowsMenu->clear();
-    QAction *cascadeAction = windowsMenu->addAction(tr("&Cascade"), ws, SLOT(cascade() ) );
-    QAction *tileAction = windowsMenu->addAction(tr("&Tile"), ws, SLOT(tile() ) );
+    QAction *cascadeAction = windowsMenu->addAction(tr("&Cascade"), ws, SLOT(cascadeSubWindows() ) );
+    QAction *tileAction = windowsMenu->addAction(tr("&Tile"), ws, SLOT(tileSubWindows() ) );
     QAction *horTileAction = windowsMenu->addAction(tr("Tile &horizontal"), this, SLOT(tileHorizontal() ) );
-    if ( ws->windowList().isEmpty() ) {
+    if ( ws->subWindowList().isEmpty() ) {
 	cascadeAction->setEnabled( false );
 	tileAction->setEnabled( false );
 	horTileAction->setEnabled( false );
     }
     windowsMenu->addSeparator();
-    QWidgetList windows = ws->windowList();
+    QList<QMdiSubWindow*> windows = ws->subWindowList();
     if(windows.count()==0) return;
     int i=0, count = windows.count();
 
@@ -276,7 +276,7 @@ void MainForm::windowsMenuAboutToShow()
 	QAction *a = windowsMenu->addAction(windows.at(i)->windowTitle() );
 	a->setData( i );
 	a->setCheckable( true );
-	a->setChecked( ws->activeWindow() == windows.at(i) );
+	a->setChecked( ws->activeSubWindow() == windows.at(i) );
 	connect( a, SIGNAL( triggered() ), this, SLOT( windowsMenuActivated() ) );
 	++i;
     }while( i < count );
@@ -285,11 +285,11 @@ void MainForm::windowsMenuAboutToShow()
 void MainForm::tileHorizontal()
 {
     // primitive horizontal tiling
-    QWidgetList windows = ws->windowList();
+    QList<QMdiSubWindow*> windows = ws->subWindowList();
     int count =0;
     for ( int i = 0; i < int(windows.count()); ++i )
     {
-	QWidget *window = windows.at(i);
+	QMdiSubWindow *window = windows.at(i);
 	if( !window ) continue;
 	if(!window->isHidden()) count++;
     }
@@ -299,7 +299,7 @@ void MainForm::tileHorizontal()
     int y = 0;
     for ( int i = 0; i < windows.count(); ++i )
     {
-	QWidget *window = windows.at(i);
+	QMdiSubWindow *window = windows.at(i);
 	if ( !window ) continue;
 	if ( window->isHidden() ) continue;
 	if ( window->windowState() == Qt::WindowMaximized )
@@ -308,10 +308,10 @@ void MainForm::tileHorizontal()
 	    window->hide();
 	    window->showNormal();
 	}
-	int preferredHeight = window->minimumHeight()+window->parentWidget()->baseSize().height();
+	int preferredHeight = window->minimumHeight();
 	int actHeight = qMax(heightForEach, preferredHeight);
 
-	window->parentWidget()->setGeometry( 0, y, ws->width(), actHeight );
+	window->setGeometry( 0, y, ws->width(), actHeight );
 	y += actHeight;
     }
 }
@@ -321,6 +321,6 @@ void MainForm::windowsMenuActivated()
     QAction *a = qobject_cast<QAction*>( sender() );
     if ( !a ) return;
     int id = a->data().toInt();
-    QWidget* w = ws->windowList().at( id );
+    QMdiSubWindow* w = ws->subWindowList().at( id );
     if ( w ) { w->showNormal(); w->setFocus(); }
 }

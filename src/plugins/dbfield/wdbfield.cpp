@@ -56,7 +56,7 @@ static QObjectList aQueryList( QObject *parent, const char *type )
  * \en	Constructor without name. \_en
  * \ru 	Создает конструктор без указания имени виджета. \_ru
  */
-wDBField::wDBField( QWidget *parent, Qt::WFlags fl )
+wDBField::wDBField( QWidget *parent, Qt::WindowFlags fl )
     : wField( parent, "wDBField", fl)
 {
 	init();
@@ -68,7 +68,7 @@ wDBField::wDBField( QWidget *parent, Qt::WFlags fl )
  * \en	Constructor. \_en
  * \ru	Конструктор. \_ru
  */
-wDBField::wDBField( QWidget *parent, const char *name, Qt::WFlags fl )
+wDBField::wDBField( QWidget *parent, const char *name, Qt::WindowFlags fl )
     : wField( parent, name, fl)
 {
 	init();

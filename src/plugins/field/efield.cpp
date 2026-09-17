@@ -163,8 +163,8 @@ void eField::typeSelect( int idx )
 	w = true;
 
     }
-    eWidth->setShown( w );
-    tWidth->setShown( w );
-    eDec->setShown( d );
-    tDec->setShown( d );
+    eWidth->setVisible( w );
+    tWidth->setVisible( w );
+    eDec->setVisible( d );
+    tDec->setVisible( d );
 }

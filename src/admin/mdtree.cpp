@@ -319,8 +319,8 @@ aListViewItem::loadTree()
 			cobj = md->find( obj, ldclass, i );
 			if ( !cobj.isNull() ) {
 //				printf("%d ok\n", i);
-//				new aListViewItem( this, md, md->find( obj, ldclass, i ), QString::null );
-				new aListViewItem( this, getLastChild(), md,  cobj, QString::null, NULL ,role );
+//				new aListViewItem( this, md, md->find( obj, ldclass, i ), QString() );
+				new aListViewItem( this, getLastChild(), md,  cobj, QString(), NULL ,role );
 			}
 		}
 	}

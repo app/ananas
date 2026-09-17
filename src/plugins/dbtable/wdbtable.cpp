@@ -1047,7 +1047,7 @@ wDBTable::keyPressEvent ( QKeyEvent *e )
 	qulonglong id;
 
 	aWidget *container = NULL;
-	if ( searchMode == FALSE && !e->text().isEmpty() && e->text().at( 0 ).isPrint() )
+	if ( searchMode == false && !e->text().isEmpty() && e->text().at( 0 ).isPrint() )
 	{
 		searchOpen( e->text() );
 	}
@@ -1241,7 +1241,7 @@ wDBTable::confirmEdit( aTableOp m ) {
             tr("You are going to remove record <br>"
                 "Are you sure?"),
             tr("&Yes, remove"), tr("&No"),
-            QString::null, 0, 1 );
+            QString(), 0, 1 );
 	}
 	return true;
 }
@@ -1252,9 +1252,9 @@ wDBTable::confirmEdit( aTableOp m ) {
 bool
 wDBTable::beginInsert() {
 	if ( !m_table || isReadOnly() || !numCols() )
-		return FALSE;
+		return false;
 	if ( !m_table->canInsert() )
-		return FALSE;
+		return false;
 
 	m_table->insertBuffer();
 	lineInsert( m_table->editBuffer() );
@@ -1344,12 +1344,12 @@ wDBTable::Select( ANANAS_UID db_uid )
 
 	ANANAS_UID cur_id = 0;
 	int curr = currentRow(), curc=currentColumn(), row = 0;
-	bool found = FALSE;
+	bool found = false;
 
 	while ( t->seek( row ) ){
 		cur_id = t->sysValue( "id" ).toULongLong();
 		if ( cur_id == db_uid ) {
-			found = TRUE;
+			found = true;
 			break;
 		}
 		row++;
@@ -1367,7 +1367,7 @@ wDBTable::searchColumn( const QString & text, bool FromCurrent, bool Forward )
 
 	QString s;
 	int curr = currentRow(), curc=currentColumn(), row = 0;
-	bool found = FALSE;
+	bool found = false;
 	aDataTable *t = m_table;
 	if ( !t ) return false;
 
@@ -1378,7 +1378,7 @@ wDBTable::searchColumn( const QString & text, bool FromCurrent, bool Forward )
 	while ( t->seek( row ) ){
 		s = t->sysValue( field ).toString();
 		if ( s.left( text.length() ) == text ) {
-			found = TRUE;
+			found = true;
 			break;
 		}
 		if ( Forward ) row++; else row--;
@@ -1395,7 +1395,7 @@ void
 wDBTable::searchOpen( const QString & text )
 {
 	searchWidget = new aSearchWidget( aWidget::parentContainer( this ), this );
-	searchMode = TRUE;
+	searchMode = true;
 	searchWidget->setFocus();
 	searchWidget->search( text );
 }
@@ -1407,7 +1407,7 @@ wDBTable::searchClose()
 	if ( searchWidget ) {
 		setFocus();
 		searchWidget->deleteLater();
-		searchMode = FALSE;
+		searchMode = false;
 		searchWidget = 0;
 	}
 }
@@ -1588,7 +1588,7 @@ aSearchWidget::eventFilter( QObject *obj, QEvent *ev )
 	if ( obj == l ) {
 		if ( ev->type() == QEvent::FocusOut ) {
 			t->searchClose();
-			return TRUE;
+			return true;
 		}
 		if ( ev->type() == QEvent::KeyPress ) {
 		QKeyEvent *e = ( QKeyEvent *) ev;
@@ -1598,18 +1598,18 @@ aSearchWidget::eventFilter( QObject *obj, QEvent *ev )
 				t->searchClose();
 				break;
 			case Qt::Key_Up:
-				t->searchColumn( ftext, TRUE, FALSE );
+				t->searchColumn( ftext, true, false );
 				break;
 			case Qt::Key_Down:
-				t->searchColumn( ftext, TRUE, TRUE );
+				t->searchColumn( ftext, true, true );
 				break;
 			default:
-				return FALSE;
+				return false;
 				break;
 			}
-                return TRUE;
+                return true;
             } else {
-                return FALSE;
+                return false;
             }
         } else {
             return QFrame::eventFilter( obj, ev );

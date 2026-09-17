@@ -39,7 +39,7 @@
 /*!
  * Constructor
  */
-aListBox::aListBox(QWidget* parent, const char * name, Qt::WFlags f):QListWidget(parent)
+aListBox::aListBox(QWidget* parent, const char * name, Qt::WindowFlags f):QListWidget(parent)
 {
 	Q_UNUSED(f);
 	setObjectName(name);
@@ -225,7 +225,7 @@ aLineEdit::setFocus()
  */
 aListView::aListView(QWidget* parent,
 		     const char* name,
-		     Qt::WFlags f) : QTreeWidget(parent)
+		     Qt::WindowFlags f) : QTreeWidget(parent)
 {
 	Q_UNUSED(f);
 	setObjectName(name);

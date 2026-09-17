@@ -78,7 +78,7 @@ aFilter::Dump() const
 QString
 aFilter::toString(bool removeFirst) const
 {
-	QString str = QString::null;
+	QString str = QString();
 	QList<filterCondition>::const_iterator it;
 	for ( it = conditions.begin(); it != conditions.end(); ++it )
 	{

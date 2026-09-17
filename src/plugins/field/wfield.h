@@ -75,8 +75,8 @@ class QDESIGNER_WIDGET_EXPORT wField : public aWidget
 public:
 	enum tEditorType { Unknown, Numberic, String, Date, DateTime, Boolean, Catalogue=101, Document};
 
-	wField( QWidget *parent, const char *name, Qt::WFlags fl = 0 );
-//	wField( QWidget *parent, const char *name, WFlags fl, bool dbf = TRUE );
+	wField( QWidget *parent, const char *name, Qt::WindowFlags fl = 0 );
+//	wField( QWidget *parent, const char *name, Qt::WindowFlags fl, bool dbf = true );
 	virtual ~wField();
 
 	virtual QDialog*	createEditor( QWidget *parent );

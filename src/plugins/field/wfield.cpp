@@ -59,7 +59,7 @@
  * \en	Constructs object with parent=parent, name=name and flags=fl \_en
  * \ru	Создает объект с родителем parent, именем name и флагом fl. \_ru
  */
-wField::wField( QWidget *parent, const char *name, Qt::WFlags fl )
+wField::wField( QWidget *parent, const char *name, Qt::WindowFlags fl )
     : aWidget( parent, name, fl )
 {
 	loaded = 0;
@@ -84,7 +84,7 @@ wField::wField( QWidget *parent, const char *name, Qt::WFlags fl )
 	vEditorType = Unknown;
 }
 /*
-wField::wField( QWidget *parent, const char *name, WFlags fl, bool dbf )
+wField::wField( QWidget *parent, const char *name, Qt::WindowFlags fl, bool dbf )
     : aWidget( parent, name, fl )
 {
     setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed ) );

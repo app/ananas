@@ -60,7 +60,7 @@ static QObjectList aQueryList( QObject *parent, const char *type )
  *\param - \~english \~russian \~
  *\param - \~english \~russian \~
  */
-wDocument::wDocument( QWidget *parent, Qt::WFlags fl )
+wDocument::wDocument( QWidget *parent, Qt::WindowFlags fl )
 :aWidget( parent, "wDocument", fl )
 {
 	setInited( false );

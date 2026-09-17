@@ -201,7 +201,7 @@ QStringList lst;
 	eColName->setText("");
 //	str = table->getFieldType((const char*) ComboBoxTable->currentText().toUtf8(),(const char*)(ListCol->currentItem() ? ListCol->currentItem()->text() : QString()).toUtf8());
 	//if(eColHeader->text="")
-//	ListCol->blockSignals( TRUE );
+//	ListCol->blockSignals( true );
 	//if(ListCol->currentRow()) ListCol->currentRow()->setText(s);
 
 //	printf(">>>read property DefHeaders in %s\n", table->objectName());
@@ -211,7 +211,7 @@ QStringList lst;
 //	printf(">>>insert str list\n");
 //	ListCol->addItems(lst);
 //	ListCol->setCurrentItem(col);
-//	ListCol->blockSignals( FALSE );
+//	ListCol->blockSignals( false );
 	if(col==-1 || ListCol->count()==0) return;
 //	printf(">>>set text in eColHeader\n");
 	eColHeader->setText((ListCol->currentItem() ? ListCol->currentItem()->text() : QString()));
@@ -433,9 +433,9 @@ CHECK_POINT
 	int idx;
 	idx = ListCol->currentRow();
 	if (idx == -1) return;
-	ListCol->blockSignals( TRUE );
+	ListCol->blockSignals( true );
 	if(ListCol->currentItem()) ListCol->currentItem()->setText(s);
-	ListCol->blockSignals( FALSE );
+	ListCol->blockSignals( false );
 
 }
 

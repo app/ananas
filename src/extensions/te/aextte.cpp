@@ -70,7 +70,7 @@ AExtTE::drivers( const QString &baseclass )
 bool 
 AExtTE::driverExists( const QString &name )
 {
-    if (te_driverExists) return te_driverExists( name, QString::null );
+    if (te_driverExists) return te_driverExists( name, QString() );
     return false;
 }
 
@@ -95,5 +95,13 @@ AExtTE::deviceEvent( int eventCode )
 }
 
 #include <aextensionplugin.h>
-typedef AExtensionPlugin<AExtTE> ATEPlugin;
-A_EXPORT_PLUGIN( ATEPlugin )
+
+class ATEPlugin : public AExtensionPlugin<AExtTE>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    ATEPlugin() {}
+};
+
+#include "aextte.moc"

@@ -56,11 +56,11 @@ void eActionButton::Script_toggled( bool o )
 void eActionButton::setData(  wActionButton *b )
 {
     if ( !b ) return;
-    if ( b->isAction() ) Action->setChecked( TRUE );
-    if ( b->isActionUpdate() ) cbUpdate->setChecked( TRUE );
-    if ( b->isActionTurnOn() ) cbTurnon->setChecked( TRUE );
-    if ( b->isActionClose() ) cbClose->setChecked( TRUE );
-    if ( b->isScript() ) Script->setChecked( TRUE );
+    if ( b->isAction() ) Action->setChecked( true );
+    if ( b->isActionUpdate() ) cbUpdate->setChecked( true );
+    if ( b->isActionTurnOn() ) cbTurnon->setChecked( true );
+    if ( b->isActionClose() ) cbClose->setChecked( true );
+    if ( b->isScript() ) Script->setChecked( true );
 //    cbAction->setCurrentIndex(b->getAction())
     // eCode->setText( b->getScriptCode() );
 //    button = b;
@@ -68,9 +68,9 @@ void eActionButton::setData(  wActionButton *b )
     if ( wd->objectName() == "Catalogue" )
     {
 	    cbTurnon->setChecked( false );
-	    cbTurnon->setHidden( TRUE );
+	    cbTurnon->setHidden( true );
 
-//	b->setActionTurnOn( FALSE );
+//	b->setActionTurnOn( false );
     }
     aCfg *md = wd->getMd();
     QStringList l_name;

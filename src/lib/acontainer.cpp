@@ -112,7 +112,7 @@ aContainer::generateName4TmpDir()
 	temp = getenv("TEMP");
 #endif
 	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
-	tmpDirName = QDir::convertSeparators(tmpDirName);
+	tmpDirName = QDir::toNativeSeparators(tmpDirName);
 
 }
 
@@ -168,7 +168,7 @@ bool
 aContainer::addFile(const QString& filename, const QString &newname, int type)
 {
 	bool res = false;
-	if(!aService::copyFile( QDir::convertSeparators(filename), QDir::convertSeparators(tmpDirName + newname), true))
+	if(!aService::copyFile( QDir::toNativeSeparators(filename), QDir::toNativeSeparators(tmpDirName + newname), true))
 	{
 		aLog::print(aLog::Error, tr("aContainer error copy file"));
 	}
@@ -241,7 +241,7 @@ aContainer::extractManifest(const QString& archName, aCManifest *mf)
 		setLastError(tr("Unzip ended with code %1").arg(process.exitStatus()));
 		return false;
 	}
-	if(mf && mf->read(tmpDirName + QDir::convertSeparators("/META-INF/manifest.xml")))
+	if(mf && mf->read(tmpDirName + QDir::toNativeSeparators("/META-INF/manifest.xml")))
 	{
 		return true;
 	}
@@ -376,7 +376,7 @@ aContainer::cleanupTmpFiles()
 		{
 			if(rec.type!=mf_dir && rec.type!=mf_invalid)
 			{
-				file.setFileName(tmpDirName + QDir::convertSeparators(rec.name));
+				file.setFileName(tmpDirName + QDir::toNativeSeparators(rec.name));
 				if(file.remove())
 					aLog::print(aLog::Debug, tr("aContainer delete file %1").arg(rec.name));
 			}
@@ -387,7 +387,7 @@ aContainer::cleanupTmpFiles()
 		{
 			if(rec.type==mf_dir)
 			{
-				if(dir.rmdir(tmpDirName + QDir::convertSeparators(rec.name) ))
+				if(dir.rmdir(tmpDirName + QDir::toNativeSeparators(rec.name) ))
 					aLog::print(aLog::Debug, tr("aContainer delete directory %1").arg(rec.name));
 			}
 			rec = manifest->next();
@@ -395,9 +395,9 @@ aContainer::cleanupTmpFiles()
 	}
 
 
-	file.setFileName(QDir::convertSeparators(tmpDirName+"/META-INF/manifest.xml"));
+	file.setFileName(QDir::toNativeSeparators(tmpDirName+"/META-INF/manifest.xml"));
 	if(file.remove()) aLog::print(aLog::Debug, tr("aContainer delete file %1").arg(file.fileName()));
-	if(dir.rmdir(QDir::convertSeparators(tmpDirName))) aLog::print(aLog::Debug, tr("aContainer delete directory %1").arg(tmpDirName + "/META-INF"));
+	if(dir.rmdir(QDir::toNativeSeparators(tmpDirName))) aLog::print(aLog::Debug, tr("aContainer delete directory %1").arg(tmpDirName + "/META-INF"));
 	//aLog::print(aLog::Info, tr("aContainer cleanup temporary files"));
 
 }

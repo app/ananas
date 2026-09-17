@@ -44,8 +44,9 @@
 class AExtension;
 //class AExtensionPluginPrivate;
 
-//#define A_EXPORT_PLUGIN(pluginobjectname) typedef AExtensionPlugin<pluginobjectname> pluginobjectname##Plugin; Q_EXPORT_PLUGIN(pluginobjectname)
-#define A_EXPORT_PLUGIN(pluginobjectname) Q_EXPORT_PLUGIN2(pluginobjectname,pluginobjectname)
+// Qt5 plugin export: Q_EXPORT_PLUGIN2 is gone. Each extension now declares a
+// concrete plugin class deriving from AExtensionPlugin<type> with Q_OBJECT and
+// Q_PLUGIN_METADATA, and includes the generated <file>.moc (see aext*.cpp).
 
 class  AExtensionInterface
 {

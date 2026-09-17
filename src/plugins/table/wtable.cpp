@@ -150,13 +150,13 @@ wTable::adjustColumn ( int col )
 void
 wTable::setColumnStretchable ( int col, bool stretch )
 {
-	horizontalHeader()->setResizeMode( col, stretch ? QHeaderView::Stretch : QHeaderView::Interactive );
+	horizontalHeader()->setSectionResizeMode( col, stretch ? QHeaderView::Stretch : QHeaderView::Interactive );
 }
 
 bool
 wTable::isColumnStretchable ( int col ) const
 {
-	return horizontalHeader()->resizeMode( col ) == QHeaderView::Stretch;
+	return horizontalHeader()->sectionResizeMode( col ) == QHeaderView::Stretch;
 }
 
 

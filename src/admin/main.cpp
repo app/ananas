@@ -62,7 +62,7 @@ parseCommandLine(  AApplication *a )
 	argv = a->argv();
         setTranslator( a->langDir(), a->lang() );
 //	printf("locale=%s\n", locale );	
-	QString str_ru=QString::null, str_en=QString::null;
+	QString str_ru=QString(), str_en=QString();
 	bool lang_setted = false;
 	bool help_setted = false;
 	for ( i=1; i<argc; i++)
@@ -113,7 +113,6 @@ int main( int argc, char ** argv )
 	bool ok;
 	QPixmap pixmap;
 
-	QTextCodec::setCodecForCStrings( QTextCodec::codecForName("UTF8") );
 	qApp->addLibraryPath( qApp->applicationDirPath() );
 	if ( parseCommandLine( &a ) ) return 1;
 //	qApp->installTranslator( &tr_app );

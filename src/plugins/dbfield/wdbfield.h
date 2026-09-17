@@ -71,8 +71,8 @@ friend class addfdialog;
 
 public:
 
-	wDBField( QWidget *parent, Qt::WFlags fl );
-	wDBField( QWidget *parent, const char *name, Qt::WFlags fl );
+	wDBField( QWidget *parent, Qt::WindowFlags fl );
+	wDBField( QWidget *parent, const char *name, Qt::WindowFlags fl );
 	~wDBField();
 
 	virtual QDialog* createEditor( QWidget *parent );

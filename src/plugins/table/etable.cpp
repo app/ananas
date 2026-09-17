@@ -204,9 +204,9 @@ void eTable::ColumnUpd()
 
 		printf("set w=%i l=%i d=%i ti=%i\n", f->sizex, f->flen,
 		f->decimals, f->ftypeindex);
-		ListCol->blockSignals( TRUE );
+		ListCol->blockSignals( true );
 		ListCol->changeItem(eColHeader->text(), idx);
-		ListCol->blockSignals( FALSE );
+		ListCol->blockSignals( false );
 	}
 	CHECK_POINT
 */
@@ -282,9 +282,9 @@ void eTable::ColumnTextUpd( const QString &s )
 	int idx;
 	idx = ListCol->currentItem();
 	if (idx == -1) return;
-	ListCol->blockSignals( TRUE );
+	ListCol->blockSignals( true );
 	ListCol->changeItem(s, ListCol->currentItem());
-	ListCol->blockSignals( FALSE );
+	ListCol->blockSignals( false );
 	CHECK_POINT
 */
 }

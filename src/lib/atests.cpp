@@ -57,7 +57,7 @@ aTests::print2log(	const QString &log_name,
 			  .arg(text);
 
 	QFile f;
-	if(log_name==QString::null)
+	if(log_name==QString())
 	{
 		f.open( stdout, QIODevice::WriteOnly );
 		f.write(toWrite.toLocal8Bit());
@@ -110,7 +110,7 @@ aTests::readConfig(const QString &conf_name,const QString &log_name)
 				if(!str.isEmpty())
 				//--if(f.readLine(str,1024)!=-1)
 				{
-					if(str==QString::null || str[0]=='#' || str[0]=='\n') continue;
+					if(str==QString() || str[0]=='#' || str[0]=='\n') continue;
 					QString s = str.section("=",0,0);
 					map[s] = (str.right(str.length() - s.length()-1)).trimmed();
 					aLog::print(aLog::Debug, QString("map[%1] = %2").arg(s).arg(map[s]));
@@ -158,7 +158,7 @@ aTests::writeConfig(const QString &conf_name, QMap<QString,QString> map, const Q
 				f.flush();
 			}
 			f.close();
-			if(log_name!=QString::null)
+			if(log_name!=QString())
 			{
 				aTests::print2log(log_name,conf_name,"OK","write config");
 			}
@@ -186,7 +186,7 @@ aTests::printline2log(const QString &log_name)
 	toWrite.fill('=',60);
 	toWrite+="\n";
 	QFile f;
-	if(log_name==QString::null)
+	if(log_name==QString())
 	{
 		f.open( stdout, QIODevice::WriteOnly );
 		f.write(toWrite.toLocal8Bit());
@@ -223,17 +223,17 @@ aTests::parseCommandLine(int argc, char** argv, const QString requestedParam)
 		param = argv[j];
 		if(param.section("=",0,0).toLower()==requestedParam)
 		{
-			if(param.section("=",1)!=QString::null)
+			if(param.section("=",1)!=QString())
 			{
 				value = param.section("=",1);
 				if(value[0]=='~')
 				{
 					value = value.mid(1);
-					value = QDir::convertSeparators(QDir::homePath()+value);
+					value = QDir::toNativeSeparators(QDir::homePath()+value);
 				}
 				return value;
 			}
 		}
 	}
-	return QString::null;
+	return QString();
 }

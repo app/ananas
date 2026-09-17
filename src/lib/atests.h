@@ -46,8 +46,8 @@ class ANANAS_EXPORT aTests
 {
 	public:
 
-	static QMap<QString, QString>	readConfig(const QString &cfg_name, const QString &log_name=QString::null);
-	static bool	writeConfig(const QString &cfg_name,QMap<QString, QString> cfg, const QString &log_name=QString::null);
+	static QMap<QString, QString>	readConfig(const QString &cfg_name, const QString &log_name=QString());
+	static bool	writeConfig(const QString &cfg_name,QMap<QString, QString> cfg, const QString &log_name=QString());
 	static void 	print2log(	const QString &log_name,
 					const QString &test_name,
 					const QString &status,

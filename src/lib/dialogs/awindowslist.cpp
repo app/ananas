@@ -120,8 +120,8 @@ aWindowsList::remove( QWidget *window )
 bool
 aWindowsList::find( int id, qulonglong ido )
 {
-    if ( !list.contains( conv( id, ido ) ) ) return FALSE;
-    return TRUE;
+    if ( !list.contains( conv( id, ido ) ) ) return false;
+    return true;
 }
 
 /*!
@@ -137,8 +137,8 @@ bool
 aWindowsList::find( QWidget *window )
 {
     QHashIterator<QString, QWidget*> it( list );
-    while ( it.hasNext() ) { it.next(); if ( it.value() == window ) return TRUE; }
-    return FALSE;
+    while ( it.hasNext() ) { it.next(); if ( it.value() == window ) return true; }
+    return false;
 }
 
 

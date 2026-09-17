@@ -12,7 +12,7 @@ HEADERS	+=  \
 	    testametadata.h
 TRANSLATES = 
 
-CONFIG +=qtestlib
+QT += testlib
 QT += script scripttools
 FORMS	= 
 TEMPLATE	=app

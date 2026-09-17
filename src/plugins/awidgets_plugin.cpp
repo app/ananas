@@ -54,5 +54,3 @@ QList<QDesignerCustomWidgetInterface*> aWidgetsCollection::customWidgets() const
 {
     return widgets;
 }
-
-Q_EXPORT_PLUGIN2(aWidgetsCollection, aWidgetsCollection)

@@ -301,7 +301,7 @@ wCatalogEditor::openForm(const bool toSelect)
 	newform->setId(value().toULongLong());
 	//--
 	if (ws)
-        ((QWorkspace*)ws)->addWindow(newform);
+        ((QMdiArea*)ws)->addSubWindow(newform);
 	newform->show();
 	((QWidget*)newform->parent())->move(0,0);
 }

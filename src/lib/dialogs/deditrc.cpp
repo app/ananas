@@ -50,8 +50,8 @@ void dEditRC::setdata(QString nameRC, rcListViewItem *item)
 	it = item;
 	QMap<QString,QString> cfg;
 
-	cfg = aTests::readConfig(QDir::convertSeparators(nameRC));
-	eRCFile->setText(QDir::convertSeparators(nameRC));
+	cfg = aTests::readConfig(QDir::toNativeSeparators(nameRC));
+	eRCFile->setText(QDir::toNativeSeparators(nameRC));
 	eDBType->setCurrentIndex(0);
 
 	eDBTitle->setText(cfg["dbtitle"]);
@@ -60,11 +60,11 @@ void dEditRC::setdata(QString nameRC, rcListViewItem *item)
 	ePass->setText(cfg["dbpass"]);
 	eDBHost->setText(cfg["dbhost"]);
 	eDBPort->setText(cfg["dbport"]);
-	eCfgName->setText(QDir::convertSeparators(cfg["configfile"]));
+	eCfgName->setText(QDir::toNativeSeparators(cfg["configfile"]));
 	if(cfg["dbtype"]=="postgres") eDBType->setCurrentIndex(3);
 	if(cfg["dbtype"]=="mysql") eDBType->setCurrentIndex(2);
 	if(cfg["dbtype"]=="internal") eDBType->setCurrentIndex(1);
-	eWorkDir->setText(QDir::convertSeparators(cfg["workdir"]));
+	eWorkDir->setText(QDir::toNativeSeparators(cfg["workdir"]));
 }
 
 
@@ -81,10 +81,10 @@ void dEditRC::updatecfg()
 	cfg["dbpass"]	= ePass->text();
 	cfg["dbhost"]	= eDBHost->text();
 	cfg["dbport"]	= eDBPort->text();
-	cfg["workdir"]	= QDir::convertSeparators(eWorkDir->text());
-	cfg["configfile"]= QDir::convertSeparators(eCfgName->text());
+	cfg["workdir"]	= QDir::toNativeSeparators(eWorkDir->text());
+	cfg["configfile"]= QDir::toNativeSeparators(eCfgName->text());
 
-	aTests::writeConfig(QDir::convertSeparators(eRCFile->text()),cfg);
+	aTests::writeConfig(QDir::toNativeSeparators(eRCFile->text()),cfg);
 }
 
 
@@ -92,7 +92,7 @@ void dEditRC::updatecfg()
 void dEditRC::onOK()
 {
 	updatecfg();
-	it->rcfile = QDir::convertSeparators(eRCFile->text());
+	it->rcfile = QDir::toNativeSeparators(eRCFile->text());
 	it->setText(0,eDBTitle->text());
 	accept();
 }
@@ -103,9 +103,9 @@ void dEditRC::onRCFile()
 		QFileDialog fd( 0, tr("Select ananas config resource"),
   			QString(), tr("ananas config resource (*.rc)") );
 		fd.setFileMode ( QFileDialog::AnyFile );
-		fd.selectFile( QDir::convertSeparators(eRCFile->text()));
+		fd.selectFile( QDir::toNativeSeparators(eRCFile->text()));
 		if ( fd.exec() == QDialog::Accepted ) {
-			eRCFile->setText(QDir::convertSeparators(fd.selectedFiles().value(0)));
+			eRCFile->setText(QDir::toNativeSeparators(fd.selectedFiles().value(0)));
 			setdata(eRCFile->text(),it);
 		} else {
 			return;
@@ -118,9 +118,9 @@ void dEditRC::onCFGFile()
 		QFileDialog fd( 0, tr("Select ananas config file"),
   			QString(), tr("ananas config file (*.cfg)") );
 		fd.setFileMode ( QFileDialog::AnyFile );
-		fd.selectFile( QDir::convertSeparators(eCfgName->text()));
+		fd.selectFile( QDir::toNativeSeparators(eCfgName->text()));
 		if ( fd.exec() == QDialog::Accepted ) {
-			eCfgName->setText(QDir::convertSeparators(fd.selectedFiles().value(0)));
+			eCfgName->setText(QDir::toNativeSeparators(fd.selectedFiles().value(0)));
 		} else {
 			return;
 		}

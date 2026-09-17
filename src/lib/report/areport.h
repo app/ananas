@@ -33,7 +33,7 @@
 
 #include	<QMainWindow>
 #include	<QTextBrowser>
-#include	<qworkspace.h>
+#include	<QMdiArea>
 #include	"acfg.h"
 #include 	"aobject.h"
 #include 	"engine.h"
@@ -53,9 +53,9 @@ class  ANANAS_EXPORT aReportBrowser :public QMainWindow
 {
 	Q_OBJECT
 public:
-	QWorkspace *ws;
+	QMdiArea *ws;
 	QTextBrowser *textBrowser;
-	aReportBrowser(  QWidget *parent = 0, const char *name = 0, Qt::WFlags f = Qt::Window );
+	aReportBrowser(  QWidget *parent = 0, const char *name = 0, Qt::WindowFlags f = Qt::Window );
 	void append( const QString &text );
 	void clear();
 public slots:

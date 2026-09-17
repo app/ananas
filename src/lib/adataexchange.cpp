@@ -72,7 +72,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 	temp = getenv("TEMP");
 #endif
 	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
-	tmpDirName = QDir::convertSeparators(tmpDirName);
+	tmpDirName = QDir::toNativeSeparators(tmpDirName);
 	//printf("tmp dir name = %s\n",tmpDirName.toLatin1().constData());
 	if(!dir.mkdir(tmpDirName))
 	{
@@ -98,7 +98,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 	}
 
 
-	QString srcDirName = QDir::convertSeparators(tmpDirName + "/templates/");
+	QString srcDirName = QDir::toNativeSeparators(tmpDirName + "/templates/");
 	dir.setPath(srcDirName);
 	templatesName = dir.entryList(QStringList() << "templ_*.odt" << "templ_*.ods");
 
@@ -153,7 +153,7 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 	}
 	qApp->processEvents();
 
-	QString destDirName = QDir::convertSeparators(db.cfg.rc.value("workdir"));
+	QString destDirName = QDir::toNativeSeparators(db.cfg.rc.value("workdir"));
 
 	//create template directory
 	QDir destDir;
@@ -178,13 +178,13 @@ aBackup::importData(const QString& rcfile, const QString &archfile, bool dropBas
 	for(uint i=0; i<templatesName.count(); i++)
 	{
 	//	aTests::print2log("f:\\ERROR.log", "aBackup", tmpDirName + "/templates/"+templatesName[i]);
-		aService::copyFile(QDir::convertSeparators(srcDirName+templatesName[i]), QDir::convertSeparators(destDirName +"/"+templatesName[i]), replaceTemplates);
+		aService::copyFile(QDir::toNativeSeparators(srcDirName+templatesName[i]), QDir::toNativeSeparators(destDirName +"/"+templatesName[i]), replaceTemplates);
 	}
 
 	db.done();
 
-//	printf("copy %s to %s\n", QDir::convertSeparators(tmpDirName+"/busines-schema.cfg").toLatin1().constData(), QDir::convertSeparators(filename+".cfg").toLatin1().constData());
-	if(!aService::copyFile( QDir::convertSeparators(tmpDirName+"/busines-schema.cfg"), QDir::convertSeparators(filename+".cfg"), true))
+//	printf("copy %s to %s\n", QDir::toNativeSeparators(tmpDirName+"/busines-schema.cfg").toLatin1().constData(), QDir::toNativeSeparators(filename+".cfg").toLatin1().constData());
+	if(!aService::copyFile( QDir::toNativeSeparators(tmpDirName+"/busines-schema.cfg"), QDir::toNativeSeparators(filename+".cfg"), true))
 	{
 		setLastError(tr("Can't copy .cfg file"));
 		aLog::print(aLog::Error, tr("aBackup copy unzipped business schema file"));
@@ -225,7 +225,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 	temp = getenv("TEMP");
 #endif
 	tmpDirName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
-	tmpDirName = QDir::convertSeparators(tmpDirName);
+	tmpDirName = QDir::toNativeSeparators(tmpDirName);
 	//printf("copy name = %s\n",tmpDirName.toLatin1().constData());
 	if(!dir.mkdir(tmpDirName))
 	{
@@ -266,7 +266,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 
 	if(withTemplates)
 	{
-		srcDirName = QDir::convertSeparators(cfg.rc.value("workdir"));
+		srcDirName = QDir::toNativeSeparators(cfg.rc.value("workdir"));
 		aLog::print(aLog::Debug, tr("aBackup workdir=%1").arg(srcDirName));
 		dir.setPath(srcDirName);
 		templatesName = dir.entryList(QStringList() << "templ_*.odt" << "templ_*.ods");
@@ -306,7 +306,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 		aLog::print(aLog::Debug, tr("aBackup bump base"));
 	}
 
-	if(writeXml(QDir::convertSeparators(tmpDirName+"/META-INF/manifest.xml"), createManifest(templatesName))==true)
+	if(writeXml(QDir::toNativeSeparators(tmpDirName+"/META-INF/manifest.xml"), createManifest(templatesName))==true)
 	{
 		setLastError(tr("Can't write file META-INF/manifest.xml"));
 		aLog::print(aLog::Error, tr("aBackup write manifest.xml"));
@@ -326,7 +326,7 @@ aBackup::exportData(const QString& rcfile, const QString &archfile, bool withTem
 		for(uint i=0; i<templatesName.count(); i++)
 		{
 //				printf("copy %s to %s\n", QString(srcDirName+"/"+templatesName[i]).toLatin1().constData(), QString(destNamePref+"/"+templatesName[i]).toLatin1().constData());
-			if(!aService::copyFile(QDir::convertSeparators(srcDirName+"/"+templatesName[i]), QDir::convertSeparators(destNamePref+"/"+templatesName[i]), true))
+			if(!aService::copyFile(QDir::toNativeSeparators(srcDirName+"/"+templatesName[i]), QDir::toNativeSeparators(destNamePref+"/"+templatesName[i]), true))
 			{
 				setLastError(tr("Can't copy template file"));
 				res&=true;
@@ -575,7 +575,7 @@ aBackup::changeRC(const QString& nameRC, const QString& newConfigName)
 	QMap<QString,QString> cfg;
 //	QString configFileName;
 
-	cfg = aTests::readConfig(QDir::convertSeparators(nameRC));
+	cfg = aTests::readConfig(QDir::toNativeSeparators(nameRC));
 
 //	configFileName = cfg["configfile"];
 //	configFileName.truncate( configFileName.length() - QString(".bsa").length() );
@@ -583,7 +583,7 @@ aBackup::changeRC(const QString& nameRC, const QString& newConfigName)
 
 	cfg["configfile"] = newConfigName;
 
-	aTests::writeConfig(QDir::convertSeparators(nameRC), cfg);
+	aTests::writeConfig(QDir::toNativeSeparators(nameRC), cfg);
 }
 
 
@@ -605,27 +605,27 @@ aBackup::cleanupTmpFiles(const QString& tmpDirName, QStringList *files)
 {
 	QFile file;
 	QDir dir;
-	file.setFileName(QDir::convertSeparators(tmpDirName+"/content.xml"));
+	file.setFileName(QDir::toNativeSeparators(tmpDirName+"/content.xml"));
 	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 	file.remove();
-	file.setFileName(QDir::convertSeparators(tmpDirName+"/busines-schema.cfg"));
+	file.setFileName(QDir::toNativeSeparators(tmpDirName+"/busines-schema.cfg"));
 	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 	file.remove();
-	file.setFileName(QDir::convertSeparators(tmpDirName+"/META-INF/manifest.xml"));
+	file.setFileName(QDir::toNativeSeparators(tmpDirName+"/META-INF/manifest.xml"));
 	aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 	file.remove();
 	for(uint i=0; i<files->count(); i++)
 	{
-			file.setFileName(QDir::convertSeparators(tmpDirName + "/templates/"+ (*files)[i]));
+			file.setFileName(QDir::toNativeSeparators(tmpDirName + "/templates/"+ (*files)[i]));
 			aLog::print(aLog::Debug, tr("aBackup delete file %1").arg(file.fileName()));
 			file.remove();
 	}
 	aLog::print(aLog::Debug, tr("aBackup delete directory %1").arg(tmpDirName + "/META-INF"));
-	dir.rmdir(QDir::convertSeparators(tmpDirName + "/META-INF"));
+	dir.rmdir(QDir::toNativeSeparators(tmpDirName + "/META-INF"));
 	aLog::print(aLog::Debug, tr("aBackup delete directory %1").arg(tmpDirName + "/templates"));
-	dir.rmdir(QDir::convertSeparators(tmpDirName + "/templates"));
+	dir.rmdir(QDir::toNativeSeparators(tmpDirName + "/templates"));
 	aLog::print(aLog::Debug, tr("aBackup delete directory %1").arg(tmpDirName));
-	dir.rmdir(QDir::convertSeparators(tmpDirName));
+	dir.rmdir(QDir::toNativeSeparators(tmpDirName));
 	aLog::print(aLog::Info, tr("aBackup cleanup temporary files"));
 
 }

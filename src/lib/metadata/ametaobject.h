@@ -62,8 +62,8 @@ Q_PROPERTY( QString className READ className SCRIPTABLE true )
 Q_PROPERTY( QString description READ description SCRIPTABLE true )
 
 public:
-    AMetaObject( const QString &objectclass  = QString::null, 
-                 const QString &objectname = QString::null, 
+    AMetaObject( const QString &objectclass  = QString(), 
+                 const QString &objectname = QString(), 
                  AMetaObject *parent = 0 );
 
     ~AMetaObject();
@@ -118,7 +118,7 @@ class AMetaGroup: public AMetaObject
 Q_OBJECT
 public:
     AMetaGroup( const QString &groupname, AMetaObject *parent = 0 )
-    :AMetaObject( groupname, QString::null, parent ){};
+    :AMetaObject( groupname, QString(), parent ){};
 };
 
 

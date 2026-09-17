@@ -27,9 +27,6 @@ win32 {
 #  CONFIG += dll
 }
 
-unix{
-    LIBS        +=  -L/usr/X11R6/lib/
-}
 win32 {
     #LIBS        += -L..\..\plugins -lananasplugin
 }

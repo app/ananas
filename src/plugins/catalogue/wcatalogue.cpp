@@ -58,7 +58,7 @@ static QObjectList aQueryList( QObject *parent, const char *type )
  *\_en \ru
  *\_ru
  */
-wCatalogue::wCatalogue( QWidget *parent, Qt::WFlags fl )
+wCatalogue::wCatalogue( QWidget *parent, Qt::WindowFlags fl )
 :aWidget( parent, "wCatalogue", fl )
 {
 	setInited( false );

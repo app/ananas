@@ -390,27 +390,27 @@ aCfg::createNew(){
 	xml.setContent(QString("<?xml version = '1.0' encoding = 'UTF-8'?>\n"));
 	setModified( true );
 
-	xml.appendChild( xml.implementation().createDocumentType("ananas_configuration",QString::null,"ananas-cfg.dtd"));
+	xml.appendChild( xml.implementation().createDocumentType("ananas_configuration",QString(),"ananas-cfg.dtd"));
 	rootnode = xml.createElement( md_root );
 	xml.appendChild( rootnode );
 	rootnode = xml.documentElement();
-	cfginfo 	= insert( rootnode, md_info, QString::null, -1 );
-	iface 		= insert( rootnode, md_interface, QString::null, -1 );
-	md 		= insert( rootnode, md_metadata, QString::null, -1 );
-	actions	= insert( rootnode, md_actions, QString::null, -1 );
+	cfginfo 	= insert( rootnode, md_info, QString(), -1 );
+	iface 		= insert( rootnode, md_interface, QString(), -1 );
+	md 		= insert( rootnode, md_metadata, QString(), -1 );
+	actions	= insert( rootnode, md_actions, QString(), -1 );
 	init();
 	setInfo( md_info_name, "New configuration" );
 	setInfo( md_info_lastid, "0" );
 	setInfo( md_info_author, "unnamed" );
 	setInfo( md_info_date, QDateTime::currentDateTime().date().toString(Qt::ISODate) );
 	//setInfo( md_info_dir, "newConfig" );
-	insert( md, md_globals, QString::null, -1 );
-	insert( md, md_catalogues, QString::null, -1 );
-	insert( md, md_documents, QString::null, -1 );
-	insert( md, md_journals, QString::null, -1 );
-	i = insert( md, md_registers, QString::null, -1 );
-	insert( i, md_iregisters, QString::null, -1 );
-	insert( i, md_aregisters, QString::null, -1 );
+	insert( md, md_globals, QString(), -1 );
+	insert( md, md_catalogues, QString(), -1 );
+	insert( md, md_documents, QString(), -1 );
+	insert( md, md_journals, QString(), -1 );
+	i = insert( md, md_registers, QString(), -1 );
+	insert( i, md_iregisters, QString(), -1 );
+	insert( i, md_aregisters, QString(), -1 );
 }
 
 
@@ -1001,7 +1001,7 @@ aCfg::setAttr(aCfgItem context, const QString &name, int value)
  *	Inserts a new object into metadata tree.
  *	\param context (in) - metadata object context.
  *	\param otype (in) - metadata object type.
- *	\param name (in) - metadata object name. If name = QString::null,
+ *	\param name (in) - metadata object name. If name = QString(),
  *	name attribute will not be setted.
  *	\param id (in) - metadata object id. If id = 0, setting next avalable id for
  *	the metadata tree.
@@ -1324,10 +1324,10 @@ aCfg::insertDocument( const QString &name )
 	r = find( md, md_documents, 0 );
 	if ( ! r.isNull() ) {
 		i = insert( r, md_document, name );
-		insert( i, md_header, QString::null, -1 );
-		insert( i, md_tables, QString::null, -1 );
-		insert( i, md_forms, QString::null, -1 );
-		insert( i, md_webforms, QString::null, -1 );
+		insert( i, md_header, QString(), -1 );
+		insert( i, md_tables, QString(), -1 );
+		insert( i, md_forms, QString(), -1 );
+		insert( i, md_webforms, QString(), -1 );
 	}
 	return i;
 }
@@ -1363,10 +1363,10 @@ aCfg::insertCatalogue( const QString &name )
 	r = find( md, md_catalogues, 0 );
 	if ( ! r.isNull() ) {
 		i = insert( r, md_catalogue, name );
-		insert( i, md_element, QString::null, -1 );
-		insert( i, md_group, QString::null, -1 );
-		insert( i, md_forms, QString::null, -1 );
-		insert( i, md_webforms, QString::null, -1 );
+		insert( i, md_element, QString(), -1 );
+		insert( i, md_group, QString(), -1 );
+		insert( i, md_forms, QString(), -1 );
+		insert( i, md_webforms, QString(), -1 );
 	}
 	return i;
 }
@@ -1383,9 +1383,9 @@ aCfg::insertIRegister ( const QString &name )
 	r = find(find( md, md_registers, 0 ),md_iregisters, 0);
 	if ( ! r.isNull() ) {
 		i = insert( r, md_iregister, name );
-		insert( i, md_resources, QString::null, -1 );
-		insert( i, md_dimensions, QString::null, -1 );
-		insert( i, md_information, QString::null, -1 );
+		insert( i, md_resources, QString(), -1 );
+		insert( i, md_dimensions, QString(), -1 );
+		insert( i, md_information, QString(), -1 );
 	}
 	return i;
 }
@@ -1402,9 +1402,9 @@ aCfg::insertARegister ( const QString &name )
 	r = find(find( md, md_registers, 0 ),md_aregisters, 0);
 	if ( ! r.isNull() ) {
 		i = insert( r, md_aregister, name );
-		insert( i, md_resources, QString::null, -1 );
-		insert( i, md_dimensions, QString::null, -1 );
-		insert( i, md_information, QString::null, -1 );
+		insert( i, md_resources, QString(), -1 );
+		insert( i, md_dimensions, QString(), -1 );
+		insert( i, md_information, QString(), -1 );
 	}
 	return i;
 }
@@ -1421,9 +1421,9 @@ aCfg::insertJournal ( const QString &name )
 	r = find( md, md_journals, 0 );
 	if ( ! r.isNull() ) {
 		i = insert( r, md_journal, name );
-		insert( i, md_columns, QString::null, -1 );
-		insert( i, md_forms, QString::null, -1 );
-		insert( i, md_webforms, QString::null, -1 );
+		insert( i, md_columns, QString(), -1 );
+		insert( i, md_forms, QString(), -1 );
+		insert( i, md_webforms, QString(), -1 );
 	}
 	return i;
 }
@@ -1440,8 +1440,8 @@ aCfg::insertReport ( const QString &name )
 	r = find( md, md_reports, 0 );
 	if ( ! r.isNull() ) {
 		i = insert( r, md_report, name );
-		insert( i, md_forms, QString::null, -1 );
-		insert( i, md_webforms, QString::null, -1 );
+		insert( i, md_forms, QString(), -1 );
+		insert( i, md_webforms, QString(), -1 );
 	}
 	return i;
 }

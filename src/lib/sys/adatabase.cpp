@@ -460,7 +460,7 @@ aDatabase::driverName()
 QString
 aDatabase::feature(const QString& featureName)
 {
-	QString res = QString::null;
+	QString res = QString();
         if(driverName() == "QMYSQL")
 	{
 		res = featuresMySQL[featureName];
@@ -749,7 +749,7 @@ aDatabase::table ( const QString & name )
         }
         else
         {
-                t = new aDataTable ( QString::null, this );
+                t = new aDataTable ( QString(), this );
         }
         return t;
 }

@@ -32,11 +32,10 @@
 #ifndef ANANASMAINFORM_H
 #define ANANASMAINFORM_H
 #include <qvariant.h>
-#include <qworkspace.h>
+#include <QMdiArea>
 //#include <qsinterpreter.h>
 #include <qdialog.h>
 #include <qstringlist.h>
-#include <qworkspace.h>
 #include <QMainWindow>
 #include <qapplication.h>
 #include <qsettings.h>
@@ -65,14 +64,14 @@ class MainForm : public QMainWindow {
 	Q_OBJECT
 
 public:
-	MainForm( QWidget* parent = 0, const char* name = 0, Qt::WFlags fl = Qt::Window );
+	MainForm( QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::Window );
 	~MainForm();
 	aEngine engine;
 	aCfg *md;
 
 	AMenuBar* menubar;
 	QMenu *windowsMenu;
-	QWorkspace* ws;
+	QMdiArea* ws;
 	aWindowsList* wl;
 	QString rcfile;
 
@@ -101,7 +100,7 @@ private:
 };
 
 extern MainForm *mainform;
-extern QWorkspace *mainformws;
+extern QMdiArea *mainformws;
 extern aWindowsList *mainformwl;
 
 #endif // ANANASMAINFORM_H

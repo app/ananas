@@ -24,7 +24,7 @@
 #ifndef TEXTEDIT_H
 #define TEXTEDIT_H
 
-#include <QtGui/QPlainTextEdit>
+#include <QtWidgets/QPlainTextEdit>
 #include "tabsettings.h"
 #include <QtGui/QTextCharFormat>
 #include <QtGui/QTextBlockUserData>

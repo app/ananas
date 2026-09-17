@@ -74,7 +74,7 @@ aOOTemplate::open( const QString &fname )
 	temp = getenv("TEMP");
 #endif
 	copyName = QString(temp+"/%1").arg(QDateTime::currentDateTime().toTime_t());
-	copyName = QDir::convertSeparators(copyName);
+	copyName = QDir::toNativeSeparators(copyName);
 	aLog::print(aLog::Debug, tr("aOOTemplate temporary directory is %1").arg(copyName));
 //	printf("copy name = %s\n",copyName.toLatin1().constData());
 	if(!dir.mkdir(copyName))
@@ -126,10 +126,10 @@ aOOTemplate::open( const QString &fname )
 		return false;
 	}
 
-	QFile content (QDir::convertSeparators( copyName+"/content.xml") );
+	QFile content (QDir::toNativeSeparators( copyName+"/content.xml") );
 	docTpl.setContent( &content, false );
 
-	QFile style (QDir::convertSeparators( copyName+"/styles.xml") );
+	QFile style (QDir::toNativeSeparators( copyName+"/styles.xml") );
 	docStyle.setContent( &style, false );
 
 	aLog::print(aLog::Info, tr("aOOTemplate open"));
@@ -554,8 +554,8 @@ bool
 aOOTemplate::save( const QString & fname )
 {
 
-	QString homeDir = QString("%1").arg(QDir::convertSeparators(QDir::homePath()));
-	QFile fContent( QDir::convertSeparators(copyName+"/content.xml") );
+	QString homeDir = QString("%1").arg(QDir::toNativeSeparators(QDir::homePath()));
+	QFile fContent( QDir::toNativeSeparators(copyName+"/content.xml") );
 	if( !fContent.open( QIODevice::WriteOnly ) )
 	{
 		aLog::print(aLog::Error, tr("aOOTemplate save %1 open for write").arg(fContent.fileName()));
@@ -565,7 +565,7 @@ aOOTemplate::save( const QString & fname )
 	docTpl.save(stream4content,2);
 	fContent.close();
 
-	QFile fStyle( QDir::convertSeparators(copyName+"/styles.xml") );
+	QFile fStyle( QDir::toNativeSeparators(copyName+"/styles.xml") );
 	if( !fStyle.open( QIODevice::WriteOnly ) )
 	{
 		aLog::print(aLog::Error, tr("aOOTemplate save %1 open for write").arg(fContent.fileName()));
@@ -577,8 +577,8 @@ aOOTemplate::save( const QString & fname )
 
 
 
-	QString curDir;// = QDir::convertSeparators(QDir::irPath());
-	curDir = QDir::convertSeparators(templateDir);
+	QString curDir;// = QDir::toNativeSeparators(QDir::irPath());
+	curDir = QDir::toNativeSeparators(templateDir);
 	aLog::print(aLog::Debug, tr("aOOTemplate save working dir =%1").arg(curDir));
 
 #ifndef Q_OS_WIN32
@@ -632,13 +632,13 @@ aOOTemplate::setDir(const QString &dir)
 QString
 aOOTemplate::getDir()
 {
-	QString homeDir = QString("%1").arg(QDir::convertSeparators(QDir::homePath()));
+	QString homeDir = QString("%1").arg(QDir::toNativeSeparators(QDir::homePath()));
 #ifdef Q_OS_WIN32
 	if(homeDir.right(1)!="\\") homeDir.append("\\");
 #else
 
 	if(homeDir.right(1)!="/") homeDir.append("/");
 #endif
-	return QDir::convertSeparators(homeDir);
+	return QDir::toNativeSeparators(homeDir);
 }
 

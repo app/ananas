@@ -14,7 +14,7 @@
 #include <qlineedit.h>
 #include <QFileDialog>
 
-dImportDB::dImportDB( QWidget* parent, const char* name, bool modal, Qt::WFlags fl )
+dImportDB::dImportDB( QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl )
     : dEditRC( parent, name, modal, fl )
 {
     if ( !name )
@@ -51,10 +51,10 @@ dImportDB::onCFGFile()
   			QString(),
 			tr("ananas business schema archiff file (*.bsa);;any files (*)") );
 		fd.setFileMode(QFileDialog::AnyFile);
-		fd.selectFile( QDir::convertSeparators(eCfgName->text()));
+		fd.selectFile( QDir::toNativeSeparators(eCfgName->text()));
 		if ( fd.exec() == QDialog::Accepted )
 		{
-			eCfgName->setText(QDir::convertSeparators(fd.selectedFiles().value(0)));
+			eCfgName->setText(QDir::toNativeSeparators(fd.selectedFiles().value(0)));
 		}
 		else
 		{

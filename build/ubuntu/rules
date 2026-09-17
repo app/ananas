@@ -9,7 +9,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
-export QTDIR=/usr/share/qt4
+export QTDIR=/usr/lib/x86_64-linux-gnu/qt5
 
 CFLAGS = -Wall -g
 

@@ -35,9 +35,11 @@
 
 
 AApplication::AApplication(  int & argc, char ** argv, AApplicationType aat )
-    :QApplication( argc, argv, true )
+    :QApplication( argc, argv )
 {
     v_aat = aat;
+    v_argc = argc;
+    v_argv = argv;
     //printf("langDir = %s\n", langDir().toUtf8().constData().data() );
 }
 

@@ -78,8 +78,8 @@ public:
 
 
 //	aField( aCfg *newmd, aCfgItem newcontext );
-	aDataField( QObject *parent, const QString &fname = QString::null, const QString &ftype = QString::null );
-	aDataField( const QString &fname = QString::null, const QString &ftype = QString::null );
+	aDataField( QObject *parent, const QString &fname = QString(), const QString &ftype = QString() );
+	aDataField( const QString &fname = QString(), const QString &ftype = QString() );
 	aDataField( const aDataField &field );
 	~aDataField();
 
@@ -99,7 +99,7 @@ public slots:
 private:
 	QVariant fieldData;
 
-	void init( const QString &fname = QString::null, const QString &ftype = QString::null );
+	void init( const QString &fname = QString(), const QString &ftype = QString() );
 };
 
 

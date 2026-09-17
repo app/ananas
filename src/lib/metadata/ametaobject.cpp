@@ -183,7 +183,7 @@ AMetaObject::attr( int idx ) const
 QString 
 AMetaObject::attrName( int idx ) const
 {
-    if ( idx < 0 || idx >= attrCount() ) return QString::null;
+    if ( idx < 0 || idx >= attrCount() ) return QString();
     return v_attr.keys().at( idx );
 }
 

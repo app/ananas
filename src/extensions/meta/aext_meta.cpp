@@ -213,5 +213,14 @@ AExtMeta::ListByClassName(const QString &className) {
 	return sList;
 }
 
-typedef AExtensionPlugin<AExtMeta> AExtMetaPlugin;
-A_EXPORT_PLUGIN( AExtMetaPlugin )
+#include <aextensionplugin.h>
+
+class AExtMetaPlugin : public AExtensionPlugin<AExtMeta>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    AExtMetaPlugin() {}
+};
+
+#include "aext_meta.moc"

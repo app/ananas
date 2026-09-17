@@ -199,5 +199,13 @@ AExtText::setCodec( const QString &codecname )
 
 
 #include <aextensionplugin.h>
-typedef AExtensionPlugin<AExtText> AExtTextPlugin;
-A_EXPORT_PLUGIN( AExtTextPlugin )
+
+class AExtTextPlugin : public AExtensionPlugin<AExtText>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    AExtTextPlugin() {}
+};
+
+#include "aexttext.moc"

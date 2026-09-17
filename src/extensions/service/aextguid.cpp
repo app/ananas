@@ -75,5 +75,13 @@ QString aExtGUID::Generate() const
 }
 
 #include <aextensionplugin.h>
-typedef AExtensionPlugin<aExtGUID> aExtGUIDPlugin;
-A_EXPORT_PLUGIN( aExtGUIDPlugin )
+
+class aExtGUIDPlugin : public AExtensionPlugin<aExtGUID>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    aExtGUIDPlugin() {}
+};
+
+#include "aextguid.moc"

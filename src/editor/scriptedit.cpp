@@ -25,7 +25,7 @@
 
 #include "scripthighlighter.h"
 
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 #include <QtGui/QPainter>
 #include <QtCore/QTimer>
 #include <QtCore/QDebug>

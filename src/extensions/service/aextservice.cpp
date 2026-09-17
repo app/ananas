@@ -135,5 +135,13 @@ aExtSERVICE::GetRcValue( QString paramName ) const
 
 
 #include <aextensionplugin.h>
-typedef AExtensionPlugin<aExtSERVICE> aExtSERVICEPlugin;
-A_EXPORT_PLUGIN( aExtSERVICEPlugin )
+
+class aExtSERVICEPlugin : public AExtensionPlugin<aExtSERVICE>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    aExtSERVICEPlugin() {}
+};
+
+#include "aextservice.moc"

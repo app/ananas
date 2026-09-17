@@ -144,7 +144,7 @@ public:
 	virtual bool Delete();
 	virtual bool Update();
 
-	virtual bool seek ( int i, bool relative = FALSE );
+	virtual bool seek ( int i, bool relative = false );
 	virtual bool next ();
 	virtual bool prev ();
 	virtual bool first ();

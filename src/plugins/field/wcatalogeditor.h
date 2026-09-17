@@ -36,7 +36,7 @@
 #include <qwidget.h>
 #include <qwidgetplugin.h>
 #include <qlabel.h>
-#include <qworkspace.h>
+#include <QMdiArea>
 //#include <qobjectlist.h>
 //#include <qlayout.h>
 //#include <qsocket.h>

@@ -50,7 +50,7 @@ class aListBox: public QListWidget
 {
 	Q_OBJECT
 public:
-	aListBox(QWidget *parent = 0, const char* name = 0, Qt::WFlags f = 0);
+	aListBox(QWidget *parent = 0, const char* name = 0, Qt::WindowFlags f = 0);
 	~aListBox();
 	void insertItem(const QString &s, long idx, int index = -1);
 	void show(QWidget *w, QFrame *fr);//, QLabel *lb);
@@ -110,7 +110,7 @@ class aListView : public QTreeWidget
 {
 	Q_OBJECT
 public:
-	aListView(QWidget* parent = 0, const char* name = 0, Qt::WFlags f = 0);
+	aListView(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags f = 0);
 	~aListView();
 
 	QMenu *menu;

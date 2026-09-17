@@ -50,9 +50,15 @@ public:
     QString applicationName();
     QString langDir();
     QString lang();
-    
+
+    // QApplication::argc()/argv() were removed in Qt5; keep the values here.
+    int argc() const { return v_argc; }
+    char **argv() const { return v_argv; }
+
 private:
-    int v_aat;        
+    int v_aat;
+    int v_argc;
+    char **v_argv;
 };
 
 #endif

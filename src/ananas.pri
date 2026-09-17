@@ -2,8 +2,8 @@
 CONFIG	+= qt warn_on release thread
 #LANGUAGE = C++
 
-QT += sql xml
-CONFIG += debug warn_on designer
+QT += widgets printsupport sql xml
+CONFIG += debug warn_on
 
 unix {
     UI_DIR = .ui

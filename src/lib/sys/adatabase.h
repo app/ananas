@@ -120,11 +120,11 @@ public:
 
 	aDatabase();
 	~aDatabase();
-	bool init( aCfgRc *rc, const QString &dbname = QString::null );
-	bool init( const QString &rcname, const QString &dbname = QString::null );
+	bool init( aCfgRc *rc, const QString &dbname = QString() );
+	bool init( const QString &rcname, const QString &dbname = QString() );
 	bool		prepareDatabaseConnect( aCfgRc *rc );
 	void done();
-	QSqlDatabase *db(const QString &dbname = QString::null );
+	QSqlDatabase *db(const QString &dbname = QString() );
 	bool checkStructure();
 	bool create();
 	bool drop( const QString &);
@@ -132,7 +132,7 @@ public:
 	qulonglong uid( int otype );
 //	int otype( qulonglong uid );
 	int uidType ( qulonglong uid );
-	aDataTable *table( const QString & name = QString::null );
+	aDataTable *table( const QString & name = QString() );
 	bool tableExists( const QString & name );
 	void markDeleted(qulonglong uid);
 	void deleteMarked();

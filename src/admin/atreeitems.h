@@ -45,10 +45,10 @@ public:
 	QWidget *editor;
 	aCfg *md;
 
-	ananasListViewItem( QTreeWidget *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
-	ananasListViewItem( QTreeWidget *parent, QTreeWidgetItem *after, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
+	ananasListViewItem( QTreeWidget *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString() );
+	ananasListViewItem( QTreeWidget *parent, QTreeWidgetItem *after, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString() );
 	ananasListViewItem( ananasListViewItem *parent, ananasListViewItem *after, aCfg * cfgmd,
-						aCfgItem cfgobj, const QString &name = QString::null );
+						aCfgItem cfgobj, const QString &name = QString() );
 
 	void clearTree();
 

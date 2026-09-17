@@ -49,7 +49,7 @@ public:
 
 
 //	aField( aCfg *newmd, aCfgItem newcontext );
-	aField( const QString &fname = QString::null, const QString &ftype = QString::null );
+	aField( const QString &fname = QString(), const QString &ftype = QString() );
 	~aField();
 
 //	QSqlField *sqlField();
@@ -69,7 +69,7 @@ public:
 	QWidget *editorWidget;
 
 	aSQLField( aCfg *newmd, aCfgItem newcontext );
-	aSQLField( const QString &name = QString::null, const QString &type = QString::null, const QString &tname = QString::null );
+	aSQLField( const QString &name = QString(), const QString &type = QString(), const QString &tname = QString() );
 	~aSQLField();
 
 	QSqlField *sqlField();

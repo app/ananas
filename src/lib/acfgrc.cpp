@@ -51,17 +51,18 @@ rcIcon( const char *name )
 
 
 void
-aMessageOutput( QtMsgType type, const char *msg )
+aMessageOutput( QtMsgType type, const QMessageLogContext &, const QString &msg )
 {
+	const char *text = msg.toLocal8Bit().constData();
 	switch ( type ) {
 	case QtDebugMsg:
-		cfg_message( 0, "%s\n", msg );
+		cfg_message( 0, "%s\n", text );
         	break;
         case QtWarningMsg:
-                cfg_message( 1, "%s\n", msg );
+                cfg_message( 1, "%s\n", text );
                 break;
         case QtFatalMsg:
-                cfg_message( 2, "%s\n", msg );
+                cfg_message( 2, "%s\n", text );
                 abort();                    // deliberately core dump
         }
 }
@@ -69,7 +70,7 @@ aMessageOutput( QtMsgType type, const char *msg )
 void
 setMessageHandler( bool ) // GUI )
 {
-//	qInstallMsgHandler( aMessageOutput );
+//	qInstallMessageHandler( aMessageOutput );
 //	if ( GUI ) {
 //		cfg_messageproc = messageproc;
 //		cfg_message( 0, "<img source=\"a_system.png\">");
@@ -79,7 +80,7 @@ setMessageHandler( bool ) // GUI )
 void
 unsetMessageHandler()
 {
-	qInstallMsgHandler( 0 );
+	qInstallMessageHandler( 0 );
 	cfg_messageproc = 0;
 }
 
@@ -88,7 +89,7 @@ Ananas resource file object.
 */
 aCfgRc::aCfgRc()
 {
-	filename = QString::null;
+	filename = QString();
 }
 
 

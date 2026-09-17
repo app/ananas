@@ -41,22 +41,22 @@ public:
 	bool group;
 
 	rcListViewItem( QTreeWidget *parent,
-			const QString &name = QString::null,
-			const QString &rc = QString::null,
+			const QString &name = QString(),
+			const QString &rc = QString(),
 			bool fgroup = false );
 
 	rcListViewItem( QTreeWidget *parent,
 			rcListViewItem* after,
-			const QString &name = QString::null,
-			const QString &rc = QString::null,
+			const QString &name = QString(),
+			const QString &rc = QString(),
 			bool fgroup = false );
 
 	rcListViewItem( rcListViewItem *parent,
-			const QString &name = QString::null,
-			const QString &rc = QString::null,
+			const QString &name = QString(),
+			const QString &rc = QString(),
 			bool fgroup = false );
 
 	virtual ~rcListViewItem();
-	void init( const QString &rc = QString::null, bool fgroup = false );
+	void init( const QString &rc = QString(), bool fgroup = false );
 };
 #endif

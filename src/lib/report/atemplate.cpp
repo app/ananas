@@ -55,7 +55,7 @@ aTemplate::~aTemplate()
 bool
 aTemplate::open( const QString &fname )
 {
-	QFile file( QDir::convertSeparators(QDir::currentPath()+"/"+templateDir+"/"+fname) );
+	QFile file( QDir::toNativeSeparators(QDir::currentPath()+"/"+templateDir+"/"+fname) );
     if ( file.open( QIODevice::ReadOnly ) )
     {
         QTextStream stream( &file );
@@ -82,7 +82,7 @@ aTemplate::close()
 QString
 aTemplate::getValue( const QString &name )
 {
-	return values.value( name, QString::null );
+	return values.value( name, QString() );
 }
 
 
@@ -166,7 +166,7 @@ aTemplate::exec( const QString &sname )
 bool
 aTemplate::save( const QString & fname)
 {
-	QFile file( QDir::convertSeparators(QDir::currentPath()+"/"+templateDir+"/"+fname) );
+	QFile file( QDir::toNativeSeparators(QDir::currentPath()+"/"+templateDir+"/"+fname) );
 	if ( file.open( QIODevice::WriteOnly ) )
 	{
 		QTextStream stream( &file );

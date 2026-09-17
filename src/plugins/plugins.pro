@@ -5,6 +5,7 @@ include( plugins.pri )
 include( ../lib/lib.pri )
 include ( ../ananas.pri )
 #load(qsa)
+QT += designer
 QT += script
 QT += scripttools
 
@@ -21,10 +22,6 @@ shared {
     win32:DEFINES+= QT_PLUGIN # ANANAS_DLL
 } else {
     win32:DEFINES   += ANANAS_NO_DLL
-}
-
-unix {
-    LIBS += -L/usr/X11R6/lib/
 }
 
 HEADERS = \

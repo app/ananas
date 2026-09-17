@@ -61,14 +61,14 @@ public:
 			ananasListViewItem *after,
 			aCfg * cfgmd, 
 			aCfgItem cfgobj, 
-			const QString &name = QString::null,
+			const QString &name = QString(),
 			aUser *usr = NULL,
 			aRole *rl = NULL);
-//	aListViewItem(QTreeWidgetItem *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
+//	aListViewItem(QTreeWidgetItem *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString() );
 	aListViewItem(	QTreeWidget *parent, 
 			aCfg * cfgmd,
 			aCfgItem obj,
-			const QString &name = QString::null);
+			const QString &name = QString());
 	
 	~aListViewItem();
 	QString text( int column ) const;

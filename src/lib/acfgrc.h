@@ -59,7 +59,7 @@ public:
 	int read(const QString &fname);
 	int write(const QString &fname);
 	int write();
-	QString value(const QString &name, const QString &defValue = QString::null );
+	QString value(const QString &name, const QString &defValue = QString() );
 	void setValue(const QString &name, const QString &value);
 	int count();
 	QString getRcFileName();

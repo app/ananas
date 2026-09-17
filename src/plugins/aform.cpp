@@ -30,8 +30,9 @@
 **********************************************************************/
 
 //--#include <qwidgetfactory.h>
-#include <QFormBuilder>
+#include <QtDesigner/QFormBuilder>
 #include <QDesignerCustomWidgetInterface>
+#include <QMdiArea>
 #include <QCoreApplication>
 #include <qdialog.h>
 #include <qobject.h>
@@ -347,7 +348,7 @@ aForm::init()
 			mw->setFocusPolicy( Qt::NoFocus );
                 }
             //--
-            ((QWorkspace*)engine->ws)->addWindow(form);
+            ((QMdiArea*)engine->ws)->addSubWindow(form);
             form->show();
 
 		connectSlots();

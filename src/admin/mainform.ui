@@ -80,9 +80,8 @@
   <layoutdefault spacing="6" margin="11" />
   <includes>
     <include location="local" >ananas.h</include>
-    <include location="local" >qworkspace.h</include>
+    <include location="global" >QMdiArea</include>
     <include location="local" >awindowslist.h</include>
-    <include location="global" >q3vbox.h</include>
     <include location="local" >usersform.h</include>
   </includes>
   <connections>

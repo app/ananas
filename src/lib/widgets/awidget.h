@@ -62,9 +62,9 @@ public:
 	aCfg*		md;
 	aEngine*	engine;
 
-	aWidget( QWidget *parent = 0, const char *name = 0, Qt::WFlags fl = 0 );
-	aWidget( const QString &oname, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WFlags fl = 0 );
-	aWidget( aCfgItem context, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WFlags fl = 0 );
+	aWidget( QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = 0 );
+	aWidget( const QString &oname, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = 0 );
+	aWidget( aCfgItem context, aDatabase *adb, QWidget *parent = 0, const char *name = 0, Qt::WindowFlags fl = 0 );
 	virtual ~aWidget();
 
 	virtual bool		checkStructure();
@@ -116,8 +116,8 @@ public:
 
 public slots:
 	virtual	QVariant 	value( const QString & name );
-	virtual QString		value() const {return QString::null;};
-	virtual	QString 	textValue() {return QString::null;};
+	virtual QString		value() const {return QString();};
+	virtual	QString 	textValue() {return QString();};
 	virtual void		setValue( const QString &);
 	virtual int		setValue( const QString & name, const QVariant &value );
 	virtual int 		setObjValue( const QString & nameWidget, aObject *value );

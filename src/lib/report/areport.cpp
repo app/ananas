@@ -34,8 +34,8 @@
 #include	<QTextDocument>
 #include	<qpainter.h>
 #include	<qkeysequence.h>
-#include	<qprinter.h>
-#include	<QPrintDialog>
+#include	<QtPrintSupport/QPrinter>
+#include	<QtPrintSupport/QPrintDialog>
 #include 	<QProcess>
 #include 	<qmessagebox.h>
 #include 	<QFileDialog>
@@ -57,7 +57,7 @@
 *	Создает объект
 *	\_ru
 */
-aReportBrowser::aReportBrowser(  QWidget *parent, const char *name, Qt::WFlags f )
+aReportBrowser::aReportBrowser(  QWidget *parent, const char *name, Qt::WindowFlags f )
 :QMainWindow( parent, f )
 {
 	Q_UNUSED(name);
@@ -422,7 +422,7 @@ aReport::show()
 		{
 
 			QFileDialog dlg( 0, tr("OpenOffice executable") );
-			dlg.setFilter( filter );
+			dlg.setNameFilter( filter );
 			dlg.setFileMode( QFileDialog::ExistingFile );
 			dlg.setDirectory( startCatalog );
 			dlg.setWindowTitle("Для отображения отчета необходим OpenOffice. Укажите исполняемый файл OpenOffice");
@@ -431,7 +431,7 @@ aReport::show()
 				oowriter = dlg.selectedFiles().value( 0 );
 				//printf("select %s", oowriter.toLatin1().constData());
 				QProcess process;
-				process.start( oowriter, QStringList() << "-n" << QDir::convertSeparators( fileName ) );
+				process.start( oowriter, QStringList() << "-n" << QDir::toNativeSeparators( fileName ) );
 				if( !process.waitForStarted() )
 				{
 					QMessageBox::warning(0, tr("Warning"), tr("Unable to start OpenOffice (%1)").arg(oowriter), QMessageBox::Ok,QMessageBox::NoButton);
@@ -448,7 +448,7 @@ aReport::show()
 		{
 
 			QProcess process;
-			process.start( oowriter, QStringList() << "-n" << QDir::convertSeparators( fileName ) );
+			process.start( oowriter, QStringList() << "-n" << QDir::toNativeSeparators( fileName ) );
 			if( !process.waitForStarted() )
 			{
 				QMessageBox::warning(0, tr("Warning"), tr("Unable to start OpenOffice (%1)").arg(oowriter), QMessageBox::Ok,QMessageBox::NoButton);
@@ -529,7 +529,7 @@ aReport::getName4NewTemplate()
 	do
 	{
 		// tpl->getDir() должно заканчиваться на /
-		fname =  QDir::convertSeparators(QString(tpl->getDir()+".ananas-report%1%2").arg(count).arg(suff));
+		fname =  QDir::toNativeSeparators(QString(tpl->getDir()+".ananas-report%1%2").arg(count).arg(suff));
 		tmpf.setFileName(fname);
 		if(tmpf.exists())
 		{

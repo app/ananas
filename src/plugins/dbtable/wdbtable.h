@@ -181,7 +181,7 @@ public slots:
 	void	newDataId(const qulonglong );
 	QVariant Value( const QString &colname );
 
-	bool searchColumn( const QString &text, bool FromCurrent = FALSE, bool Forward = TRUE );
+	bool searchColumn( const QString &text, bool FromCurrent = false, bool Forward = true );
 	void searchOpen( const QString &text = "" );
 	void searchClose();
 

@@ -40,7 +40,7 @@
 
 #ifndef QT_NO_WIDGETPLUGIN
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 #ifdef QT_PLUGIN
 #define QT_WIDGET_PLUGIN_EXPORT __declspec(dllexport)
 #else

@@ -109,8 +109,8 @@ void TestAMetaData::testAMetaObject()
 //    QVERIFY( o->textExists("Text0") == false );
 //    QVERIFY( o->text("Text") == QString::fromUtf8("Проверочный текст") );
 //    QVERIFY( o->text( 1 ) == QString::fromUtf8("Проверочный текст") );
-//    QVERIFY( o->text( -1 ) == QString::null );
-//    QVERIFY( o->text( 10 ) == QString::null );
+//    QVERIFY( o->text( -1 ) == QString() );
+//    QVERIFY( o->text( 10 ) == QString() );
 // Test rawdata functions
 //    QVERIFY( o->rawdataCount() == 2 );
 //    QVERIFY( o->rawdataExists("RAW1") );

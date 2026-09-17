@@ -54,7 +54,7 @@ static QObjectList aQueryList( QObject *parent, const char *type )
 
 
 
-wJournal::wJournal( QWidget *parent, Qt::WFlags fl )
+wJournal::wJournal( QWidget *parent, Qt::WindowFlags fl )
 :aWidget( parent, "wJournal", fl )
 {
 	dSelectType = new eSelectDocType();
@@ -240,7 +240,7 @@ wJournal::update()
 						tr("Can not edit document"),
 						tr("To edit document you have to unconduct it. Or you can view it. Unconduct?"),
 						tr("&Unconduct"), tr("&View"),
-						QString::null, 0, 1 );
+						QString(), 0, 1 );
 	}
 	else
 	{
@@ -291,7 +291,7 @@ wJournal::markDelete()
 					tr("Confirm"),
 					tr("Do you really want to delete document?"),
 					tr("&Yes"), tr("&No"),
-					QString::null, 0, 1 );
+					QString(), 0, 1 );
 	if(res) return res;
 	aDocument *doc = ((aDocJournal*)dbobj)->CurrentDocument();
 	if(doc->IsConducted()) doc->UnConduct();

@@ -38,7 +38,7 @@ class QT_WIDGET_PLUGIN_EXPORT wReport : public aWidget
 {
 	Q_OBJECT
 public:
-	wReport( QWidget *parent = 0, Qt::WFlags fl = 0 );
+	wReport( QWidget *parent = 0, Qt::WindowFlags fl = 0 );
 	virtual ~wReport();
 	bool checkStructure();
 	virtual void initObject( aDatabase *adb );

@@ -58,5 +58,13 @@ AExtExample::timerEvent( QTimerEvent * )
 }
 
 #include <aextensionplugin.h>
-typedef AExtensionPlugin<AExtExample> AExtExamplePlugin;
-A_EXPORT_PLUGIN( AExtExamplePlugin )
+
+class AExtExamplePlugin : public AExtensionPlugin<AExtExample>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    AExtExamplePlugin() {}
+};
+
+#include "aextexample.moc"

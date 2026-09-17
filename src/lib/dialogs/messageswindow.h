@@ -48,7 +48,7 @@ class  ANANAS_EXPORT MessagesWindow : public QDockWidget
 
 public:
 //	bool empty;
-    MessagesWindow( QWidget* parent = 0, Qt::WFlags fl = Qt::Window );
+    MessagesWindow( QWidget* parent = 0, Qt::WindowFlags fl = Qt::Window );
     ~MessagesWindow();
 
     QTextBrowser* msgBrowser;

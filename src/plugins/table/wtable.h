@@ -73,7 +73,7 @@ public slots:
 	QString text(int col, int row);
 	void setHeaderText(int col, const QString& text);
 	QString textHeader(int col);
-	virtual void sortColumn ( int col, bool ascending = TRUE, bool wholeRows = TRUE );
+	virtual void sortColumn ( int col, bool ascending = true, bool wholeRows = true );
 	virtual void setColumnWidth(int col, int width);
 	virtual int columnWidth(int col);
 	virtual void setNumCols ( int r );
@@ -84,14 +84,14 @@ public slots:
 	virtual void adjustColumn ( int col );
 	virtual void setColumnStretchable ( int col, bool stretch );
 	bool isColumnStretchable ( int col ) const;
-	virtual void swapColumns ( int col1, int col2, bool swapHeader = FALSE );
+	virtual void swapColumns ( int col1, int col2, bool swapHeader = false );
 	virtual void swapCells ( int row1, int col1, int row2, int col2 );
 	virtual void setCurrentCell ( int row, int col );
 	virtual void setColumnReadOnly ( int col, bool ro );
 	virtual void insertColumns ( int col, int count = 1 );
 	virtual void removeColumn ( int col );
-	virtual void editCell ( int row, int col, bool replace = FALSE );
-	virtual void swapRows ( int row1, int row2, bool swapHeader = FALSE );
+	virtual void editCell ( int row, int col, bool replace = false );
+	virtual void swapRows ( int row1, int row2, bool swapHeader = false );
 signals:
 //	void pressed ( int row, int col, int button, const QPoint & mousePos );
 //	void currentChanged ( int row, int col );

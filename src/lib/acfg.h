@@ -413,7 +413,7 @@ public:
     QString objClass( aCfgItem context );
 
     int count(aCfgItem context, const QString &classname);
-    int countChild(aCfgItem context, const QString &classname = QString::null );
+    int countChild(aCfgItem context, const QString &classname = QString() );
 
     QString attr(aCfgItem context, const QString &name);
     void setAttr(aCfgItem context, const QString &name, const QString &value);
@@ -422,7 +422,7 @@ public:
     QString text(aCfgItem context);
     void setText(aCfgItem context, const QString &value );
     QByteArray binary( aCfgItem context );
-    void setBinary( aCfgItem context, const QByteArray &value, const QString &format = QString::null );
+    void setBinary( aCfgItem context, const QByteArray &value, const QString &format = QString() );
     QString binaryFormat( aCfgItem context );
     QString sText(aCfgItem context, const QString & subname );
     void setSText(aCfgItem context, const QString & subname, const QString &value);
@@ -431,7 +431,7 @@ public:
     aCfgItem find(long id);
     aCfgItem find(const QString &name);
     aCfgItem findChild(aCfgItem context, const QString &classname, int n = 0 );
-    aCfgItem findName(aCfgItem context, const QString &classname, const QString &name = QString::null );
+    aCfgItem findName(aCfgItem context, const QString &classname, const QString &name = QString() );
 
     bool swap( aCfgItem &item1, aCfgItem &item2);
     int order( aCfgItem item );
@@ -441,7 +441,7 @@ public:
     aCfgItem nextSibling( aCfgItem context );
     aCfgItem previousSibling( aCfgItem context );
 
-    aCfgItem insert(aCfgItem context, const QString &otype, const QString &name = QString::null, long id = 0);
+    aCfgItem insert(aCfgItem context, const QString &otype, const QString &name = QString(), long id = 0);
 	int 		saveOneObject(aCfgItem context, const QString &fileName);
 	aCfgItem	loadOneObject(const QString &fileName);
     void remove(aCfgItem context);
@@ -449,7 +449,7 @@ public:
     aCfgItem importCfgItem( aCfgItem context,  aCfgItem obj );
     void setupNewId( aCfgItem obj );
 
-    QStringList types( const QString &filter = QString::null, aCfgItem *obj = 0 );
+    QStringList types( const QString &filter = QString(), aCfgItem *obj = 0 );
     QStringList ObjectTypes();
 
     // Hi level functions.

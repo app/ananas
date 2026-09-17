@@ -69,7 +69,7 @@ static QObjectList aQueryList( QObject *parent, const char *type )
 	return res;
 }
 
-aWidget::aWidget( QWidget *parent, const char *name, Qt::WFlags fl )
+aWidget::aWidget( QWidget *parent, const char *name, Qt::WindowFlags fl )
 :QWidget( parent, fl )
 {
 	if (name) setObjectName(name);
@@ -92,7 +92,7 @@ aWidget::aWidget( QWidget *parent, const char *name, Qt::WFlags fl )
  * 	\param fl - флаги, используемые конструктором базового класса.
  * \_ru
  */
-aWidget::aWidget( const QString &itemname, aDatabase *adb, QWidget *parent, const char *name, Qt::WFlags fl )
+aWidget::aWidget( const QString &itemname, aDatabase *adb, QWidget *parent, const char *name, Qt::WindowFlags fl )
 :QWidget( parent, fl )
 {
 	if (name) setObjectName(name);
@@ -119,7 +119,7 @@ aWidget::aWidget( const QString &itemname, aDatabase *adb, QWidget *parent, cons
  * 	\param fl - флаги, используемые конструктором базового класса.
  * \_ru
  */
-aWidget::aWidget( aCfgItem context, aDatabase *adb, QWidget *parent, const char *name, Qt::WFlags fl )
+aWidget::aWidget( aCfgItem context, aDatabase *adb, QWidget *parent, const char *name, Qt::WindowFlags fl )
 :QWidget( parent, fl )
 {
 	if (name) setObjectName(name);

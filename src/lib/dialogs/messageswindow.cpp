@@ -31,7 +31,7 @@
 */
 #include <QTextBrowser>
 #include <qlayout.h>
-#include <qworkspace.h>
+#include <QMdiArea>
 #include <qimage.h>
 #include <qpixmap.h>
 //Added by qt3to4:
@@ -53,7 +53,7 @@ messageproc(int n, const char *msg){
 }
 
 
-MessagesWindow::MessagesWindow( QWidget* parent, Qt::WFlags fl )
+MessagesWindow::MessagesWindow( QWidget* parent, Qt::WindowFlags fl )
     : QDockWidget( tr("Messages window"), parent, fl )
 {
 	setObjectName( "MessagesWindow" );

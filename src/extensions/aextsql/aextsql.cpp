@@ -505,5 +505,13 @@ aExtSQL::LastError() const
 }
 
 #include <aextensionplugin.h>
-typedef AExtensionPlugin<aExtSQL> aExtSQLPlugin;
-A_EXPORT_PLUGIN( aExtSQLPlugin )
+
+class aExtSQLPlugin : public AExtensionPlugin<aExtSQL>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    aExtSQLPlugin() {}
+};
+
+#include "aextsql.moc"

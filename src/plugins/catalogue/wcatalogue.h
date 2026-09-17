@@ -44,7 +44,7 @@ class QT_WIDGET_PLUGIN_EXPORT wCatalogue : public aWidget
 {
 	Q_OBJECT
 public:
-	wCatalogue( QWidget *parent = 0, Qt::WFlags fl = 0 );
+	wCatalogue( QWidget *parent = 0, Qt::WindowFlags fl = 0 );
 	virtual ~wCatalogue();
 	bool checkStructure();
 	virtual void 		initObject( aDatabase *adb );

@@ -93,7 +93,7 @@ wGroupTreeItem::parentItem()
 }
 
 
-wGroupTree::wGroupTree( QWidget *parent, Qt::WFlags fl )
+wGroupTree::wGroupTree( QWidget *parent, Qt::WindowFlags fl )
     : aWidget( parent, "wGroupTree", fl )
 {
 	tree = new QTreeWidget( this );

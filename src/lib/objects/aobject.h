@@ -115,7 +115,7 @@ public slots:
 	virtual int Conduct();
 	virtual int UnConduct();
 	virtual bool IsConducted();
-	virtual QString Kind( const QString & name = QString::null );
+	virtual QString Kind( const QString & name = QString() );
 //	virtual ERR_Code Select( QString num ){return err_incorrecttype;};
 //	virtual ERR_Code Select( QDateTime from, QDateTime to, QString mdName){return err_incorrecttype;};
 //	virtual ERR_Code Select( aObject* ){return err_incorrecttype;};

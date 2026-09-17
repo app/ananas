@@ -37,7 +37,7 @@
 //extern aCfg *plugins_aCfg;
 
 
-wReport::wReport( QWidget *parent, Qt::WFlags fl )
+wReport::wReport( QWidget *parent, Qt::WindowFlags fl )
 :aWidget( parent, "wReport", fl )
 {
 	setInited( false );

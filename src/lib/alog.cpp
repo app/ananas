@@ -146,7 +146,7 @@ aLog::init(const QString &log_name, int show_up, bool echoToConsole)
 	bool ok;
 	QString log;
 	aLog::echoRequired = echoToConsole;
-	if(log_name =="" || logName==QString::null)
+	if(log_name =="" || logName==QString())
 	{
 		log = aService::readConfigVariable("log", &ok);	
 		if(!ok )

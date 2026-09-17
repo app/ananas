@@ -47,7 +47,7 @@ public:
 	QTreeWidget *tree;
 	wGroupTreeItem *root;
 
-	wGroupTree( QWidget *parent = 0, Qt::WFlags fl = 0 );
+	wGroupTree( QWidget *parent = 0, Qt::WindowFlags fl = 0 );
 	virtual ~wGroupTree();
 
 	virtual void initObject( aDatabase *adb );
@@ -82,8 +82,8 @@ class wGroupTreeItem : public QTreeWidgetItem
 public:
 	ANANAS_UID id;
 	int level;
-    wGroupTreeItem( QTreeWidget *parent, const QString &name = QString::null );
-    wGroupTreeItem( wGroupTreeItem *parent, wGroupTreeItem *after, const QString &name = QString::null, int newlevel = 0, ANANAS_UID newid = 0 );
+    wGroupTreeItem( QTreeWidget *parent, const QString &name = QString() );
+    wGroupTreeItem( wGroupTreeItem *parent, wGroupTreeItem *after, const QString &name = QString(), int newlevel = 0, ANANAS_UID newid = 0 );
     wGroupTreeItem( wGroupTreeItem *parent, wGroupTreeItem *after, aCatGroup *g = 0 );
     virtual ~wGroupTreeItem();
     wGroupTreeItem *parentItem();

@@ -1,6 +1,8 @@
 .moc
 .obj
 .ui
+.qmake.stash
+moc_predefs.h
 *.so
 *.so.1*
 *.o

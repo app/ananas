@@ -420,5 +420,13 @@ AExtXML::childExists()
 }
 
 #include <aextensionplugin.h>
-typedef AExtensionPlugin<AExtXML> AExtXMLPlugin;
-A_EXPORT_PLUGIN( AExtXMLPlugin )
+
+class AExtXMLPlugin : public AExtensionPlugin<AExtXML>
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Ananas.Extensions.AExtensionInterface/1.0")
+public:
+    AExtXMLPlugin() {}
+};
+
+#include "aextxml.moc"

@@ -1,0 +1,60 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 1. Qt5 toolchain + Debian packaging tools. Ubuntu 24.04 (noble) is the current
+#    LTS and ships Qt 5.15 plus the (deprecated but still present) QtScript and
+#    QtUiTools modules needed by the intermediate port.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    devscripts \
+    debhelper \
+    dh-make \
+    fakeroot \
+    qtbase5-dev \
+    qtbase5-dev-tools \
+    qt5-qmake \
+    qtchooser \
+    qttools5-dev \
+    qttools5-dev-tools \
+    qtscript5-dev \
+    libqt5sql5-sqlite \
+    libqt5sql5-mysql \
+    libqt5sql5-psql \
+    libmysqlclient-dev \
+    wget \
+    unzip \
+    git \
+    xvfb \
+    ccache \
+    && rm -rf /var/lib/apt/lists/*
+
+# qtchooser may not provide a /usr/bin/qmake with a single Qt installed; make
+# sure the Qt5 qmake is the one the build system finds on PATH.
+RUN if ! command -v qmake >/dev/null 2>&1; then \
+        ln -sf /usr/lib/qt5/bin/qmake /usr/local/bin/qmake; \
+    fi && \
+    qmake -v
+
+# ccache in front of gcc/g++: speeds up repeated (including clean) builds.
+# CCACHE_DIR is set when running the container (see scripts/*.sh) so the cache
+# lives on the mounted volume and survives --rm.
+ENV PATH=/usr/lib/ccache:$PATH
+ENV CCACHE_MAXSIZE=5G
+ENV CCACHE_COMPRESS=1
+
+# 2. Build and install libqdataschema for Qt5 (branch `qt5`).
+COPY ananas-legacy-qdataschema /tmp/qdataschema
+RUN cd /tmp/qdataschema && \
+    git checkout -q qt5 && \
+    cd src/lib && \
+    qmake && \
+    make -j"$(nproc)" && \
+    mkdir -p /usr/include/x86_64-linux-gnu/qt5/qdataschema /usr/share/qt5/include/qdataschema && \
+    cp -df /tmp/qdataschema/lib/* /usr/lib/ && \
+    cp -f /tmp/qdataschema/src/lib/*.h /usr/include/x86_64-linux-gnu/qt5/qdataschema/ && \
+    cp -f /tmp/qdataschema/src/lib/*.h /usr/share/qt5/include/qdataschema/ && \
+    ldconfig && \
+    rm -rf /tmp/qdataschema
+
+WORKDIR /workspace

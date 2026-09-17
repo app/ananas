@@ -3,7 +3,7 @@ set -e
 
 WORKSPACE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 REPO="$WORKSPACE_DIR/ananas-legacy-qt4"
-BRANCH="${ANANAS_BRANCH:-qtscript}"
+BRANCH="${ANANAS_BRANCH:-port}"
 
 # git archive only exports tracked files: fail fast if a source file exists on
 # disk but is ignored by .gitignore (it would silently be missing from the build).
@@ -19,14 +19,14 @@ if [[ -n "$MISSING" ]]; then
     exit 1
 fi
 
-echo "===> 1. Сборка Podman-образа (Ubuntu 14.04 + Qt4 + QtScript + libqdataschema)..."
-podman build -t ananas-qt4-builder -f "$WORKSPACE_DIR/tools/docker/Containerfile.qt4-legacy" "$WORKSPACE_DIR"
+echo "===> 1. Сборка Podman-образа (Ubuntu 24.04 + Qt5 + QtScript + libqdataschema)..."
+podman build -t ananas-qt5-builder -f "$WORKSPACE_DIR/tools/docker/Containerfile.qt5" "$WORKSPACE_DIR"
 
 echo "===> 2. Сборка ananas-legacy-qt4 (ветка ${BRANCH})..."
 podman run --rm \
   -v "$WORKSPACE_DIR":/workspace:z \
   -e BRANCH="$BRANCH" \
-  ananas-qt4-builder \
+  ananas-qt5-builder \
   bash -c '
     set -e
     export CCACHE_DIR=/workspace/tmp/ccache

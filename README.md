@@ -1,10 +1,13 @@
 # Ananas legacy build tooling
 
-Containers and scripts used to build the legacy Ananas Qt4 sources
+Containers and scripts used to build the legacy Ananas sources
 (`ananas-legacy-qt4`) on a modern host with Podman.
 
-The build runs inside an Ubuntu 14.04 (trusty) container, because the project
-needs Qt4, `qmake-qt4` and the Qt3 support module.
+Two build images exist:
+
+- `ananas-qt4-builder` (Ubuntu 14.04, Qt4) — the historical regression bench;
+- `ananas-qt5-builder` (Ubuntu 24.04, Qt 5.15) — the current target after the
+  Qt4→Qt5 port (see `docs/PORTING.md`).
 
 ## Layout
 
@@ -18,7 +21,9 @@ ananas-port/
 ├── ananas-legacy-qdataschema/  # libqdataschema sources
 ├── tools/                      # this repository
 │   ├── docker/Containerfile.qt4-legacy
-│   └── scripts/build-qt4.sh
+│   ├── docker/Containerfile.qt5
+│   ├── scripts/build-qt4.sh
+│   └── scripts/build-qt5.sh
 └── dist/                       # build output (created by the script)
 ```
 
@@ -32,13 +37,16 @@ The sources are taken from GitHub:
 | `ananas-legacy-qt4`         | `https://github.com/app/ananas-labs-qt4.git` |
 | `ananas-legacy-qdataschema` | `https://github.com/app/qdataschema.git`     |
 
-The build requires the `origin/qtscript` ref in `ananas-legacy-qt4` and the
-`origin/newname` ref in `ananas-legacy-qdataschema`.
+The Qt4 build requires the `origin/qtscript` ref in `ananas-legacy-qt4` and the
+`origin/newname` ref in `ananas-legacy-qdataschema`. The Qt5 build uses the
+local `port` branch of `ananas-legacy-qt4` and the local `qt5` branch of
+`ananas-legacy-qdataschema`.
 
 ## Requirements
 
 - `podman` (rootless is fine)
-- Network access to `archive.ubuntu.com` and `security.ubuntu.com`
+- Network access to `archive.ubuntu.com`, `security.ubuntu.com` and
+  `ports.ubuntu.com` (the latter for the Ubuntu 24.04 image)
 - Full clones of the repositories listed above, checked out in the layout
   described above, with their `origin` remotes pointing at the URLs above
 
@@ -47,6 +55,10 @@ The build requires the `origin/qtscript` ref in `ananas-legacy-qt4` and the
 Run the whole pipeline (build the image, then compile and package):
 
 ```sh
+# Qt5 (current)
+bash tools/scripts/build-qt5.sh
+
+# Qt4 (legacy regression bench)
 bash tools/scripts/build-qt4.sh
 ```
 
@@ -58,52 +70,69 @@ dist/ananas_0.9.6-1_amd64.deb
 
 ### Choosing a branch
 
-The script builds the `qtscript` branch by default. Override it with the
-`ANANAS_BRANCH` environment variable (any local branch or ref works):
+`build-qt5.sh` builds `port` by default and `build-qt4.sh` builds `qtscript`.
+Override with the `ANANAS_BRANCH` environment variable (any local branch or ref
+works):
 
 ```sh
+ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh
 ANANAS_BRANCH=port bash tools/scripts/build-qt4.sh
 ```
 
-### Building the image only
+### Building the images only
 
 ```sh
-podman build --no-cache -t ananas-qt4-builder \
-    -f tools/docker/Containerfile.qt4-legacy .
+podman build --no-cache -t ananas-qt5-builder -f tools/docker/Containerfile.qt5 .
+podman build --no-cache -t ananas-qt4-builder -f tools/docker/Containerfile.qt4-legacy .
 ```
 
-### Running a shell in the build image
+### Running a shell in a build image
 
 ```sh
+podman run --rm -it -v "$PWD":/workspace:z ananas-qt5-builder bash
 podman run --rm -it -v "$PWD":/workspace:z ananas-qt4-builder bash
 ```
 
 ## Porting helpers
 
-Used while porting the Qt4 codebase (see `docs/PORTING.md`).
+Used while porting the codebase (see `docs/PORTING.md`).
 
 ```sh
 # Read-only burndown report of remaining Qt3Support/QtScript usage
 bash tools/scripts/port-metrics.sh
 
-# Build in place and run the QtTest suite headlessly (Xvfb)
-bash tools/scripts/smoke-qt4.sh
+# Build (clean) and run the QtTest suite headlessly under Xvfb
+bash tools/scripts/smoke-qt5.sh     # Ubuntu 24.04 / Qt5
+bash tools/scripts/smoke-qt4.sh     # Ubuntu 14.04 / Qt4
 
-# Install the built .deb in the trusty container and run the application
+# Install the built .deb in the matching container and run the application
+bash tools/scripts/run-qt5.sh ananas-administrator
 bash tools/scripts/run-qt4.sh ananas-administrator
 ```
 
-Both scripts take an optional path to `ananas-legacy-qt4` as their first
-argument.
+The smoke/run scripts take an optional path to `ananas-legacy-qt4` as their
+first argument (the run scripts take the application name instead).
 
 ### Build caching
 
 The image ships `ccache` (on `PATH` ahead of `gcc`/`g++`). The cache directory
 is `tmp/ccache` on the mounted workspace, so it survives `podman run --rm` and
-speeds up repeated and clean builds. `build-qt4.sh` and `smoke-qt4.sh` print
-`ccache -s` at the end.
+speeds up repeated and clean builds. All build/smoke scripts print `ccache -s`
+at the end.
 
 ## How it works
+
+Qt5 (`Containerfile.qt5`, Ubuntu 24.04):
+
+1. Installs `qtbase5-dev`, `qttools5-dev` (Designer), `qtscript5-dev`, the Qt5
+   SQL drivers and the Debian packaging tools.
+2. Builds `libqdataschema` from the `qt5` branch of the
+   `ananas-legacy-qdataschema` checkout and installs it under
+   `/usr/lib` + the Qt5 header paths.
+3. `build-qt5.sh` exports the requested branch with `git archive` (so the host
+   working tree is left untouched) and runs `dpkg-buildpackage`.
+
+Qt4 (`Containerfile.qt4-legacy`, Ubuntu 14.04):
 
 1. `Containerfile.qt4-legacy` starts from `ubuntu:14.04`. Since `trusty` has
    been removed from `old-releases.ubuntu.com`, the APT sources point to

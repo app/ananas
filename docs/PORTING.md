@@ -24,28 +24,40 @@ and an external `libqdataschema`.
   - `scripts/run-qt4.sh` runs the packaged app in the trusty container
     (`ananas-administrator` starts and shows the schema/DB dialogs).
   - Branch `port` (from `origin/qtscript`).
-- **Phases 2–6: pending.**
+- **Phase 2 (Qt4 → Qt5): done.**
+  - `docker/Containerfile.qt5` (Ubuntu 24.04 + Qt 5.15) and
+    `scripts/build-qt5.sh` produce `dist/ananas_0.9.6-1_amd64.deb` with Qt5
+    dependencies only (no Qt4 / Qt3Support).
+  - `libqdataschema` is ported to Qt5 on the `qt5` branch of
+    `ananas-legacy-qdataschema` and installed into the image.
+  - `scripts/smoke-qt5.sh`: clean Qt5 build + `ananas-test` 7/7.
+  - `scripts/run-qt5.sh` installs the package in the image; the packaged
+    `ananas-administrator` starts (manual GUI smoke pending).
+- **Phases 3–6: pending.**
 
 ## Handoff (next session)
 
 - Branch: `ananas-legacy-qt4` @ `port` (from `origin/qtscript`); the `qtscript`
-  branch is the untouched rollback point. Tooling lives in the `tools` repo
-  (`main`), sources in `ananas-legacy-qt4` / `ananas-legacy-qdataschema`
-  (branch `newname`).
-- Phase 1 is done and functionally verified; the next step is Phase 2
-  (Qt4→Qt5), see below.
+  branch is the untouched rollback point. The Phase 1 result is
+  `port` @ `b2f77d0`. Tooling lives in the `tools` repo (`main`), sources in
+  `ananas-legacy-qt4` / `ananas-legacy-qdataschema` (branch `qt5`).
+- Phases 1–2 are done; the next step is Phase 3 (QtScript → QJSEngine).
 - Commands:
   - burndown: `bash tools/scripts/port-metrics.sh`
-  - build + tests (trusty): `bash tools/scripts/smoke-qt4.sh`
-  - package: `ANANAS_BRANCH=port bash tools/scripts/build-qt4.sh`
-  - run the app: `bash tools/scripts/run-qt4.sh ananas-administrator`
-- Image `ananas-qt4-builder`: Ubuntu 14.04 + Qt4 + QtScript + `libqdataschema`
-  (built from `ananas-legacy-qdataschema@newname`); ccache at
-  `<workspace>/tmp/ccache`.
+  - Qt4 regression bench: `bash tools/scripts/smoke-qt4.sh`
+  - Qt5 build + tests: `bash tools/scripts/smoke-qt5.sh`
+  - package: `ANANAS_BRANCH=port bash tools/scripts/build-qt5.sh`
+  - run the app: `bash tools/scripts/run-qt5.sh ananas-administrator`
+- Images:
+  - `ananas-qt4-builder`: Ubuntu 14.04 + Qt4 + QtScript + `libqdataschema`
+    (`ananas-legacy-qdataschema@newname`).
+  - `ananas-qt5-builder`: Ubuntu 24.04 + Qt 5.15 + QtScript + `libqdataschema`
+    (`ananas-legacy-qdataschema@qt5`).
+  - ccache at `<workspace>/tmp/ccache`.
 - Known caveat: the rewritten `wDBTable`/`wTable`/`awidget` have no functional
   tests; only the schema/DB dialogs were smoke-tested manually.
-- The `.deb` targets Ubuntu 14.04 and cannot be installed on a modern host
-  until Phase 2/4.
+- The Qt5 `.deb` targets Ubuntu 24.04 and cannot be installed on the Qt4
+  (trusty) image.
 
 ## Decisions
 
@@ -140,17 +152,25 @@ Rich text/printing: `Q3SimpleRichText`→`QTextDocument`,
 package builds in the trusty container; `ananas-test` green; smoke
 `ananas-administrator` on SQLite.
 
-## Phase 2 — Qt4 → Qt5
+## Phase 2 — Qt4 → Qt5 (done)
 
 Reference: <https://wiki.qt.io/Transition_from_Qt_4.x_to_Qt5>. The counts below
 were measured on the `port` branch at the end of Phase 1.
 
+Outcome: `port` builds and links against Qt 5.15, `ananas-test` is 7/7 and
+`build-qt5.sh` produces a Qt5-only `.deb`. `QRegExp` and `QTextCodec` were left
+in place on purpose (still available in Qt5, removed in Qt6 — Phase 4). The
+vendored Designer (`src/designer`) is still Qt4 and out of scope (Phase 6).
+
 ### 2.1 Build system
 
-- `QT += widgets printsupport uitools`; widget plugins add `QT += designer`.
+- `QT += widgets printsupport` (QFormBuilder lives in `QtDesigner`, so the
+  widget plugins add `QT += designer`; `uitools` turned out to be unnecessary).
 - `CONFIG += qtestlib` → `QT += testlib` (`src/test/test.pro`).
-- Add `docker/Containerfile.qt5` (current LTS) + `scripts/build-qt5.sh`.
-- Build `libqdataschema` for Qt5 in lockstep.
+- Added `docker/Containerfile.qt5` (Ubuntu 24.04 LTS) + `scripts/build-qt5.sh`,
+  `scripts/smoke-qt5.sh`, `scripts/run-qt5.sh`.
+- Built `libqdataschema` for Qt5 in lockstep (branch `qt5`): `QChar::toAscii`,
+  `QString::null`, driver names `QMYSQL3`/`QPSQL7` → `QMYSQL`/`QPSQL`.
 
 ### 2.2 Includes
 
@@ -160,7 +180,8 @@ were measured on the `port` branch at the end of Phase 1.
   (`QIcon`, `QPainter`, `QCloseEvent`, `QTextBlock`, `QTextCharFormat`,
   `QTextCursor`, `QTextDocument`, `QSyntaxHighlighter`) stay `<QtGui/…>`.
   Automate with `fixqt4headers.pl` (qtbase/bin) if available.
-- `QFormBuilder` → `<QtUiTools/QFormBuilder>` (`src/plugins/aform.cpp`).
+- `QFormBuilder` → `<QtDesigner/QFormBuilder>` (`src/plugins/aform.cpp`); in
+  Qt5 it is part of the Designer module, not QtUiTools.
 - `QPrinter`/`QPrintDialog` → `<QtPrintSupport/…>`
   (`src/lib/report/areport.cpp`).
 
@@ -172,9 +193,14 @@ were measured on the `port` branch at the end of Phase 1.
 | `QDir::convertSeparators` | `toNativeSeparators` | 58 |
 | `QRegExp` | `QRegularExpression` | 10 |
 | `QTextCodec` / `setCodecForCStrings` | remove / UTF-8 default | 6 / 2 |
-| `QHeaderView::setResizeMode` | `setSectionResizeMode` | 1 |
+| `QHeaderView::setResizeMode` | `setSectionResizeMode` | 2 |
 | `qInstallMsgHandler` | `qInstallMessageHandler` | 1 |
 | `Q_EXPORT_PLUGIN2` | `Q_PLUGIN_METADATA` | 2 |
+| `Qt::WFlags` | `Qt::WindowFlags` | 34 |
+| `TRUE` / `FALSE` | `true` / `false` | 43 |
+| `QString::null` | `QString()` | 110 |
+| `QWidget::setShown` | `setVisible` | 4 |
+| `QFileDialog::setFilter` | `setNameFilter` | 1 |
 
 Already zero: `QDesktopWidget`, `QApplication::desktop()`,
 `QApplication::setMainWidget`, `QLibraryInfo`, `QDesktopServices`,
@@ -183,9 +209,12 @@ Already zero: `QDesktopWidget`, `QApplication::desktop()`,
 
 ### 2.4 Plugins
 
-- `Q_PLUGIN_METADATA` + JSON for `aWidgetsCollection`
-  (`src/plugins/awidgets_plugin.cpp`) and `AExtensionPlugin` /
-  `A_EXPORT_PLUGIN` (`src/lib/aextensionplugin.h`).
+- `aWidgetsCollection` got `Q_PLUGIN_METADATA(IID …)` in
+  `src/plugins/awidgets_plugin.h`.
+- The `A_EXPORT_PLUGIN` macro was dropped: `Q_PLUGIN_METADATA` must be visible
+  to `moc`, which does not expand macros. Each `src/extensions/*/*.cpp` now
+  declares a concrete plugin class deriving from `AExtensionPlugin<type>` with
+  `Q_OBJECT` + `Q_PLUGIN_METADATA` and includes its generated `<file>.moc`.
 
 ### 2.5 Scripting
 
@@ -193,8 +222,9 @@ Already zero: `QDesktopWidget`, `QApplication::desktop()`,
 
 ### 2.6 Verification
 
-- `scripts/build-qt5.sh` (image + `.deb`) and `scripts/smoke-qt5.sh`
-  (build + `ananas-test`), then `scripts/run-qt5.sh` and a manual GUI smoke.
+- Done: `scripts/build-qt5.sh` (image + `.deb`) and `scripts/smoke-qt5.sh`
+  (clean build + `ananas-test` 7/7). `scripts/run-qt5.sh` starts the packaged
+  `ananas-administrator`; the manual GUI smoke (schema/DB dialogs) is pending.
 
 Note: this phase is Qt4→Qt5 only; the Qt5→Qt6 items (`QTextCodec`, `QRegExp`,
 `Qt::SplitBehavior`, `QAction` in QtGui, qmake→CMake, `QJSEngine`) stay in

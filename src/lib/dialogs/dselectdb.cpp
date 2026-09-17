@@ -56,6 +56,23 @@ void dSelectDB::languageChange()
 #include "atests.h"
 #include "adataexchange.h"
 #include "alog.h"
+#include <QTreeWidgetItem>
+
+static QTreeWidgetItem *nextSiblingItem( QTreeWidgetItem *item )
+{
+	if ( !item ) return 0;
+	QTreeWidgetItem *p = item->parent();
+	if ( p ) return p->child( p->indexOfChild( item ) + 1 );
+	QTreeWidget *t = item->treeWidget();
+	return t ? t->topLevelItem( t->indexOfTopLevelItem( item ) + 1 ) : 0;
+}
+
+static int itemDepth( QTreeWidgetItem *item )
+{
+	int d = 0;
+	while ( item->parent() ) { item = item->parent(); ++d; }
+	return d;
+}
 
 void dSelectDB::init()
 {
@@ -111,9 +128,9 @@ void dSelectDB::init()
 		readSettings(lst);
 		settings.endGroup();
 	}
-	setIcon( rcIcon("a-system.png"));
+	setWindowIcon( rcIcon("a-system.png"));
 	listDBRC->hideColumn( 1 );
-	listDBRC->setSorting( -1 );
+	listDBRC->setSortingEnabled( false );
 	listDBRC->header()->hide();
 	listDBRC->setRootIsDecorated(1);
 	buttonOk->setEnabled( FALSE );
@@ -134,20 +151,20 @@ void dSelectDB::readSettings(QStringList entryGroup)
 		QString groupName = "unknown group";
 		groupName = settings.readEntry(entryGroup[j]);
 		aLog::print(aLog::Debug, tr("dSelectDB read settings for group with name %1").arg(groupName));
-		rcListViewItem * lastIt = (rcListViewItem *) listDBRC->lastItem();
+		rcListViewItem * lastIt = (rcListViewItem *) listDBRC->topLevelItem( listDBRC->topLevelItemCount()-1 );
 		if(lastIt!=NULL)
 		{
-			while(lastIt->depth()>0)
+			while(itemDepth(lastIt)>0)
 			{
 				lastIt =(rcListViewItem *) lastIt->parent();
 			}
 			gitem= new rcListViewItem(listDBRC, lastIt, groupName, "", true );
-			gitem->setOpen(true);
+			gitem->setExpanded(true);
 		}
 		else
 		{
 			gitem= new rcListViewItem(listDBRC, groupName, "", true );
-			gitem->setOpen(true);
+			gitem->setExpanded(true);
 		}
 //		withgroups=1;
 		QMap<QString,QString> cfg;
@@ -164,21 +181,22 @@ void dSelectDB::readSettings(QStringList entryGroup)
 }
 
 
-void dSelectDB::itemSelect( Q3ListViewItem *item )
+void dSelectDB::itemSelect()
 {
-	if (! item ) return;
-	rcListViewItem *i = ( rcListViewItem *) item ;
+	rcListViewItem *i = ( rcListViewItem *) listDBRC->currentItem();
+	if (! i ) return;
 	buttonOk->setEnabled( !i->group );
 }
 
 
 void dSelectDB::newGroup()
 {
-	Q3ListViewItem *gitem;
+	QTreeWidgetItem *gitem;
 	gitem = new rcListViewItem(listDBRC, tr("New group"), "", true );
 	listDBRC->setRootIsDecorated(1);
-	gitem->setOpen(true);
-	listDBRC->setSelected(gitem, true);
+	gitem->setExpanded(true);
+	listDBRC->setCurrentItem(gitem);
+	gitem->setSelected(true);
 	editItem();
 	withgroups=1;
 	changes = true;
@@ -190,18 +208,19 @@ void dSelectDB::newItem()
 {
 	rcListViewItem *item, *gitem;
 	QString rc;
-	item= ( rcListViewItem *) listDBRC->selectedItem();
+	item= ( rcListViewItem *) listDBRC->currentItem();
 	if (!item) return;
 	if (withgroups) {
 		if (item->parent()) gitem = ( rcListViewItem *) item->parent();
 		else gitem=item;
 		item = new rcListViewItem(gitem, tr("New shema"), "myrc");
-		gitem->setOpen(true);
+		gitem->setExpanded(true);
 
 	} else {
 		item = new rcListViewItem(listDBRC, tr("New shema"), "myrc");
 	}
-	listDBRC->setSelected(item, true);
+	listDBRC->setCurrentItem(item);
+	item->setSelected(true);
 	editItem();
 	changes = true;
 }
@@ -212,13 +231,13 @@ void dSelectDB::editItem()
 	rcListViewItem *item;
 	dEditRC *d = new dEditRC(this);
 
-	item = ( rcListViewItem *) listDBRC->selectedItem();
+	item = ( rcListViewItem *) listDBRC->currentItem();
 	if (!item) return;
 	if ( item->group )
 	{
 	// Group
-		item->setRenameEnabled(0, true);
-		item->startRename(0);
+		item->setFlags( item->flags() | Qt::ItemIsEditable );
+		listDBRC->editItem( item, 0 );
 		changes = true;
 	}
 	else
@@ -236,8 +255,8 @@ void dSelectDB::editItem()
 
 void dSelectDB::deleteItem()
 {
-	Q3ListViewItem *item;
-	item=listDBRC->selectedItem();
+	QTreeWidgetItem *item;
+	item=listDBRC->currentItem();
 	if (item)
 	{
 		QString msg = tr("Delete item?");
@@ -247,7 +266,7 @@ void dSelectDB::deleteItem()
 		}
 
 		delete item;
-		if (listDBRC->childCount()==0) withgroups=0;
+		if (listDBRC->topLevelItemCount()==0) withgroups=0;
 		changes = true;
 	}
 }
@@ -276,7 +295,7 @@ void dSelectDB::saveRC()
 		//--settings.removeSearchPath( QSettings::Windows, "/ananasgroup/ananas/globalsettings");
 
 
-		gitem= ( rcListViewItem *) listDBRC->firstChild();
+		gitem= ( rcListViewItem *) listDBRC->topLevelItem(0);
 		uint gcount=0;
 		uint ecount=0;
 		clearSettings();
@@ -290,17 +309,17 @@ void dSelectDB::saveRC()
                                 settings.writeEntry(QString::number(gcount),gitem->text(0));
 				if(gitem->childCount())
 				{
-					item = ( rcListViewItem *) gitem->firstChild();
+					item = ( rcListViewItem *) gitem->child(0);
 					while (item)
 					{
 						settings.writeEntry(QString::number(gcount)+"/"+QString::number(ecount),item->rcfile);
-						item =  ( rcListViewItem *) item->nextSibling();
+						item =  ( rcListViewItem *) nextSiblingItem(item);
 						++ecount;
 					}
 				}
 			}
 			++gcount;
-			gitem =  ( rcListViewItem *) gitem->nextSibling();
+			gitem =  ( rcListViewItem *) nextSiblingItem(gitem);
 		}
 		settings.endGroup();
 }
@@ -311,7 +330,7 @@ void dSelectDB::onOK()
 	rcListViewItem *item;
 
 	saveRC();
-	item =  ( rcListViewItem *) listDBRC->selectedItem();
+	item =  ( rcListViewItem *) listDBRC->currentItem();
 	if (item) {
 	             if ( !item->rcfile.isEmpty() ) {
 			 rcfile = item->rcfile;
@@ -328,7 +347,7 @@ void dSelectDB::onCancel()
 }
 
 
-void dSelectDB::ItemRenamed(Q3ListViewItem *item, int col)
+void dSelectDB::ItemRenamed(QTreeWidgetItem *item, int col)
 {
 	if (!item) return;
 	if (col>1) return;
@@ -391,21 +410,21 @@ void dSelectDB::importItem()
 {
 	rcListViewItem *item,*gitem;
 	dImportDB *d = new dImportDB(this);
-	item = (rcListViewItem *)listDBRC->selectedItem();
+	item = (rcListViewItem *)listDBRC->currentItem();
 	if (!item) return;
 	if (withgroups)
 	{
 		if (item->parent()) gitem = ( rcListViewItem *) item->parent();
 		else gitem=item;
 		item = new rcListViewItem(gitem, tr("New shema"), "myrc");
-		gitem->setOpen(true);
+		gitem->setExpanded(true);
 
 	}
 	else
 	{
 		item = new rcListViewItem(listDBRC, tr("New shema"), "myrc");
 	}
-	listDBRC->setSelected(item, true);
+	listDBRC->setCurrentItem(item); item->setSelected(true);
 	d->setdata("", item );
 	if ( d->exec() == QDialog::Accepted )
 	{
@@ -453,7 +472,7 @@ void dSelectDB::exportItem()
 	dir = "/home";
 #endif
 
-	rcListViewItem *item =  ( rcListViewItem *) listDBRC->selectedItem();
+	rcListViewItem *item =  ( rcListViewItem *) listDBRC->currentItem();
 	if (item)
 	{
 		if ( !item->rcfile.isEmpty() && !item->group )
@@ -508,7 +527,7 @@ void dSelectDB::exportItem()
 }
 
 
-void dSelectDB::onDblClick( Q3ListViewItem *item)
+void dSelectDB::onDblClick( QTreeWidgetItem *item, int )
 {
 
 	if (! (( rcListViewItem *)item)->group )

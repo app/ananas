@@ -29,27 +29,38 @@
 #include "rclistviewitem.h"
 #include "qpixmap.h"
 
-rcListViewItem::rcListViewItem( Q3ListView *parent,
+rcListViewItem::rcListViewItem( QTreeWidget *parent,
 			const QString &name,
 			const QString &rc,
-			bool fgroup): Q3ListViewItem( parent, name )
+			bool fgroup): QTreeWidgetItem( parent, QStringList() << name )
 	{
 		init( rc, fgroup );
 	};
 
-rcListViewItem::rcListViewItem( Q3ListView *parent,
+rcListViewItem::rcListViewItem( QTreeWidget *parent,
 			rcListViewItem* after,
 			const QString &name,
 			const QString &rc,
-			bool fgroup ): Q3ListViewItem( parent, after, name )
+			bool fgroup): QTreeWidgetItem( parent, QStringList() << name )
 	{
+		if ( after ) {
+			QTreeWidgetItem *container = after->parent();
+			if ( container ) {
+				container->removeChild( this );
+				container->insertChild( container->indexOfChild( after ) + 1, this );
+			} else {
+				int idx = parent->indexOfTopLevelItem( this );
+				parent->takeTopLevelItem( idx );
+				parent->insertTopLevelItem( parent->indexOfTopLevelItem( after ) + 1, this );
+			}
+		}
 		init( rc, fgroup );
 	};
 
 rcListViewItem::rcListViewItem( rcListViewItem *parent,
 			const QString &name,
 			const QString &rc,
-			bool fgroup): Q3ListViewItem( parent, name )
+			bool fgroup): QTreeWidgetItem( parent, QStringList() << name )
 	{
 		init( rc, fgroup );
 	};
@@ -64,6 +75,6 @@ rcListViewItem::init( const QString &rc, bool fgroup)
 	{
 		group = fgroup;
 		rcfile = rc;
-		if ( group ) setPixmap(0, QPixmap(":/images/lib_dbgroup.png") );
-		else setPixmap(0, QPixmap(":/images/lib_database.png") );
+		if ( group ) setIcon(0, QIcon(":/images/lib_dbgroup.png") );
+		else setIcon(0, QIcon(":/images/lib_database.png") );
 	};

@@ -2,6 +2,7 @@
 #define DSELECTDB_H
 
 #include "ui_dselectdb.h"
+#include <QTreeWidgetItem>
 
 
 class ANANAS_EXPORT dSelectDB : public QDialog, public Ui::dSelectDB
@@ -19,10 +20,10 @@ public slots:
     void editItem();
     void deleteItem();
     void onCancel();
-    void ItemRenamed( Q3ListViewItem * item, int col );
+    void ItemRenamed( QTreeWidgetItem * item, int col );
     void onHelp();
     void createMenu();
-    virtual void onDblClick(Q3ListViewItem *);
+    virtual void onDblClick(QTreeWidgetItem *, int);
 
 protected:
     QSettings settings;
@@ -42,7 +43,7 @@ private:
 private slots:
     void init();
     void readSettings( QStringList entryGroup );
-    void itemSelect( Q3ListViewItem * item );
+    void itemSelect();
     void newGroup();
     void saveRC();
     void onOK();

@@ -29,31 +29,23 @@
 #ifndef RCLISTVIEWITEM_H
 #define RCLISTVIEWITEM_H
 
-//#include <qdir.h>
-//#include <qstring.h>
-#include <q3listview.h>
-//#include <qlineedit.h>
-//#include <qstring.h>
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+#include <QString>
+#include <QIcon>
 
-//#include "deditrc.h"
-//#include "acfgrc.h"
-//#include "atests.h"
-
-class Q3ListView;
-class Q3ListViewItem;
-
-class rcListViewItem : public Q3ListViewItem
+class rcListViewItem : public QTreeWidgetItem
 {
 public:
 	QString rcfile;
 	bool group;
 
-	rcListViewItem( Q3ListView *parent,
+	rcListViewItem( QTreeWidget *parent,
 			const QString &name = QString::null,
 			const QString &rc = QString::null,
 			bool fgroup = false );
 
-	rcListViewItem( Q3ListView *parent,
+	rcListViewItem( QTreeWidget *parent,
 			rcListViewItem* after,
 			const QString &name = QString::null,
 			const QString &rc = QString::null,
@@ -68,4 +60,3 @@ public:
 	void init( const QString &rc = QString::null, bool fgroup = false );
 };
 #endif
-

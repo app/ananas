@@ -94,9 +94,9 @@
             </widget>
           </item>
           <item>
-            <widget class="Q3ListView" name="listDBRC" >
-              <property name="hScrollBarMode" >
-                <enum>Q3ScrollView::AlwaysOff</enum>
+            <widget class="QTreeWidget" name="listDBRC" >
+              <property name="horizontalScrollBarPolicy" >
+                <enum>Qt::ScrollBarAlwaysOff</enum>
               </property>
               <property name="allColumnsShowFocus" >
                 <bool>true</bool>
@@ -137,11 +137,10 @@
     </layout>
   </widget>
   <layoutdefault spacing="5" margin="5" />
-  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
   <includes>
     <include location="local" >ananasglobal.h</include>
     <include location="local" >qmenubar.h</include>
-    <include location="local" >q3popupmenu.h</include>
+    <include location="local" >QMenu</include>
     <include location="local" >qsettings.h</include>
     <include location="local" >rclistviewitem.h</include>
     <include location="local" >qmessagebox.h</include>
@@ -161,9 +160,9 @@
     </connection>
     <connection>
       <sender>listDBRC</sender>
-      <signal>selectionChanged(Q3ListViewItem*)</signal>
+      <signal>itemSelectionChanged()</signal>
       <receiver>dSelectDB</receiver>
-      <slot>itemSelect(Q3ListViewItem*)</slot>
+      <slot>itemSelect()</slot>
     </connection>
     <connection>
       <sender>buttonHelp</sender>
@@ -173,9 +172,9 @@
     </connection>
     <connection>
       <sender>listDBRC</sender>
-      <signal>doubleClicked(Q3ListViewItem*)</signal>
+      <signal>itemDoubleClicked(QTreeWidgetItem*,int)</signal>
       <receiver>dSelectDB</receiver>
-      <slot>onDblClick(Q3ListViewItem*)</slot>
+      <slot>onDblClick(QTreeWidgetItem*,int)</slot>
     </connection>
   </connections>
 </ui>

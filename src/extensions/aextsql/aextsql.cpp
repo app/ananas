@@ -42,6 +42,7 @@
 aExtSQL::aExtSQL() : AExtension("SQL")
 {
     cursor = 0;
+    m_index = -1;
 }
 
 /**
@@ -55,9 +56,8 @@ aExtSQL::aExtSQL() : AExtension("SQL")
 int
 aExtSQL::init( aDatabase *database )
 {
-//	cursor = new Q3SqlSelectCursor(const QString::QString(""), database->db());
-	const QString emptyString = "";
-	cursor = new Q3SqlSelectCursor(emptyString, *(database->db()) );
+	cursor = new QSqlQuery( *(database->db()) );
+	m_index = -1;
 	return AExtension::init(database);
 }
 
@@ -91,10 +91,23 @@ aExtSQL::~aExtSQL()
  * \see aExtSQL::ExecQuery()
  * \see aExtSQL::ExecScalar()
  */
-Q3SqlSelectCursor *
+QSqlQuery *
 aExtSQL::Cursor() const
 {
 	return cursor;
+}
+
+bool
+aExtSQL::bufferResult()
+{
+	m_rows.clear();
+	m_index = -1;
+	if ( !cursor ) return false;
+	if ( !cursor->isSelect() ) return true;
+	while ( cursor->next() )
+		m_rows.append( cursor->record() );
+	m_index = -1;
+	return true;
 }
 
 /**
@@ -114,7 +127,10 @@ QVariant
 aExtSQL::Value(int col) const
 {
 	QVariant res = QVariant::Invalid;
-	if(cursor->count() > col && col >= 0) res = cursor->value(col);
+	if ( m_index >= 0 && m_index < m_rows.size() ) {
+		const QSqlRecord &rec = m_rows.at( m_index );
+		if ( col >= 0 && col < rec.count() ) res = rec.value( col );
+	}
 	if(res.type() == QVariant::ULongLong || res.type() == QVariant::LongLong)
 	{
 		res = res.toString();
@@ -133,7 +149,7 @@ aExtSQL::Value(int col) const
 int
 aExtSQL::Size() const
 {
-	return cursor->size();
+	return m_rows.size();
 }
 
 /**
@@ -147,7 +163,9 @@ aExtSQL::Size() const
 int 
 aExtSQL::Count() const
 {
-	return cursor->count();
+	if ( !m_rows.isEmpty() ) return m_rows.first().count();
+	if ( cursor ) return cursor->record().count();
+	return 0;
 }
 
 /**
@@ -185,7 +203,13 @@ aExtSQL::Count() const
 bool
 aExtSQL::ExecQuery( const QString & query)
 {
-	return cursor->exec(query);
+	if ( !cursor ) return false;
+	if ( !cursor->exec( query ) ) {
+		m_rows.clear();
+		m_index = -1;
+		return false;
+	}
+	return bufferResult();
 }
 
 /**
@@ -216,9 +240,15 @@ aExtSQL::ExecQuery( const QString & query)
 QVariant 
 aExtSQL::ExecScalar( const QString & query)
 {
-	cursor->exec(query);
-	if(cursor->size() > 0)
-		return cursor->value(0);
+	if ( !cursor ) return QVariant::Invalid;
+	if ( !cursor->exec( query ) ) {
+		m_rows.clear();
+		m_index = -1;
+		return QVariant::Invalid;
+	}
+	bufferResult();
+	if ( m_rows.size() > 0 )
+		return m_rows.first().value( 0 );
 	else
 		return QVariant::Invalid;
 }
@@ -241,7 +271,9 @@ aExtSQL::ExecScalar( const QString & query)
 bool
 aExtSQL::First()
 {
-	return cursor->first();
+	if ( m_rows.isEmpty() ) return false;
+	m_index = 0;
+	return true;
 }
 
 /**
@@ -260,7 +292,8 @@ aExtSQL::First()
 bool
 aExtSQL::Next()
 {
-	return cursor->next();
+	if ( m_index + 1 < m_rows.size() ) { ++m_index; return true; }
+	return false;
 }
 
 /**
@@ -279,7 +312,9 @@ aExtSQL::Next()
 bool
 aExtSQL::Last()
 {
-	return cursor->last();
+	if ( m_rows.isEmpty() ) return false;
+	m_index = m_rows.size() - 1;
+	return true;
 }
 
 
@@ -299,7 +334,8 @@ aExtSQL::Last()
 bool
 aExtSQL::Prev()
 {
-	return cursor->prev();
+	if ( m_index - 1 >= 0 ) { --m_index; return true; }
+	return false;
 }
 
 

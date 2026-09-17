@@ -44,9 +44,7 @@ default-character-set=utf8
 #include <qstringlist.h>
 //Added by qt3to4:
 #include <QSqlQuery>
-#include <Q3SqlCursor>
 #include <QSqlError>
-#include <Q3SqlRecordInfo>
 #include <QMessageBox>
 
 #include "alog.h"

@@ -1039,8 +1039,8 @@ aForm::TabNewLine(const QString &tname)
        if ( w  && !strcmp(w->className(),"wDBTable"))
        {
                wDBTable *wdb = (wDBTable*)w;
-               Q3SqlCursor *cur = wdb->sqlCursor();
-               QSqlRecord *buffer = cur->primeInsert();
+               aDataTable *cur = wdb->sqlCursor();
+               QSqlRecord *buffer = cur->insertBuffer();
                wdb->lineInsert(buffer);
                cur->insert();
        }
@@ -1059,10 +1059,10 @@ aForm::TabUpdate(const QString &tname)
        if ( w  && !strcmp(w->className(),"wDBTable"))
        {
                wDBTable *wdb = (wDBTable*)w;
-               Q3SqlCursor *cur = wdb->sqlCursor();
-               //QSqlRecord *buffer = cur->primeInsert();
+               aDataTable *cur = wdb->sqlCursor();
+               //QSqlRecord *buffer = cur->insertBuffer();
              //  wdb->lineInsert(buffer);
-               cur->primeUpdate();
+               cur->updateBuffer();
 	       cur->update();
        }
        else

@@ -156,7 +156,7 @@ public:
 	virtual int Select( ANANAS_UID db_uid );
 	aCfg*	getMd();
 
-	/* compatibility helpers replacing the Q3DataTable API */
+	/* compatibility helpers replacing the legacy table API */
 	aDataTable*	sqlCursor() const { return m_table; }
 	void		setSqlCursor( aDataTable *t ) { m_table = t; }
 	int		numCols() const { return columnCount(); }
@@ -169,6 +169,7 @@ public:
 	bool		isReadOnly() const;
 	QSqlRecord*	currentRecord();
 	void		refresh( int mode = RefreshAll );
+	QVariant	value( int row, int col );
 
 public slots:
 	void	refreshAll();

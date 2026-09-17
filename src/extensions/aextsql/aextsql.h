@@ -32,7 +32,9 @@
 
 
 #include <qobject.h>
-#include <Q3SqlSelectCursor>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QList>
 #include "adatabase.h"
 #include "aextension.h"
 #include "aobject.h"
@@ -130,9 +132,12 @@ public:
 	virtual int init( aDatabase *database );
 	~aExtSQL();
 private:
-	Q3SqlSelectCursor *cursor;
+	QSqlQuery	*cursor;
+	QList<QSqlRecord> m_rows;
+	int		m_index;
+	bool		bufferResult();
 public slots:
-	Q3SqlSelectCursor *	Cursor() const;
+	QSqlQuery *	Cursor() const;
 	QVariant		Value(int col) const;
 	int			Size() const;
 	int 			Count() const;

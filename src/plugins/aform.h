@@ -44,7 +44,6 @@
 //--#include <qsargument.h>
 #include <qmutex.h>
 //Added by qt3to4:
-#include <Q3SqlForm>
 
 #include "engine.h"
 #include "adatabase.h"
@@ -53,7 +52,6 @@
 
 
 class QWidget;
-class Q3SqlForm;
 class aWidget;
 
 

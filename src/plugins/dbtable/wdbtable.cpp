@@ -1436,6 +1436,16 @@ wDBTable::refreshAll()
 	refresh( RefreshAll );
 }
 
+QVariant
+wDBTable::value( int row, int col )
+{
+	if ( !m_table ) return QVariant();
+	QString field = m_columns.value( col );
+	if ( field.isEmpty() ) return QVariant();
+	m_table->seek( row );
+	return m_table->sysValue( field );
+}
+
 void
 wDBTable::setColumnReadOnly( int col, bool ro )
 {

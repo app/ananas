@@ -373,7 +373,7 @@ Ananas startup.
 - Packaging: schemes + templates + demo data go to
   `/usr/share/ananas/applications/inventory/`; `inventory.rc` /
   `inventory-demo.rc` to `/etc/ananas/`; a system QSettings registry
-  (`/etc/xdg/ananasgroup/ananas.conf`) makes both appear in the startup dialog.
+  (`/etc/xdg/ananas/ananas.conf`) makes both appear in the startup dialog.
 - Runtime (`aDatabase::init`): the database structure is created/updated on
   open; for internal (SQLite) schemes a relative `dbname` is resolved against
   `workdir` (with `~` expanded), the scheme templates are copied into the

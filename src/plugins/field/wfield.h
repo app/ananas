@@ -67,7 +67,7 @@ class QDESIGNER_WIDGET_EXPORT wField : public aWidget
 {
 	Q_OBJECT
 
-	Q_PROPERTY( QString value READ value WRITE setValue)
+	Q_PROPERTY( QString value READ value WRITE setValue USER true )
 	Q_PROPERTY( QString FieldType READ getFieldType WRITE setFieldType )
 	Q_PROPERTY( tEditorType EditorType READ getEditorType WRITE setEditorType )
 	Q_ENUMS(tEditorType)

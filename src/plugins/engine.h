@@ -186,6 +186,9 @@ public slots:
 
 	aDataField *enterValue( const QString &FieldType, const QString &title = "" );
 
+	// Factory used by the script constructor shims (new Document(...), ...).
+	QObject *createObject( const QString &className, const QVariantList &arguments );
+
 private slots:
 	void error ( 	const QString & message, QObject * context,
 			const QString & scriptName, int lineNumber );
@@ -196,6 +199,11 @@ signals:
 
 private:
 	void checkScriptError( const QJSValue &result, const QString &context = QString() );
+	// Install the JS API that business schemes rely on: object constructor
+	// shims, the form-method wrappers and print().
+	void installScriptApi();
+
+	aObjectsFactory *objectsFactory;
 
 	QString pr_timer;
 	QString mGlobal;

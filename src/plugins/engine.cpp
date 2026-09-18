@@ -309,15 +309,13 @@ aEngine::init( const QString &rcfile )
         md = &db->cfg;
         code = new QJSEngine();
 
-        //code->addObjectFactory( new QSInputDialogFactory );
-        //code->addObjectFactory( new aObjectsFactory( this ) );
-        //code->addObjectFactory( new QSUtilFactory );
-
-        //project.addObject( this );
-
         // Объект sys часто используется для вывода сообщений в окно сообщений
         QJSValue ananasEngineObject = code->newQObject(this);
         code->globalObject().setProperty("sys", ananasEngineObject);
+
+        // Restore the QSA-era script API that business schemes rely on.
+        objectsFactory = new aObjectsFactory( this );
+        installScriptApi();
 
 
         //project.addObject( md );
@@ -335,6 +333,76 @@ aEngine::init( const QString &rcfile )
 //                        printf("Global module is empty\n");
         }
 	return true;
+}
+
+
+
+/*!
+ * \brief Create an Ananas object for the script constructor shims.
+ */
+QObject *
+aEngine::createObject( const QString &className, const QVariantList &arguments )
+{
+	if ( !objectsFactory ) return 0;
+	return objectsFactory->create( className, arguments, this );
+}
+
+
+
+/*!
+ * \brief Install the QSA-era script API on top of QJSEngine.
+ *
+ * QSA provided native object constructors and a per-form script context; the
+ * QtScript port dropped both.  QJSEngine has no native-function constructor
+ * hook, so the constructors are JS shims over aObjectsFactory::create(), and
+ * the form methods are wrappers dispatching to the active form
+ * (__ananas_form).
+ */
+void
+aEngine::installScriptApi()
+{
+	if ( !code ) return;
+
+	QString js;
+
+	// Object constructors: new Document(...), new Catalogue(...), ...
+	const char *classes[] = {
+		"PopupMenu", "Document", "Catalogue", "Report", "CatalogEditor",
+		"ARegister", "IRegister", "Journal", "ATime", "DataField",
+		"ComboBox", 0
+	};
+	for ( int i = 0; classes[i]; i++ ) {
+		js += QString("function %1(){ return sys.createObject(\"%1\", Array.prototype.slice.call(arguments)); }\n")
+			.arg( classes[i] );
+	}
+
+	// Extension constructors: new Service(), new SQL(), ...
+	const QStringList extlist = AExtensionFactory::keys();
+	for ( int i = 0; i < extlist.count(); i++ ) {
+		js += QString("function %1(){ return sys.createObject(\"%1\", Array.prototype.slice.call(arguments)); }\n")
+			.arg( extlist[i] );
+	}
+
+	// Form methods: dispatch to the currently active form.
+	const char *formMethods[] = {
+		"done", "Show", "Close", "show", "close", "Value", "DBValue",
+		"SetValue", "SetObjValue", "SetColumnReadOnly", "ColIndex",
+		"TabCount", "TabValue", "TabDBValue", "TabNewLine", "TabUpdate",
+		"SetTabValue", "setfocus", "SetFocus", "UpdateDB", "update",
+		"turn_on", "turn_off", "SignIn", "SignOut", "Update", "SetReadOnly",
+		"IsReadOnly", "GetMode", "Propis", "MoneyToText",
+		"ConvertNumber2MoneyFormat", "ConvertDateFromIso", "EndOfDay",
+		"SelectByCurrent", "SetCurrent", "Current", "Widget", 0
+	};
+	for ( int i = 0; formMethods[i]; i++ ) {
+		js += QString("function %1(){ if (!__ananas_form) return; return __ananas_form.%1.apply(__ananas_form, arguments); }\n")
+			.arg( formMethods[i] );
+	}
+
+	// print() goes to the message window and stdout.
+	js += "function print(){ var a=[]; for (var i=0;i<arguments.length;i++) a.push(arguments[i]); sys.Message(0, a.join(\" \")); }\n";
+
+	checkScriptError( code->evaluate( js ), tr("script api") );
 }
 
 

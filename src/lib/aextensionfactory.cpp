@@ -66,9 +66,8 @@ AExtensionFactoryPrivate::AExtensionFactoryPrivate()
     extensionKeys.clear();
     QDir extensionsDirectory( extensionsDirName );
     QStringList extensionFiles = extensionsDirectory.entryList( QDir::Files );
-    QString fileName = extensionFiles.first();
     for (int i=0; i<extensionFiles.count(); i++){
-      fileName = extensionFiles[i];
+      QString fileName = extensionFiles[i];
       pluginLoader.setFileName( extensionsDirectory.absoluteFilePath( fileName ) );
       plugin = pluginLoader.instance();
       if (plugin) {

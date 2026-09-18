@@ -200,6 +200,10 @@ private:
 	bool		RO;
 	aWidget*	mainWidget;
 	aWidget*	callerWidget;
+
+	// Saved value of the engine's __ananas_form while this form is active.
+	QJSValue	m_prevFormContext;
+	bool		m_formContextSet = false;
 };
 
 

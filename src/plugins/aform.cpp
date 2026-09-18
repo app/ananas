@@ -176,6 +176,9 @@ aForm::aForm( QWidget *parent,  aEngine *eng, QString oftype, QObject *aobj )
 
 aForm::~aForm()
 {
+	if ( m_formContextSet && engine && engine->code ) {
+		engine->code->globalObject().setProperty( "__ananas_form", m_prevFormContext );
+	}
 }
 
 aWidget *
@@ -276,6 +279,15 @@ aForm::init()
 	aCfgItem obj;
 	static QMutex mutex;
 	mainWidget = 0;
+
+	// Make this form the current script context so that its methods are
+	// reachable from the form module and the global module helpers.
+	if ( engine && engine->code ) {
+		m_prevFormContext = engine->code->globalObject().property( "__ananas_form" );
+		engine->code->globalObject().setProperty( "__ananas_form", engine->code->newQObject( this ) );
+		m_formContextSet = true;
+	}
+
 	if ( !mdObj.isNull() && md ) {
 		ui = md->sText( mdObj, md_formdesign );
 		sModule = md->sText( mdObj, md_sourcecode );

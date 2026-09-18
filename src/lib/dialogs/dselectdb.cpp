@@ -15,7 +15,7 @@
  */
 dSelectDB::dSelectDB(QWidget* parent, const char* name, bool modal, Qt::WindowFlags fl)
     : QDialog(parent, fl)
-    ,settings( QSettings::IniFormat, QSettings::UserScope, "Ananas company Ltd", "Ananas4")
+    ,settings( QSettings::NativeFormat, QSettings::UserScope, "ananas", "ananas")
 {
     Q_UNUSED(name);
     setModal(modal);

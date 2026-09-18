@@ -126,7 +126,7 @@ int main( int argc, char ** argv )
 	QPixmap pixmap;
 
 	// Для QSettings
-	a.setOrganizationName("ananasgroup");
+	a.setOrganizationName("ananas");
         a.setApplicationName("ananas");
 
 	if ( parseCommandLine( &a ) ) return 1;

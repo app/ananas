@@ -87,7 +87,7 @@ install: build
 	# inventory schemes: metadata, report templates, rc files and registry
 	mkdir -p $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory
 	mkdir -p $(CURDIR)/debian/ananas/etc/ananas
-	mkdir -p $(CURDIR)/debian/ananas/etc/xdg/ananasgroup
+	mkdir -p $(CURDIR)/debian/ananas/etc/xdg/ananas
 	cp -f ./applications/inventory/inventory.cfg $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
 	cp -f ./applications/inventory/inventory-demo.cfg $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
 	cp -f ./applications/inventory/inventory-demo-data.sql $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
@@ -95,7 +95,7 @@ install: build
 	cp -f ./applications/ananas-cfg.dtd $(CURDIR)/debian/ananas/usr/share/ananas/applications/inventory/
 	cp -f ./build/ubuntu/inventory.rc $(CURDIR)/debian/ananas/etc/ananas/inventory.rc
 	cp -f ./build/ubuntu/inventory-demo.rc $(CURDIR)/debian/ananas/etc/ananas/inventory-demo.rc
-	cp -f ./build/ubuntu/ananas.conf $(CURDIR)/debian/ananas/etc/xdg/ananasgroup/ananas.conf
+	cp -f ./build/ubuntu/ananas.conf $(CURDIR)/debian/ananas/etc/xdg/ananas/ananas.conf
 
 #	rm -Rf $(CURDIR)/debian/ananas/usr/include/ananas || :
 #	rm -f $(CURDIR)/debian/ananas/usr/share/doc/ananas/*.tex || :

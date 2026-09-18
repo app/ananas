@@ -112,6 +112,10 @@ int main( int argc, char ** argv )
 	bool ok;
 	QPixmap pixmap;
 
+	// Для QSettings
+	a.setOrganizationName("ananas");
+	a.setApplicationName("ananas");
+
 	qApp->addLibraryPath( qApp->applicationDirPath() );
 	if ( parseCommandLine( &a ) ) return 1;
 //	qApp->installTranslator( &tr_app );

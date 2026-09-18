@@ -76,6 +76,7 @@ public slots:
 	int		view();
 	int		markDelete();
 	int		copy();
+	virtual ERR_Code New();
 
 protected slots:
 	void		setFilterByDate();

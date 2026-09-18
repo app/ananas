@@ -227,6 +227,24 @@ wJournal::insert()
 }
 
 
+/*!
+ *\~english
+ *	A journal is a list of documents and has no record of its own, so the
+ *	form-level New() must not insert a row into the journal table.  A new
+ *	document is created through insert() (the "New document" toolbar action).
+ *\~russian
+ *	Журнал является списком документов и не имеет собственной записи, поэтому
+ *	New() на уровне формы не должен добавлять строку в таблицу журнала.
+ *	Новый документ создаётся через insert() (кнопка "Новый документ").
+ *\~
+ */
+ERR_Code
+wJournal::New()
+{
+	return err_noerror;
+}
+
+
 int
 wJournal::update()
 {

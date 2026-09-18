@@ -328,7 +328,7 @@ CatalogForm::init()
     connect(LineEdit, 	SIGNAL	(keyEnterPressed()),
 	    this, 	SLOT	(go()));
 
-    connect(ListView,	SIGNAL	(expanded ( QTreeWidgetItem *)),
+    connect(ListView,	SIGNAL	(itemExpanded ( QTreeWidgetItem *)),
 	    this,	SLOT	(onLoadElements( QTreeWidgetItem *)));
 
     connect(ListHint, 	SIGNAL	(lostFocus()),
@@ -350,13 +350,13 @@ CatalogForm::init()
      this,  SLOT (go()));
 
     connect(ListHint,  SIGNAL (sendMessage(const QString &)),
-     this->statusBar(),  SLOT (message( const QString &)));
+     this->statusBar(),  SLOT (showMessage( const QString &)));
 
     connect(ListView,  SIGNAL (sendMessage(const QString &)),
-     this->statusBar(),  SLOT (message( const QString &)));
+     this->statusBar(),  SLOT (showMessage( const QString &)));
 
     connect(LineEdit,  SIGNAL (sendMessage(const QString &)),
-     this->statusBar(),  SLOT (message( const QString &)));
+     this->statusBar(),  SLOT (showMessage( const QString &)));
 
     LineEdit->setFocus();
 }

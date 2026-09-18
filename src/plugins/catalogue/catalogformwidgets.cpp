@@ -165,7 +165,7 @@ aLineEdit::aLineEdit ( QWidget* parent, const char* name) : QLineEdit(parent)
 		this,	SLOT	(timerDone()));
 	connect(this,	SIGNAL	(textChanged ( const QString & )),
 		this,  	SLOT	(timerRestart(const QString &)));
-	connect(this,	SIGNAL	(lostFocus()),
+	connect(this,	SIGNAL	(editingFinished()),
 			SLOT	(stopTimer()));
 }
 

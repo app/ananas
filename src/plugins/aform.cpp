@@ -499,7 +499,7 @@ aForm::Show()
 
 		form->show();
 		((QWidget*)form->parent())->move(0,0);
-		connect( form, SIGNAL(destroyed()), this, SLOT(close()) );
+		connect( form, SIGNAL(destroyed()), this, SLOT(Close()) );
     }
 }
 
@@ -1382,7 +1382,7 @@ aForm::on_actionbutton()
 					form->hide();
 //#endif
 				}
-	                        close();
+	                        Close();
                          }
                 } else {
 			if(b->getActionId())
@@ -1509,7 +1509,7 @@ aForm::on_tabselected( qulonglong uid )
 	emit selected( uid );
 	if ( closeAfterSelect ) {
 		aLog::print(aLog::Debug, QObject::tr("aForm::on_tabselected(...),   closeAfterSelect is true"));
-		close();
+		Close();
 	} else {
 		aLog::print(aLog::Debug, QObject::tr("aForm::on_tabselected(...),   closeAfterSelect is false"));
 	}

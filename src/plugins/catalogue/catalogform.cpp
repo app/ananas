@@ -949,7 +949,22 @@ return key;
 
 void CatalogForm::doOk()
 {
-	close();
+	closeWindow();
+}
+
+/*!
+ * Closes the MDI window.  CatalogForm is shown inside a QMdiSubWindow created
+ * by QMdiArea::addSubWindow(); closing the widget itself only hides it and
+ * leaves an empty frame behind, so close the frame instead (it carries
+ * WA_DeleteOnClose and deletes the form with it).
+ */
+void CatalogForm::closeWindow()
+{
+	QWidget *frame = parentWidget();
+	if ( frame && frame->inherits("QMdiSubWindow") )
+		frame->close();
+	else
+		close();
 }
 
 
@@ -961,7 +976,7 @@ void CatalogForm::keyPressEvent( QKeyEvent * e )
 	}
 	if ( e->key()==Qt::Key_Escape)
 	{
-		close();
+		closeWindow();
 	}
 	e->ignore();
 }

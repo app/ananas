@@ -78,6 +78,7 @@ private:
 
 private slots:
     virtual void doOk();
+    void closeWindow();
 
 };
 

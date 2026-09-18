@@ -43,6 +43,8 @@ and an external `libqdataschema`.
     against the `applications/inventory` scheme (SQLite): slot binding via
     `newQObject`, global function call, `QVariant` bridging and `isError()`
     detection all pass.
+  - Phase 3b restored the QSA script API (object constructors, form-method
+    context, `print`) that business-scheme scripts rely on.
 - **Phase 4 (Qt5 → Qt6): done.**
   - `docker/Containerfile.qt6` (Ubuntu 24.04 + Qt 6.4) and `scripts/build-qt6.sh`
     produce a Qt6-only `dist/ananas_0.9.6-1_amd64.deb`; the SQL driver packages
@@ -284,6 +286,28 @@ Note: this phase is Qt4→Qt5 only; the Qt5→Qt6 items (`QTextCodec`, `QRegExp`
   global function calls, `QVariant` bridging and `isError()` all pass.
 - Compatibility note: `aEngine::code` changes type, a source-level break for any
   plugin touching it (none in-tree; Qt4 ABI is incompatible anyway).
+
+### Phase 3b — restore the QSA script API (done)
+
+The Qt3→Qt4 port replaced QSA with QtScript but dropped the QSA execution
+environment, so business-scheme scripts (`<sourcecode>` in the `.cfg`) no
+longer ran. Restored on top of QJSEngine (core, transparent to schemes):
+
+- Object constructors: `aEngine` owns an `aObjectsFactory` and installs JS
+  constructor shims (`new Document(...)`, `new Catalogue(...)`,
+  `new Report(...)`, `new ARegister(...)`, extension classes such as
+  `new Service()`/`new SQL()`) calling
+  `sys.createObject()` → `aObjectsFactory::create()`.
+- Form context: `aForm` sets itself as `__ananas_form`; global wrappers for the
+  `aForm` slots (`Value`, `SetValue`, `TabValue`, `Widget`, `Propis`, ...)
+  dispatch to it, so form modules and the global-module helpers resolve the
+  form methods.
+- `print()` writes to the message window and stdout.
+- Fixed `AExtensionFactoryPrivate` crashing on an empty extension directory
+  (exposed by calling `keys()`).
+
+Verified: shims present, `new Catalogue()` returns a QObject, a real document
+form module loads and `on_formstart` runs without `ReferenceError`.
 
 ## Phase 4 — Qt5 → Qt6 (done)
 

@@ -999,6 +999,7 @@ aDatabase::uid ( int otype )
 int
 aDatabase::uidType ( qulonglong uid )
 {
+        if ( !uid ) return 0;
         QSqlQuery q = db()->exec ( QString ( "SELECT otype FROM uniques WHERE id=%1" ).arg ( uid ) );
         if ( q.first() )
                 return q.value ( 0 ).toInt();

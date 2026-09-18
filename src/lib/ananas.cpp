@@ -144,7 +144,8 @@ ananas_objectstr( aDatabase *db, qulonglong uid, int oid )
 
 //	printf("objstr uid = %Ld\n", uid );
 	if ( !db ) return "<>";
-	if ( !oid ) oid = db->uidType( oid );
+	if ( !uid ) return res;
+	if ( !oid ) oid = db->uidType( uid );
 	fto = db->cfg.find( oid );
 	if ( !fto.isNull() ) {
 		oclass = db->cfg.objClass( fto );

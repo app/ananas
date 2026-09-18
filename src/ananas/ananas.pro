@@ -27,7 +27,7 @@ SOURCES = \
 
 #FORMS = qadocjournal.ui
 
-RESOURCE = \
+RESOURCES += \
     ananas.qrc
     
 TRANSLATIONS = \

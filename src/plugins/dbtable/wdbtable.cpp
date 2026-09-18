@@ -929,6 +929,27 @@ wField::tEditorType type = wField::Unknown;
 	tmp->engine = m_table->engine;
 	return tmp;
 }
+
+/*!
+ *	Fill the editor with the cell value.  For a reference column the cell shows
+ *	the object name but the editor must be initialized with the stored id, so
+ *	the id is taken straight from the data table.
+ */
+void
+aEditorFactory::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+	wField *field = qobject_cast<wField *>(editor);
+	aDataTable *t = m_table ? m_table->sqlCursor() : 0;
+	if ( field && t ) {
+		QString colField = m_table->columnField( index.column() );
+		if ( !colField.isEmpty() && t->sysFieldExists( "text_" + colField ) ) {
+			t->seek( index.row() );
+			field->setValue( t->sysValue( colField ).toString() );
+			return;
+		}
+	}
+	QStyledItemDelegate::setEditorData( editor, index );
+}
 void
 aEditorFactory::setMd(aCfg * cfg)
 {
@@ -1191,6 +1212,11 @@ wDBTable::updateTableCellHandler(int r, int c)
 			m_table->seek( r );
 			m_table->setSysValue( m_columns.at(c), it->text() );
 			m_table->Update();
+			// The editor stores the raw value (a reference column keeps the
+			// object id), so show the display form again (the object name).
+			m_populating = true;
+			it->setText( displayValue( m_columns.at(c) ) );
+			m_populating = false;
 		}
 	}
 }
@@ -1495,6 +1521,10 @@ QString
 wDBTable::displayValue( const QString & field ) const
 {
 	if ( !m_table ) return QString();
+	// Reference columns keep the object id in `ufNNN`; the human-readable
+	// name is the calculated `text_ufNNN` field.
+	if ( m_table->sysFieldExists( "text_" + field ) )
+		return m_table->sysValue( "text_" + field ).toString();
 	QVariant v = m_table->sysValue( field );
 	if ( m_table->field( field ).type() == QVariant::DateTime && v.isValid() )
 		return v.toDate().toString();

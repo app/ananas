@@ -301,6 +301,7 @@ class aEditorFactory: public QStyledItemDelegate
 public:
 	aEditorFactory( wDBTable *table );
 	QWidget * createEditor (QWidget * parent, const QStyleOptionViewItem & option, const QModelIndex & index) const;
+	void setEditorData(QWidget *editor, const QModelIndex &index) const override;
 	void setMd(aCfg *md);
 private:
 	wDBTable *m_table;

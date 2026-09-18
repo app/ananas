@@ -176,9 +176,6 @@ aForm::aForm( QWidget *parent,  aEngine *eng, QString oftype, QObject *aobj )
 
 aForm::~aForm()
 {
-	if ( m_formContextSet && engine && engine->code ) {
-		engine->code->globalObject().setProperty( "__ananas_form", m_prevFormContext );
-	}
 }
 
 aWidget *
@@ -280,12 +277,8 @@ aForm::init()
 	static QMutex mutex;
 	mainWidget = 0;
 
-	// Make this form the current script context so that its methods are
-	// reachable from the form module and the global module helpers.
 	if ( engine && engine->code ) {
-		m_prevFormContext = engine->code->globalObject().property( "__ananas_form" );
-		engine->code->globalObject().setProperty( "__ananas_form", engine->code->newQObject( this ) );
-		m_formContextSet = true;
+		m_jsObject = engine->code->newQObject( this );
 	}
 
 	if ( !mdObj.isNull() && md ) {
@@ -389,17 +382,34 @@ aForm::init()
 		connectSlots();
 		if ( !sModule.isEmpty() )
 		{
-//                        engine->project.interpreter()->evaluate(sModule,this );
-                        QJSValue result = engine->code->evaluate(sModule);
-                        if ( result.isError() ) {
-                            aLog::print(aLog::Error, tr("aForm form module script error: %1").arg(result.toString()));
-                        }
+			// Evaluate the module in a per-form scope (QSA evaluated each
+			// form module in its own context).  The IIFE keeps the module's
+			// functions private to the form while still resolving the shared
+			// functions of the global module through the scope chain.
+			static const char *const callbacks[] = {
+				"on_formstart", "on_formstop", "on_conduct", "on_button",
+				"on_valuechanged", "on_tabupdate", "on_tablerow", "on_event",
+				"on_tabrowselected", 0
+			};
+			QString wrapper = "(function(){\n";
+			wrapper += sModule;
+			wrapper += "\nvar __ananas_exports = {};\n";
+			for ( int i = 0; callbacks[i]; i++ ) {
+				wrapper += QString("__ananas_exports[\"%1\"] = (typeof %1 !== \"undefined\") ? %1 : undefined;\n")
+					.arg( callbacks[i] );
+			}
+			wrapper += "return __ananas_exports;\n})()";
+
+			QJSValue prev = engine->code->globalObject().property( "__ananas_form" );
+			engine->code->globalObject().setProperty( "__ananas_form", m_jsObject );
+			QJSValue result = engine->code->evaluate( wrapper );
+			engine->code->globalObject().setProperty( "__ananas_form", prev );
+			if ( result.isError() ) {
+				aLog::print(aLog::Error, tr("aForm form module script error: %1").arg(result.toString()));
+			} else {
+				m_scope = result;
+			}
 			aLog::print(aLog::Debug, tr("aForm load form module script"));
-//			QStringList lst = engine->project.interpreter()->functions(this);
-//			for(uint i=0; i<lst.count();i++)
-//			{
-//				aLog::print(aLog::Debug, tr("aForm defined function %1").arg(lst[i]));
-//			}
 		}
 		else
 		{
@@ -413,6 +423,34 @@ aForm::init()
 		QMessageBox::critical( 0, tr("Error"), tr("Error open dialog form. Form not found.") );
 
 	}
+}
+
+/*!
+ *\~english
+ *	Call a lifecycle function defined in this form's module.  The function is
+ *	taken from the per-form scope captured in init(), so it belongs to this
+ *	form only; the engine's shared (global module) functions are untouched.
+ *\~russian
+ *	Вызывает lifecycle-функцию из модуля данной формы. Функция берется из
+ *	per-form области, захваченной в init(), поэтому принадлежит только этой
+ *	форме; общие функции глобального модуля не затрагиваются.
+ *\~
+ */
+QJSValue
+aForm::callModuleFunction(const QString &name, const QJSValueList &args)
+{
+	if ( !engine || !engine->code || !m_scope.isObject() )
+		return QJSValue();
+	QJSValue fn = m_scope.property( name );
+	if ( !fn.isCallable() )
+		return QJSValue();
+
+	QJSValue global = engine->code->globalObject();
+	QJSValue prev = global.property( "__ananas_form" );
+	global.setProperty( "__ananas_form", m_jsObject );
+	QJSValue res = fn.call( args );
+	global.setProperty( "__ananas_form", prev );
+	return res;
 }
 
 /*!
@@ -457,13 +495,7 @@ aForm::Show()
 {
 	if ( form )
 	{
-//		if ( engine->project.interpreter()->functions( this ).indexOf("on_formstart")!=-1)
-//		{
-//			engine->project.interpreter()->call("on_formstart", QVariantList(), this);
-//		}
-                if ( engine->code->globalObject().property("on_formstart").isCallable() ){
-                    engine->code->globalObject().property("on_formstart").call();
-                }
+		callModuleFunction( "on_formstart" );
 
 		form->show();
 		((QWidget*)form->parent())->move(0,0);
@@ -547,14 +579,7 @@ aForm::SignIn(){
         QJSValue res;
 	if ( form && !mainWidget->dataObject()->IsConducted())
 	{
-//		if ( engine->project.interpreter()->functions( this ).indexOf("on_conduct")!=-1)
-//		{
-//			res  = engine->project.interpreter()->call("on_conduct",QVariantList(), this);
-//		}
-                if ( engine->code->globalObject().property("on_conduct").isCallable() ){
-                    res = engine->code->globalObject().property("on_conduct").call();
-                }
-
+		res = callModuleFunction( "on_conduct" );
 	}
         // if return false
         if ( res.isBool() && res.toBool() == false )
@@ -1326,14 +1351,9 @@ aForm::SetFocus(){
 
 void
 aForm::on_button(){
-//	if ( engine->project.interpreter()->functions(this).indexOf("on_button")!=-1)
-//	{
-//		engine->project.interpreter()->call("on_button",QVariantList()<<sender()->objectName(),this);
-//	}
-        if ( engine->code->globalObject().property("on_button").isCallable() ){
-            engine->code->globalObject().property("on_button").call();
-        }
-
+	QJSValueList list;
+	list << sender()->objectName();
+	callModuleFunction( "on_button", list );
 }
 
 
@@ -1389,12 +1409,7 @@ aForm::on_lostfocus(){
 void
 aForm::on_form_close(){
 	if(!engine) return;
-//	if ( engine->project.interpreter()->functions(this).indexOf("on_formstop")!=-1) {
-//		engine->project.interpreter()->call("on_formstop", QVariantList(),this);
-//	}
-        if ( engine->code->globalObject().property("on_formstop").isCallable() ){
-            engine->code->globalObject().property("on_formstop").call();
-        }
+	callModuleFunction( "on_formstop" );
 }
 
 
@@ -1439,46 +1454,21 @@ aForm::on_valueChanged(const QString &s){
 void
 aForm::on_valueChanged( const QString & name, const QVariant & val )
 {
-
-//	if ( engine->project.interpreter()->functions(this).indexOf("on_valuechanged")!=-1)
-//	{
-//		QList<QVariant> lst;
-//		lst << name;
-//		lst << val;
-//		engine->project.interpreter()->call("on_valuechanged",QVariantList(lst), this);
-//	}
-        if ( engine->code->globalObject().property("on_valuechanged").isCallable() ){
-            QJSValueList list;
-            list.append(QJSValue(name));
-            list.append( engine->code->toScriptValue(val));
-            engine->code->globalObject().property("on_valuechanged")
-                    .call(list);
-        }
-
+	QJSValueList list;
+	list << name;
+	list << engine->code->toScriptValue( val );
+	callModuleFunction( "on_valuechanged", list );
 }
 
 
 void
 aForm::on_tabvalueChanged(int row, int col)
 {
-
-//	if ( engine->project.interpreter()->functions(this).indexOf("on_tabupdate")!=-1)
-//	{
-//		QList<QVariant> lst;
-//		lst << row;
-//		lst << col;
-//		lst << sender()->objectName();
-//
-//		engine->project.interpreter()->call("on_tabupdate",QVariantList(lst), this);
-//	}
-        if ( engine->code->globalObject().property("on_tabupdate").isCallable() ){
-            QJSValueList list;
-            list << row;
-            list << col;
-            list << sender()->objectName();
-            engine->code->globalObject().property("on_tabupdate")
-                    .call(list);
-        }
+	QJSValueList list;
+	list << row;
+	list << col;
+	list << sender()->objectName();
+	callModuleFunction( "on_tabupdate", list );
 }
 
 
@@ -1497,30 +1487,18 @@ aForm::on_dbtablerow( QSqlRecord *r )
 //	if ( engine->project.interpreter()->functions(this).indexOf("on_tablerow")!=-1) {
 //		engine->project.interpreter()->call("on_tablerow", QVariantList()<<sender()->objectName(), this);
 //	}
-        if ( engine->code->globalObject().property("on_tablerow").isCallable() ){
-            QJSValueList list;
-            list << sender()->objectName();
-            engine->code->globalObject().property("on_tablerow")
-                    .call(list);
-        }
+	QJSValueList list;
+	list << sender()->objectName();
+	callModuleFunction( "on_tablerow", list );
 }
 
 void
 aForm::on_event( const QString &source, const QString &data )
 {
-//	QList<QVariant> lst;
-//	lst << source;
-//	lst << data;
-//	if ( engine->project.interpreter()->functions(this).indexOf("on_event")!=-1) {
-//		engine->project.interpreter()->call("on_event", QVariantList(lst), this);
-//	}
-        if ( engine->code->globalObject().property("on_event").isCallable() ){
-            QJSValueList list;
-            list << source;
-            list << data;
-            engine->code->globalObject().property("on_event")
-                    .call(list);
-        }
+	QJSValueList list;
+	list << source;
+	list << data;
+	callModuleFunction( "on_event", list );
 }
 
 
@@ -1540,19 +1518,10 @@ aForm::on_tabselected( qulonglong uid )
 void
 aForm::on_tablerow( qulonglong uid )
 {
-//	QList<QVariant> lst;
-//	lst << sender()->objectName();
-//	lst << QString("%1").arg(uid);
-//	if ( engine->project.interpreter()->functions(this).indexOf("on_tabrowselected")!=-1) {
-//		engine->project.interpreter()->call("on_tabrowselected", QVariantList(lst), this);
-//	}
-        if ( engine->code->globalObject().property("on_tabrowselected").isCallable() ){
-            QJSValueList list;
-            list << sender()->objectName();
-            list << QString("%1").arg(uid);
-            engine->code->globalObject().property("on_tabrowselected")
-                    .call(list);
-        }
+	QJSValueList list;
+	list << sender()->objectName();
+	list << QString("%1").arg(uid);
+	callModuleFunction( "on_tabrowselected", list );
 }
 
 int
@@ -1816,7 +1785,7 @@ aForm::SelectByCurrent(aObject *doc)
 	if(mainWidget)
 	{
 		int res = doc->select(mainWidget->uid());
-		aLog::print(aLog::Debug, QObject::tr("aForm SelectByCurrent %1 ended with %1").arg(mainWidget->uid()).arg(res));
+		aLog::print(aLog::Debug, QObject::tr("aForm SelectByCurrent %1 ended with %2").arg(mainWidget->uid()).arg(res));
 	}
 }
 

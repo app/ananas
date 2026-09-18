@@ -201,9 +201,12 @@ private:
 	aWidget*	mainWidget;
 	aWidget*	callerWidget;
 
-	// Saved value of the engine's __ananas_form while this form is active.
-	QJSValue	m_prevFormContext;
-	bool		m_formContextSet = false;
+	// Per-form script context.  The module's functions are evaluated inside an
+	// IIFE and captured here, so lifecycle callbacks are dispatched to the
+	// form that defined them (QSA evaluated each module per form context).
+	QJSValue	m_scope;
+	QJSValue	m_jsObject;
+	QJSValue	callModuleFunction(const QString &name, const QJSValueList &args = QJSValueList());
 };
 
 

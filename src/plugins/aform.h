@@ -191,6 +191,7 @@ protected:
 	virtual void initWidget( QWidget *widget, aDatabase *adb );
 	virtual void initContainer( aWidget *widget, aDatabase *adb );
 	aWidget *parentContainer( QWidget *widget );
+	bool eventFilter( QObject *obj, QEvent *event ) override;
 private:
 	QObject*	dbobject;
 	int		tobj, objid;
@@ -200,6 +201,12 @@ private:
 	bool		RO;
 	aWidget*	mainWidget;
 	aWidget*	callerWidget;
+
+	// The QMdiSubWindow frame the form widget lives in (created by
+	// QMdiArea::addSubWindow).  Closing it also deletes the form widget.
+	QWidget*	m_subWindow = 0;
+	bool		m_closing = false;
+	void		shutdown( bool windowClosing );
 
 	// Per-form script context.  The module's functions are evaluated inside an
 	// IIFE and captured here, so lifecycle callbacks are dispatched to the

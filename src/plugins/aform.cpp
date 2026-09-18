@@ -377,6 +377,12 @@ aForm::init()
                 }
             //--
             ((QMdiArea*)engine->ws)->addSubWindow(form);
+            // QMdiArea wraps the form widget in a QMdiSubWindow (the frame with
+            // the title bar).  Closing that frame is what removes the window;
+            // watch it so a close from the frame itself cleans this form up.
+            m_subWindow = form->parentWidget();
+            if ( m_subWindow )
+                m_subWindow->installEventFilter( this );
             form->show();
 
 		connectSlots();
@@ -499,7 +505,6 @@ aForm::Show()
 
 		form->show();
 		((QWidget*)form->parent())->move(0,0);
-		connect( form, SIGNAL(destroyed()), this, SLOT(Close()) );
     }
 }
 
@@ -527,21 +532,60 @@ aForm::show() {
 */
 void
 aForm::Close() {
-        // don't call function name() in this place in Win32 - crash
+	shutdown( false );
+}
+
+/*!
+ *\~english
+ *	Close the form once: run the form module's on_formstop, drop it from the
+ *	window list and destroy the MDI frame (which also destroys the form
+ *	widget).  \a windowClosing is true when the close already comes from the
+ *	QMdiSubWindow itself, so the frame must not be closed again.
+ *\~russian
+ *	Однократно закрывает форму: вызывает on_formstop модуля формы, убирает
+ *	её из списка окон и уничтожает MDI-рамку (вместе с виджетом формы).
+ *	\a windowClosing = true, если закрытие идёт уже от самого QMdiSubWindow,
+ *	тогда рамку повторно не закрываем.
+ *\~
+ */
+void
+aForm::shutdown( bool windowClosing ) {
+	if ( m_closing ) return;
+	m_closing = true;
+
+	// don't call function name() in this place in Win32 - crash
 	emit(closeForm(selectedCatId()));
 	on_form_close(); //to run ananas-script
-	
+
 	if( form ) {
-		if( form->isVisible() ) {
-			aLog::print(aLog::Debug,tr("aForm::Close() hides form"));
-			disconnect( form );
-			form->hide();
-		}
+		aLog::print(aLog::Debug,tr("aForm::Close() hides form"));
+		disconnect( form );
 	}
 	if( engine && engine->wl ) {
 		engine->wl->remove( objid, db_uid );
 	}
-    deleteLater();
+	if( !windowClosing && m_subWindow ) {
+		// QMdiArea::addSubWindow() sets WA_DeleteOnClose, so this destroys the
+		// frame and the form widget with it.
+		m_subWindow->close();
+	}
+	deleteLater();
+}
+
+/*!
+ *\~english
+ *	Catch the QMdiSubWindow close (title bar button) so the form is cleaned up
+ *	the same way as with the in-form close button.
+ *\~russian
+ *	Перехватывает закрытие QMdiSubWindow (кнопка в шапке окна), чтобы форма
+ *	очищалась так же, как при закрытии кнопкой внутри формы.
+ *\~
+ */
+bool
+aForm::eventFilter( QObject *obj, QEvent *event ) {
+	if ( m_subWindow && obj == m_subWindow && event->type() == QEvent::Close )
+		shutdown( true );
+	return QObject::eventFilter( obj, event );
 }
 
 /**
@@ -1372,18 +1416,7 @@ aForm::on_actionbutton()
                 if ( b->isAction() ) {
                         if ( b->isActionUpdate() ) update();
                         if ( b->isActionTurnOn() ) turn_on();
-                        if ( b->isActionClose() )
-                        {
-	                       	if(form)
-				if( form->isVisible() )
-				{
-//#ifndef _Windows
-					form->disconnect();
-					form->hide();
-//#endif
-				}
-	                        Close();
-                         }
+                        if ( b->isActionClose() ) Close();
                 } else {
 			if(b->getActionId())
 			{

@@ -64,7 +64,8 @@ aToolBar::ReadTool( aCfgItem &obj )
 		            md_active_picture,
                   		0
 		);	// first action pixmap cfg object
-	QPixmap pix( md->binary( apix ) );	// pixmap
+	QPixmap pix;	// pixmap
+	pix.loadFromData( md->binary( apix ) );	// Qt3 QPixmap(QByteArray) was removed; load from data
 	QAction *a = new QAction(
 		QIcon(pix), // pixmap
 		md->attr( aobj, mda_name), // name

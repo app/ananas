@@ -69,7 +69,11 @@ wField::wField( QWidget *parent, const char *name, Qt::WindowFlags fl )
 	md_fid = 0;
 	setSizePolicy( QSizePolicy( QSizePolicy::Preferred, QSizePolicy::Fixed ) );
 	setFocusPolicy(Qt::StrongFocus);
-	new QHBoxLayout( this );
+	QHBoxLayout *lay = new QHBoxLayout( this );
+	// Qt3 used QHBoxLayout(this, 0, 0); the style default margins squeeze the
+	// contents in a table cell editor so the value is clipped top and bottom.
+	lay->setContentsMargins( 0, 0, 0, 0 );
+	lay->setSpacing( 0 );
 	lineEdit = new QLineEdit(this);
 	lineEdit->hide();
 	dateEdit = new wDateEdit(this);

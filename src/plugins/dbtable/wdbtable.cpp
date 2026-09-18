@@ -927,6 +927,11 @@ wField::tEditorType type = wField::Unknown;
 	tmp->setEditorType(type);
 	tmp->initObject( m_table->db );
 	tmp->engine = m_table->engine;
+	// A custom editor does not fill its background (QWidget is transparent in
+	// Qt4/6), so the item text underneath would show through the editor.  Make
+	// the cell editor opaque.
+	tmp->setAutoFillBackground( true );
+	tmp->setBackgroundRole( QPalette::Base );
 	return tmp;
 }
 

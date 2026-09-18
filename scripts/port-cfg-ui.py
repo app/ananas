@@ -58,6 +58,11 @@ def normalize(ui):
     # Any leftover direct Q3 widget references.
     ui = ui.replace('class="Q3Frame"', 'class="QFrame"')
     ui = ui.replace('class="Q3Table"', 'class="QTableWidget"')
+    ui = ui.replace('class="Q3GroupBox"', 'class="QGroupBox"')
+    ui = ui.replace('class="Q3DateEdit"', 'class="QDateEdit"')
+
+    # Qt3 Q3Table::focusStyle has no equivalent on QTableWidget.
+    ui = re.sub(r"\s*<property name=\"focusStyle\">.*?</property>", "", ui, flags=re.DOTALL)
 
     # Qt3 <cstring> element -> Qt4 <string>.
     ui = re.sub(r"<cstring\s*/>", "<string/>", ui)

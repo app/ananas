@@ -1242,6 +1242,22 @@ wDBTable::updateCurrent()
 	return res;
 }
 
+/*!
+ *	Commit the value of the currently open cell editor to the model/data table
+ *	and close it.  The editor is normally committed when it loses focus, but a
+ *	wField editor keeps the focus on a child (focus proxy), so clicking a form
+ *	button does not commit it and the last edited value would be lost.
+ */
+void
+wDBTable::commitEditor()
+{
+	if ( state() != QAbstractItemView::EditingState ) return;
+	QWidget *editor = viewport()->findChild<wField*>();
+	if ( !editor ) return;
+	commitData( editor );
+	closeEditor( editor, QAbstractItemDelegate::SubmitModelCache );
+}
+
 
 /*!
  *	Double click handler.

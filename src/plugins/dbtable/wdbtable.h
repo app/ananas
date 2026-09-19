@@ -170,6 +170,7 @@ public:
 	QSqlRecord*	currentRecord();
 	void		refresh( int mode = RefreshAll );
 	QVariant	value( int row, int col );
+	void		commitEditor();
 
 public slots:
 	void	refreshAll();

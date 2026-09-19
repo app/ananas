@@ -90,6 +90,22 @@ static QObjectList aQueryList( QObject *parent, const char *type )
 	return res;
 }
 
+/*!
+ *	Commit any open cell editor of the form's tables.  A wField cell editor
+ *	keeps the focus on a child widget, so the value is not committed when a
+ *	form button is clicked; do it explicitly before saving or conducting.
+ */
+static void
+commitTableEditors( aWidget *mainWidget )
+{
+	if ( !mainWidget ) return;
+	const QObjectList l = aQueryList( mainWidget, "wDBTable" );
+	for ( QObject *o : l ) {
+		wDBTable *t = qobject_cast<wDBTable*>( o );
+		if ( t ) t->commitEditor();
+	}
+}
+
 aForm::aForm()
 :QObject( 0 )
 {
@@ -621,6 +637,7 @@ aForm::turn_on(){
 int
 aForm::SignIn(){
         QJSValue res;
+	commitTableEditors( mainWidget );
 	if ( form && !mainWidget->dataObject()->IsConducted())
 	{
 		res = callModuleFunction( "on_conduct" );
@@ -681,6 +698,7 @@ aForm::UpdateDB()
 	aWidget*	aw = NULL;
 
 	if ( RO ) return err_readonly;
+	commitTableEditors( mainWidget );
 	rc = mainWidget->Update();
 	if (!rc && callerWidget!=NULL)
 	{
@@ -1686,6 +1704,7 @@ int
 aForm::Update()
 {
         if ( mainWidget ) {
+                commitTableEditors( mainWidget );
                 mainWidget->Update();
         }
         return err_noerror;

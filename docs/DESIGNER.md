@@ -277,3 +277,14 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
   - Stripped the stale `iCCP` chunk from the designer splash PNGs (libpng
     `known incorrect sRGB profile` warning); added `strip-png-iccp.py`.
   - Gate: package builds; the installed app starts with no libpng warning.
+- **2026-09-22** — **Widget-box drag-and-drop fixed.**
+  - The widget box starts a drag via
+    `core->formWindowManager()->dragItems()`, which passes `core->topLevel()`
+    to `QDesignerMimeData::execDrag()` as the drag source. The workbench never
+    called `core->setTopLevel()`, so `QDrag` had no source and dropping a
+    widget on a form did nothing.
+  - `aDesignerWorkbench` now calls `m_core->setTopLevel(this)` and, after
+    opening a form, `formWindow->editWidgets()` (activate the widget tool);
+    the smoke asserts `core->topLevel()`.
+  - Note: Qt6 Designer's widget box only supports drag-and-drop, not
+    double-click insertion (the list view only handles `pressed`).

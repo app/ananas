@@ -394,13 +394,13 @@
     </connection>
     <connection>
       <sender>ListCol</sender>
-      <signal>highlighted(int)</signal>
+      <signal>currentRowChanged(int)</signal>
       <receiver>eDBTable</receiver>
       <slot>ColumnSel(int)</slot>
     </connection>
     <connection>
       <sender>ComboBoxTable</sender>
-      <signal>activated(QString)</signal>
+      <signal>textActivated(QString)</signal>
       <receiver>eDBTable</receiver>
       <slot>ColumnUpd()</slot>
     </connection>
@@ -418,7 +418,7 @@
     </connection>
     <connection>
       <sender>ComboBoxTable</sender>
-      <signal>activated(QString)</signal>
+      <signal>textActivated(QString)</signal>
       <receiver>ListCol</receiver>
       <slot>setFocus()</slot>
     </connection>

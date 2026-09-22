@@ -125,7 +125,7 @@
     </connection>
     <connection>
       <sender>eName</sender>
-      <signal>activated(QString)</signal>
+      <signal>textActivated(QString)</signal>
       <receiver>eDBField</receiver>
       <slot>namechanged(QString)</slot>
     </connection>

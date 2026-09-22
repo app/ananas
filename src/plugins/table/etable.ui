@@ -249,7 +249,7 @@
     </connection>
     <connection>
       <sender>ListCol</sender>
-      <signal>highlighted(int)</signal>
+      <signal>currentRowChanged(int)</signal>
       <receiver>eTable</receiver>
       <slot>ColumnSel(int)</slot>
     </connection>

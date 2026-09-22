@@ -480,29 +480,31 @@ aWidget::widgetEditor()
 void
 aWidget::widgetEditor(  QWidget *object, QDialog *editor )
 {
-        aCfg *md = 0;
 	QWidget *mw = object->topLevelWidget();
         aWidget o( mw );
-	if ( mw->objectName() == QString( "ananas-designer_mainwindow" ) )
+	// getMd() locates the designer main window among all top-level widgets
+	// and returns null when it is absent (i.e. in the runtime engine). The
+	// editor must not depend on the widget's own top-level window being the
+	// main window: in the form designer the edited form lives in a separate
+	// top-level window.
+	aCfg *md = o.getMd();
+	if ( !md )
 	{
-                md = o.getMd();
-		if ( !md )
+		aLog::print(aLog::Error, tr("aWidget widgetEditor: invalid metadata object") );
+		delete editor;
+		return;
+	}
+	if ( editor ) {
+		connect( &o, SIGNAL( setData( QWidget *, aCfg* ) ), editor, SLOT( setData( QWidget *, aCfg* ) ) );
+		connect( &o, SIGNAL( getData( QWidget * ) ), editor, SLOT( getData( QWidget * ) ) );
+		o.setObjectData( object, md );
+		if ( editor->exec() == QDialog::Accepted )
 		{
-			aLog::print(aLog::Error, tr("aWidget widgetEditor: invalid metadata object") );
-			return;
+			o.getObjectData( object );
+			//o.updateProp();
 		}
-		if ( editor ) {
-			connect( &o, SIGNAL( setData( QWidget *, aCfg* ) ), editor, SLOT( setData( QWidget *, aCfg* ) ) );
-			connect( &o, SIGNAL( getData( QWidget * ) ), editor, SLOT( getData( QWidget * ) ) );
-			o.setObjectData( object, md );
-			if ( editor->exec() == QDialog::Accepted )
-			{
-				o.getObjectData( object );
-				//o.updateProp();
-			}
-			delete editor;
-			editor = 0;
-		}
+		delete editor;
+		editor = 0;
 	}
 }
 

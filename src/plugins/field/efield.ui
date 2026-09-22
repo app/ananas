@@ -197,7 +197,7 @@
     </connection>
     <connection>
       <sender>eType</sender>
-      <signal>activated(QString)</signal>
+      <signal>textActivated(QString)</signal>
       <receiver>eField</receiver>
       <slot>typechanged(QString)</slot>
     </connection>

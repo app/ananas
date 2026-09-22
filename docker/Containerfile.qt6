@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libqt6sql6-mysql \
     libqt6sql6-psql \
     libmysqlclient-dev \
+    libxkbcommon-dev \
     wget \
     unzip \
     git \

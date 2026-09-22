@@ -129,7 +129,9 @@ podman run --rm -it -v "$PWD":/workspace:z ananas-qt6-builder bash
 
 ## Porting helpers
 
-Used while porting the codebase (see `docs/PORTING.md`).
+Used while porting the codebase (see `docs/PORTING.md`). The Phase 6 designer
+work (wrapper + metadata editor) has its own plan and progress log in
+`docs/DESIGNER.md`.
 
 ```sh
 # Read-only burndown report of remaining Qt3Support/QtScript usage

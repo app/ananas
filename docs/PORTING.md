@@ -384,11 +384,16 @@ Ananas startup.
   demo loads its data, templates are provisioned once, and a second run does
   not duplicate data or overwrite templates.
 
-## Phase 6 — Designer (deferred, out of scope)
+## Phase 6 — Designer (in progress)
 
-- Options: (a) metadata editor + stock Qt Designer with our widget plugins;
-  (b) rebase the vendored Designer fork onto Qt5/6 sources. Revisit after the
-  Qt5/6 runtime is done.
+- Plan and progress log: `docs/DESIGNER.md`.
+- Decision: replace the vendored Qt4 Designer fork (`src/designer/formdesigner/`)
+  with a thin wrapper over the **public** Qt6 Designer API
+  (`Qt6::Designer` + `libQt6DesignerComponents.so`). Rebasing the fork would
+  require vendoring the Qt6 Designer app layer plus its private headers, which
+  Ubuntu does not ship; the wrapper needs only public API.
+- Part A (wrapper) starts first; Part B ports the metadata editor
+  (`src/designer` top level); Part C covers build and packaging.
 
 ## Skills and tooling by phase
 

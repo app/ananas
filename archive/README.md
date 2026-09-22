@@ -8,6 +8,12 @@ for history and for reproducing the last state that built under Qt5.
 | --------- | ------- |
 | `qt4/`    | Ubuntu 14.04 + Qt4 (the original baseline) |
 | `qt5/`    | Ubuntu 24.04 + Qt 5.15 (the intermediate port) |
+| `qt4-designer-fork/` | The vendored Qt4 Designer fork from `src/designer/formdesigner/` |
+
+`qt4-designer-fork/` was removed from the active tree in Phase 6 and replaced
+by a thin wrapper over the public Qt6 Designer API (see `../docs/DESIGNER.md`).
+It is kept only for reference; it is Qt4 code using Qt Designer private
+headers and does not build against Qt6.
 
 The scripts had to be moved one directory deeper, so their workspace path
 resolution was adjusted (`WORKSPACE_DIR` is now three levels above the script

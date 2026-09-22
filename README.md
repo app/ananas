@@ -1,7 +1,7 @@
 # Ananas
 
-Ananas is a free accounting automation platform for Linux (and, historically,
-Windows). This repository contains the whole system: the engine, the
+Ananas is a free accounting automation platform for Linux and Windows. This
+repository contains the whole system: the engine, the
 administrator, the designer, the libraries and the bundled `qdataschema`.
 
 Built with **Qt6** and **CMake** (qmake is no longer used).

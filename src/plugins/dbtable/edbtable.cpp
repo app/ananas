@@ -217,6 +217,10 @@ QStringList lst;
 	eColHeader->setText((ListCol->currentItem() ? ListCol->currentItem()->text() : QString()));
 	eColHeader->blockSignals(false);
 	ind = ListCol->currentRow();
+	// The per-column lists come from widget properties and may be shorter than
+	// the header list; indexing them out of range would assert in Qt6.
+	if (ind < 0 || ind >= cwidth.count() || ind >= fname.count() || ind >= idlist.count())
+		return;
 	str = cwidth[ind];
 	eColWidth->setValue(str.toInt());
 	eColWidth->blockSignals(false);
@@ -323,6 +327,8 @@ int i;
 		}
 		for(uint j=0; j<ListCol->count(); j++)
 		{
+			if (j >= (uint)fname.count() || j >= (uint)cwidth.count())
+				continue;
 			ListCol->setCurrentRow(j);
 			str = (ListCol->currentItem() ? ListCol->currentItem()->text() : QString());
 			lst << str;
@@ -384,11 +390,14 @@ aWidget *wo;
 	//	table->setProperty("ColWidth",*v);
 	//ComboBoxTable->setFocus();
 //       	tmp_table = *t;
-		lst = table->property("DefHeaders").toStringList();
-		ListCol->insertItems(0,lst);
+		// Fill the per-column lists before inserting the headers: inserting
+		// the first header emits currentRowChanged, which calls ColumnSel()
+		// and reads these lists.
 		cwidth = table->property("ColWidth").toStringList();
 		fname = table->property("DefFields").toStringList();
 		idlist = table->property("DefIdList").toStringList();
+		lst = table->property("DefHeaders").toStringList();
+		ListCol->insertItems(0,lst);
 		findDeletedFields(idTable,idlist);
 	}
 	else
@@ -476,7 +485,7 @@ void eDBTable::ColWidthChange( int value )
 	int ind;
 	QString num;
 	ind = ListCol->currentRow();
-	if(ind!=-1)
+	if(ind!=-1 && ind < cwidth.count())
 	{
 		cwidth[ind] = num.setNum(value);
 	}

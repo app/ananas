@@ -116,6 +116,12 @@ port=5432
 service postgresql restart
 
 
+_Лицензия_
+
+Ananas распространяется на условиях GNU General Public License version 2.
+Полный текст лицензии находится в файле COPYING.
+
+
 
 
 

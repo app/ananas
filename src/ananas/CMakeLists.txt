@@ -9,7 +9,7 @@ set_target_properties(ananas PROPERTIES
     BUILD_RPATH "${ANANAS_LIB_DIR};${ANANAS_DESIGNER_DIR}")
 
 target_link_libraries(ananas PRIVATE
-    ananaslib ananasplugin ananas_common ${QDATASCHEMA_LIBRARY})
+    ananaslib ananasplugin ananas_common qdataschema)
 
 # libananasplugin.so lives under <libdir>/ananas/designer, which is not in the
 # default loader path.

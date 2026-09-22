@@ -17,7 +17,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
 # Qt6 uic defaults to pointer-to-member connections, which fail to compile for
@@ -35,13 +35,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(Qt6 REQUIRED COMPONENTS
     Core Gui Widgets PrintSupport Sql Xml Qml Designer Test)
-
-# External libqdataschema (installed by the build image).
-find_library(QDATASCHEMA_LIBRARY NAMES qdataschema REQUIRED)
-find_path(QDATASCHEMA_INCLUDE_DIR NAMES qdataschema.h
-    PATHS
-        /usr/include/x86_64-linux-gnu/qt6/qdataschema
-        /usr/share/qt6/include/qdataschema)
 
 # Common include paths and Qt modules: the CMake analog of ananas.pri,
 # lib.pri and plugins.pri.
@@ -65,8 +58,7 @@ target_include_directories(ananas_common INTERFACE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugins/grouptree
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugins/journal
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugins/report
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugins/table
-    ${QDATASCHEMA_INCLUDE_DIR})
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugins/table)
 target_link_libraries(ananas_common INTERFACE
     Qt6::Widgets Qt6::PrintSupport Qt6::Sql Qt6::Xml Qt6::Qml)
 target_compile_features(ananas_common INTERFACE cxx_std_17)
@@ -76,12 +68,14 @@ set(ANANAS_LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(ANANAS_DESIGNER_DIR ${ANANAS_LIB_DIR}/designer)
 set(ANANAS_BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bin)
 
+include(GNUInstallDirs)
+
+add_subdirectory(src/qdataschema)
 add_subdirectory(src/lib)
 add_subdirectory(src/editor)
 add_subdirectory(src/plugins)
 add_subdirectory(src/ananas)
 add_subdirectory(src/admin)
+add_subdirectory(src/designer)
 add_subdirectory(src/extensions)
 add_subdirectory(src/test)
-
-include(GNUInstallDirs)

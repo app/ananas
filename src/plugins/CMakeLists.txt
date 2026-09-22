@@ -68,7 +68,7 @@ set_target_properties(ananasplugin PROPERTIES
     BUILD_RPATH ${ANANAS_LIB_DIR})
 
 target_link_libraries(ananasplugin PRIVATE
-    ananaslib ananas_common Qt6::Designer ${QDATASCHEMA_LIBRARY})
+    ananaslib ananas_common Qt6::Designer qdataschema)
 
 # Expose the plugin AUTOUIC headers to consumers (symmetry with libananas).
 target_include_directories(ananas_common INTERFACE

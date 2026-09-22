@@ -8,7 +8,7 @@ function(ananas_add_extension name)
         LIBRARY_OUTPUT_DIRECTORY ${ANANAS_LIB_DIR}
         BUILD_RPATH ${ANANAS_LIB_DIR})
     target_link_libraries(${name} PRIVATE
-        ananaslib ananas_common ${QDATASCHEMA_LIBRARY})
+        ananaslib ananas_common qdataschema)
     install(TARGETS ${name}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/ananas)
 endfunction()

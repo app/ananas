@@ -9,4 +9,4 @@ set_target_properties(ananas-test PROPERTIES
     BUILD_RPATH "${ANANAS_LIB_DIR};${ANANAS_DESIGNER_DIR}")
 
 target_link_libraries(ananas-test PRIVATE
-    ananaslib ananasplugin ananas_common Qt6::Test ${QDATASCHEMA_LIBRARY})
+    ananaslib ananasplugin ananas_common Qt6::Test qdataschema)

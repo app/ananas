@@ -16,6 +16,6 @@ set_target_properties(ananas-administrator PROPERTIES
     INSTALL_RPATH "/usr/lib/ananas/designer")
 
 target_link_libraries(ananas-administrator PRIVATE
-    ananaslib ananasplugin ananas_common ${QDATASCHEMA_LIBRARY})
+    ananaslib ananasplugin ananas_common qdataschema)
 
 install(TARGETS ananas-administrator RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

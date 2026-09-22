@@ -59,7 +59,7 @@ set_target_properties(ananaslib PROPERTIES
     SOVERSION 1
     LIBRARY_OUTPUT_DIRECTORY ${ANANAS_LIB_DIR})
 
-target_link_libraries(ananaslib PRIVATE ananas_common ${QDATASCHEMA_LIBRARY})
+target_link_libraries(ananaslib PRIVATE ananas_common qdataschema)
 
 # Public libananas headers (e.g. dselectdb.h) include generated ui_*.h headers;
 # expose the AUTOUIC include directory to every consumer of ananas_common.

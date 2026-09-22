@@ -211,3 +211,33 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
 - **2026-09-22** — **Step 4 (no regression): done.**
   - `smoke-qt6.sh`: clean build + `ananas-test` **7/7**, `Total fails: 0`.
   - `smoke-designer-qt6.sh`: green after the clean.
+
+### Part B — metadata editor port (done)
+
+- **2026-09-22** — **Part B: done.**
+  - `designer.pro` configured for Qt6: dropped `QT += script scripttools`
+    and `-lqt4designer`, added `QT += designer qml` and
+    `-lQt6DesignerComponents`; `src/designer/formdesigner/` references
+    already removed (Part A).
+  - Added two porting helpers: `scripts/port-designer-ui.py` (Qt4 `.ui`
+    with Qt3 widgets -> Qt6 `.ui`) and `scripts/port-designer-q3.py`
+    (mechanical Qt3 class/QString renames in C++).
+  - Converted all 19 `.ui` files; they pass `uic -c string` on Qt6.
+  - Ported the C++ sources: `QWorkspace`->`QMdiArea`, `Q3ListView`->
+    `QTreeWidget`, `Q3Table`->`QTableWidget`, `Q3IntDict`->`QHash`,
+    `Q3TextEdit`/`ScriptEdit`->`QPlainTextEdit` accessors, `Q3PopupMenu`->
+    `QMenu`, `Q3FileDialog`->`QFileDialog`, `QString::sprintf`->`arg`,
+    `QWorkspace`/`setCaption`/`QMAX`/`QDir::homeDirPath` and the removed
+    `QMessageBox::warning(..., button texts)` overload, `QSplashScreen::message`
+    ->`showMessage`, etc.
+  - Dead Qt3 Trolltech code `embed.{cpp,h}` moved to
+    `tools/archive/qt4-designer-fork/`.
+  - `port-metrics.sh` now includes `src/designer`; **Q3* / Qt3Support / q3
+    includes / Q3 `.ui` are all 0**.
+  - Gates: `ananas-designer` builds and links; `smoke-designer-qt6.sh`
+    green (wrapper round-trip + `ananas-designer --help` starts MainForm);
+    `smoke-qt6.sh` still **7/7**.
+  - Known follow-ups: some string-based `connect()`s still use Qt3 signal
+    signatures and are runtime no-ops (tab change, item rename/double-click);
+    item rename via `editItem()` needs `Qt::ItemIsEditable`. These are
+    behavioral, not build, issues and are tracked for Part C/manual smoke.

@@ -22,6 +22,7 @@
 //#include <qseditor.h>
 #include <qapplication.h>
 #include <QTextStream>
+#include <QDir>
 
 #include "formdesigner.h"
 #include "mainform.h"
@@ -96,7 +97,7 @@ void dEditDialog::setData( aListViewItem *o )
 		eName->setText( md->attr( obj, mda_name ) );
 		eDescription->setPlainText( md->sText( obj, md_description ) );
                 eModule->setPlainText( md->sText( obj, md_sourcecode ) );
-		eFormFile->setText( QString("inputform_")+QString::number(item->id)+QString(".ui"));
+		eFormFile->setText( QDir::tempPath()+QString("/inputform_")+QString::number(item->id)+QString(".ui"));
 		setWindowTitle( tr("Form:") + eName->text() );
 		parentClass = md->objClass( md->parent ( md->parent( obj ) ) );
 		docId = md->id(md->parent(md->parent( obj )));
@@ -332,6 +333,7 @@ void dEditDialog::formPreview()
     fb.addPluginPath("/usr/lib/ananas/designer");
     QWidget *form = fb.load(d);
 	d->close();
+	f.remove();
 	if (form) form->show();
 	else printf("Error create form\n");
 

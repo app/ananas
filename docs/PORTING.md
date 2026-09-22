@@ -72,9 +72,10 @@ and an external `libqdataschema`.
   `port` @ `b2f77d0` (Phase 1 result). Tooling lives in the `tools` repo
   (`main`), sources in `ananas-legacy-qt4` / `ananas-legacy-qdataschema`
   (branch `qt6`).
-- Phases 1–5 are done; the next step is packaging (deferred): update `debian/`
-  and the legacy `build/*` (RPM/Inno/menus) for Qt6/CMake, or add CPack. The
-  legacy scripts are kept, not deleted.
+- Phases 1–6 are done. The Ubuntu `.deb` (debhelper) ships the engine, the
+  administrator, the designer and the inventory scheme. Remaining deferred
+  work: the non-Ubuntu packaging (`build/rpm`, `build/win32` Inno, menus) and
+  CPack; the legacy scripts are kept, not deleted.
 - Commands:
   - burndown: `bash tools/scripts/port-metrics.sh`
   - Qt6 build + tests: `bash tools/scripts/smoke-qt6.sh`
@@ -384,7 +385,7 @@ Ananas startup.
   demo loads its data, templates are provisioned once, and a second run does
   not duplicate data or overwrite templates.
 
-## Phase 6 — Designer (in progress)
+## Phase 6 — Designer (done)
 
 - Plan and progress log: `docs/DESIGNER.md`.
 - Decision: replace the vendored Qt4 Designer fork (`src/designer/formdesigner/`)
@@ -392,8 +393,15 @@ Ananas startup.
   (`Qt6::Designer` + `libQt6DesignerComponents.so`). Rebasing the fork would
   require vendoring the Qt6 Designer app layer plus its private headers, which
   Ubuntu does not ship; the wrapper needs only public API.
-- Part A (wrapper) starts first; Part B ports the metadata editor
-  (`src/designer` top level); Part C covers build and packaging.
+- Part A (wrapper): `src/designer/designer6/aworkbench.*` plus the
+  `aFormDesigner` facade; the Qt4 fork is archived in `tools/archive/`.
+- Part B (metadata editor): the `src/designer` top-level sources and 19 `.ui`
+  forms are ported to Qt6; `Q3*`/Qt3Support are 0 (`port-metrics.sh`).
+- Part C (build & packaging): `ananas-designer` is built as part of the main
+  tree and shipped in the `.deb` (`/usr/bin/ananas-designer`,
+  `/usr/lib/libqtscriptedit.so*`, desktop file, translations, icon). The
+  packaged app starts on the inventory scheme, creates the SQLite DB and runs
+  without connect warnings.
 
 ## Skills and tooling by phase
 

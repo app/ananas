@@ -29,30 +29,20 @@
 #ifndef FORMDESIGNER_H
 #define FORMDESIGNER_H
 
-#include <QMouseEvent>
-#include <QCloseEvent>
-#include <QMainWindow>
+#include "designer6/aworkbench.h"
 
-
-class QDesignerWorkbench;
- 
-class aFormDesigner : public QMainWindow
+// Facade kept for the metadata editor, which only opens/saves forms and
+// shows/hides the designer window.
+class aFormDesigner : public aDesignerWorkbench
 {
+    Q_OBJECT
+
 public:
-	aFormDesigner();
-	virtual ~aFormDesigner();
-	void show();
-	void hide();
-	void fileOpen(const QString&);
-	void fileSaveAll();
-        QDesignerWorkbench *workbench();
+    aFormDesigner();
+    ~aFormDesigner() override;
 
-protected:
-	virtual void closeEvent( QCloseEvent *e );
-	virtual void mouseDoubleClickEvent ( QMouseEvent * e );
-
-private:
-    QDesignerWorkbench *m_workbench;
+    void fileOpen(const QString &fileName);
+    void fileSaveAll();
 };
 
-#endif
+#endif // FORMDESIGNER_H

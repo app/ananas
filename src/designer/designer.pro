@@ -7,7 +7,7 @@ CONFIG += designer debug
 
 DESTDIR = ../../bin
 
-INCLUDEPATH += . ./formdesigner ./formdesigner/private  ../lib ../../tmp/ui/ananas ../plugins ../editor
+INCLUDEPATH += . ./designer6 ../lib ../../tmp/ui/ananas ../plugins ../editor
 LIBS += -L../../lib -lananas -lqt4designer -L../../lib/designer -lananasplugin -lqdataschema -L../editor -lqtscriptedit
 unix {
     #LIBS += -L$(QTINC)/QtDesigner
@@ -79,22 +79,7 @@ HEADERS	= \
     mdtree.h \
     pixmappreview.h \
     roleeditor.h     \
-    formdesigner/formwindowsettings.h \
-    formdesigner/newform.h \
-    formdesigner/plugindialog.h \
-    formdesigner/qdesigner_actioneditor.h \
-    formdesigner/qdesigner_actions.h \
-    formdesigner/qdesigner_formwindow.h \
-    formdesigner/qdesigner_objectinspector.h \
-    formdesigner/qdesigner_pch.h \
-    formdesigner/qdesigner_propertyeditor.h \
-    formdesigner/qdesigner_resourceeditor.h \
-    formdesigner/qdesigner_settings.h \
-    formdesigner/qdesigner_signalsloteditor.h \
-    formdesigner/qdesigner_toolwindow.h \
-    formdesigner/qdesigner_widgetbox.h \
-    formdesigner/qdesigner_workbench.h \
-    formdesigner/saveformastemplate.h
+    designer6/aworkbench.h
 
 SOURCES	= \
     actiontree.cpp \
@@ -124,21 +109,7 @@ SOURCES	= \
     mainform.cpp \
     mdtree.cpp \
     roleeditor.cpp     \
-    formdesigner/formwindowsettings.cpp \
-    formdesigner/newform.cpp \
-    formdesigner/plugindialog.cpp \
-    formdesigner/qdesigner_actioneditor.cpp \
-    formdesigner/qdesigner_actions.cpp \
-    formdesigner/qdesigner_formwindow.cpp \
-    formdesigner/qdesigner_objectinspector.cpp \
-    formdesigner/qdesigner_propertyeditor.cpp \
-    formdesigner/qdesigner_resourceeditor.cpp \
-    formdesigner/qdesigner_settings.cpp \
-    formdesigner/qdesigner_signalsloteditor.cpp \
-    formdesigner/qdesigner_toolwindow.cpp \
-    formdesigner/qdesigner_widgetbox.cpp \
-    formdesigner/qdesigner_workbench.cpp \
-    formdesigner/saveformastemplate.cpp
+    designer6/aworkbench.cpp
 
 FORMS = \
     cfgform.ui \
@@ -159,11 +130,7 @@ FORMS = \
     deditrole.ui \
     dedittoolbar.ui \
     deditwebform.ui \
-    mainform.ui     \
-    formdesigner/formwindowsettings.ui \
-    formdesigner/newform.ui \
-    formdesigner/plugindialog.ui \
-    formdesigner/saveformastemplate.ui
+    mainform.ui
 
 RESOURCES = \
     designer.qrc 

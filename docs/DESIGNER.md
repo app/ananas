@@ -263,3 +263,17 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
   - Note: `dh_shlibdeps` resolves `libqt6designer6` /
     `libqt6designercomponents6` from their shlibs, so no manual `Depends`
     entry is needed.
+
+### Runtime smoke fixes
+
+- **2026-09-22** — **First runtime errors from the GUI smoke: fixed.**
+  - `dEditDialog::formPreview()` built the form with a bare `QFormBuilder`
+    that had no plugin path, so custom widgets (e.g. `wCatalogue`) failed with
+    `QFormBuilder was unable to create a widget of the class 'wCatalogue'`.
+    Added the same plugin paths as `aForm`: `applicationDirPath()`,
+    `<appdir>/../lib/designer` and `/usr/lib/ananas/designer`. Verified with a
+    standalone `QFormBuilder` probe: the catalogue form fails without the
+    plugin path and loads with it.
+  - Stripped the stale `iCCP` chunk from the designer splash PNGs (libpng
+    `known incorrect sRGB profile` warning); added `strip-png-iccp.py`.
+  - Gate: package builds; the installed app starts with no libpng warning.

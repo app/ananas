@@ -1,0 +1,56 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 1. Qt6 toolchain + Debian packaging tools. Ubuntu 24.04 ships Qt 6.4 plus
+#    QtQml (QJSEngine) and QtDesigner/QtUiTools.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    devscripts \
+    debhelper \
+    dh-make \
+    fakeroot \
+    qt6-base-dev \
+    qt6-base-dev-tools \
+    qt6-tools-dev \
+    qt6-tools-dev-tools \
+    qt6-declarative-dev \
+    libqt6sql6-sqlite \
+    libqt6sql6-mysql \
+    libqt6sql6-psql \
+    libmysqlclient-dev \
+    libxkbcommon-dev \
+    wget \
+    unzip \
+    git \
+    xvfb \
+    ccache \
+    && rm -rf /var/lib/apt/lists/*
+
+# The project build system invokes `qmake` and `lrelease` by name; point them
+# at Qt6 (qt6-l10n-tools installs lrelease under /usr/lib/qt6/bin).
+RUN ln -sf /usr/lib/qt6/bin/qmake6 /usr/local/bin/qmake && \
+    ln -sf /usr/lib/qt6/bin/lrelease /usr/local/bin/lrelease && \
+    qmake -v && lrelease -version
+
+# ccache in front of gcc/g++: speeds up repeated (including clean) builds.
+ENV PATH=/usr/lib/ccache:$PATH
+ENV CCACHE_MAXSIZE=5G
+ENV CCACHE_COMPRESS=1
+
+# 2. Build and install libqdataschema for Qt6 (branch `qt6`).
+COPY ananas-legacy-qdataschema /tmp/qdataschema
+RUN cd /tmp/qdataschema && \
+    git checkout -q qt6 && \
+    cd src/lib && \
+    qmake && \
+    make -j"$(nproc)" && \
+    mkdir -p /usr/include/x86_64-linux-gnu/qt6/qdataschema /usr/share/qt6/include/qdataschema && \
+    cp -df /tmp/qdataschema/lib/* /usr/lib/ && \
+    cp -f /tmp/qdataschema/src/lib/*.h /usr/include/x86_64-linux-gnu/qt6/qdataschema/ && \
+    cp -f /tmp/qdataschema/src/lib/*.h /usr/share/qt6/include/qdataschema/ && \
+    ldconfig && \
+    rm -rf /tmp/qdataschema
+
+WORKDIR /workspace

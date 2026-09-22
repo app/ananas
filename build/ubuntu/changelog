@@ -1,3 +1,13 @@
+ananas (0.9.7-1) noble; urgency=medium
+
+  * Build the whole tree with CMake; drop qmake.
+  * Bundle libqdataschema as src/qdataschema and ship it as a separate
+    libqdataschema binary package (library, headers, qdsadm).
+  * Replace the vendored Qt4 Designer fork with a wrapper over the public Qt6
+    Designer API.
+
+ -- Ananas Project <project@ananas.su>  Tue, 22 Sep 2026 12:00:00 +0300
+
 ananas (0.9.6-2) noble; urgency=medium
 
   * Port to Qt6; a CMake build is available alongside qmake.

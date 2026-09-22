@@ -120,7 +120,7 @@
 #include "atests.h"
 #include "afilter.h"
 
-#define ANANAS_LIBVERSION "0.9.6"
+#define ANANAS_LIBVERSION "0.9.7"
 extern const char ANANAS_EXPORT *ananas_libversion();
 //extern bool ANANAS_EXPORT ananas_login( QString &rcfile, QString &username, QString &userpassword );
 extern bool ANANAS_EXPORT ananas_login( QString &rcfile, QString &username, QString &userpassword, aDatabase *db=0, int appId = 0 );

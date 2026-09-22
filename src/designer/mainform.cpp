@@ -361,13 +361,13 @@ void MainForm::closeEvent( QCloseEvent *e )
 
 void MainForm::connectSignals( CfgForm *cf )
 {
-    connect(objNewFormAction, SIGNAL(activated()), cf, SLOT(newForm()));
-    connect(objNewTableAction, SIGNAL(activated()), cf, SLOT(newTable()));
-    connect(objNewFieldAction, SIGNAL(activated()), cf, SLOT(newField()));
-    connect(objRenameAction, SIGNAL(activated()), cf->mdtree, SLOT(itemRename()));
-    connect(objNewObjAction, SIGNAL(activated()), cf->mdtree, SLOT(itemNew()));
-    connect(objEditAction, SIGNAL(activated()), cf->mdtree, SLOT(itemEdit()));
-    connect(objDeleteAction, SIGNAL(activated()), cf->mdtree, SLOT(itemDelete()));
+    connect(objNewFormAction, SIGNAL(triggered()), cf, SLOT(newForm()));
+    connect(objNewTableAction, SIGNAL(triggered()), cf, SLOT(newTable()));
+    connect(objNewFieldAction, SIGNAL(triggered()), cf, SLOT(newField()));
+    connect(objRenameAction, SIGNAL(triggered()), cf->mdtree, SLOT(itemRename()));
+    connect(objNewObjAction, SIGNAL(triggered()), cf->mdtree, SLOT(itemNew()));
+    connect(objEditAction, SIGNAL(triggered()), cf->mdtree, SLOT(itemEdit()));
+    connect(objDeleteAction, SIGNAL(triggered()), cf->mdtree, SLOT(itemDelete()));
 }
 
 

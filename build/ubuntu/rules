@@ -82,6 +82,7 @@ install: build
 	
 
 	cp -f ./build/menus/kde/ananas.desktop $(CURDIR)/debian/ananas/usr/share/applications/
+	cp -f ./build/menus/kde/ananas-designer.desktop $(CURDIR)/debian/ananas/usr/share/applications/
 	cp -f ./build/icons/*.png $(CURDIR)/debian/ananas/usr/share/pixmaps/
 
 	# inventory schemes: metadata, report templates, rc files and registry

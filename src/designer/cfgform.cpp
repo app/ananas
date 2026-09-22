@@ -169,22 +169,22 @@ CfgForm::init( QString &rcf, bool flagNew )	//	flagNew shows if it needs to crea
     k->setSpacing(2);
     k->addWidget( interfacetree, 0, 0);
     // connection toolbar actions
-    connect(mainform->objMetadataNewAction, SIGNAL(activated()), mdtree, SLOT( itemNew() ) );
-    connect(mainform->objMetadataEditAction, SIGNAL(activated()), mdtree, SLOT( itemEdit() ) );
-    connect(mainform->objActionsNewAction, SIGNAL(activated()), actiontree, SLOT( itemNewAction() ) );
-    connect(mainform->objActionsNewGroupAction, SIGNAL(activated()), actiontree, SLOT( itemNewGroup() ) );
-    connect(mainform->objActionsEditAction, SIGNAL(activated()), actiontree, SLOT( itemEdit() ) );
-    connect(mainform->objInterfaceNewCommandAction, SIGNAL(activated()), interfacetree, SLOT( itemNewCommand() ) );
-    connect(mainform->objInterfaceNewSubmenuAction, SIGNAL(activated()), interfacetree, SLOT( itemNewSubmenu() ) );
-    connect(mainform->objInterfaceNewSeparatorAction, SIGNAL(activated()), interfacetree, SLOT( itemNewSeparator() ) );
-    connect(mainform->objInterfaceEditAction, SIGNAL(activated()), interfacetree, SLOT( itemEdit() ) );
-    connect(mainform->objImageCollectionAddAction, SIGNAL(activated()), this, SLOT( bAddImage_clicked() ) );
-    connect(mainform->objLanguagesNewAction, SIGNAL(activated()), this, SLOT( bAdd_clicked() ) );
-    connect(mainform->objLanguagesEditAction, SIGNAL(activated()), this, SLOT( bEdit_clicked() ) );
-    connect(mainform->objLanguagesClearAction, SIGNAL(activated()), this, SLOT( bKill_clicked() ) );
-    connect(mainform->objRoleNewAction, SIGNAL(activated()), this, SLOT( bAddRole_clicked() ) );
-    connect(mainform->objRoleEditAction, SIGNAL(activated()), this, SLOT( bEditRole_clicked() ) );
-    connect(mainform->objRoleClearAction, SIGNAL(activated()), this, SLOT( bKillRole_clicked() ) );
+    connect(mainform->objMetadataNewAction, SIGNAL(triggered()), mdtree, SLOT( itemNew() ) );
+    connect(mainform->objMetadataEditAction, SIGNAL(triggered()), mdtree, SLOT( itemEdit() ) );
+    connect(mainform->objActionsNewAction, SIGNAL(triggered()), actiontree, SLOT( itemNewAction() ) );
+    connect(mainform->objActionsNewGroupAction, SIGNAL(triggered()), actiontree, SLOT( itemNewGroup() ) );
+    connect(mainform->objActionsEditAction, SIGNAL(triggered()), actiontree, SLOT( itemEdit() ) );
+    connect(mainform->objInterfaceNewCommandAction, SIGNAL(triggered()), interfacetree, SLOT( itemNewCommand() ) );
+    connect(mainform->objInterfaceNewSubmenuAction, SIGNAL(triggered()), interfacetree, SLOT( itemNewSubmenu() ) );
+    connect(mainform->objInterfaceNewSeparatorAction, SIGNAL(triggered()), interfacetree, SLOT( itemNewSeparator() ) );
+    connect(mainform->objInterfaceEditAction, SIGNAL(triggered()), interfacetree, SLOT( itemEdit() ) );
+    connect(mainform->objImageCollectionAddAction, SIGNAL(triggered()), this, SLOT( bAddImage_clicked() ) );
+    connect(mainform->objLanguagesNewAction, SIGNAL(triggered()), this, SLOT( bAdd_clicked() ) );
+    connect(mainform->objLanguagesEditAction, SIGNAL(triggered()), this, SLOT( bEdit_clicked() ) );
+    connect(mainform->objLanguagesClearAction, SIGNAL(triggered()), this, SLOT( bKill_clicked() ) );
+    connect(mainform->objRoleNewAction, SIGNAL(triggered()), this, SLOT( bAddRole_clicked() ) );
+    connect(mainform->objRoleEditAction, SIGNAL(triggered()), this, SLOT( bEditRole_clicked() ) );
+    connect(mainform->objRoleClearAction, SIGNAL(triggered()), this, SLOT( bKillRole_clicked() ) );
 }
 
 /*
@@ -289,10 +289,11 @@ void CfgForm::bRemoveImage_clicked()
 /*
   * Image rename event handler
   */
-void CfgForm::vImageCollection_itemRenamed( QListWidgetItem *item, const QString &name )
+void CfgForm::vImageCollection_itemChanged( QListWidgetItem *item )
 {
     aCfgItem image_collection, image;
     int i, n;
+    const QString name = item->text();
 
     image_collection = cfg.findChild( cfg.find( mdc_root ), md_image_collection, 0 );
     n = cfg.countChild( image_collection, md_image );		// count images
@@ -483,7 +484,7 @@ void CfgForm::bEdit_clicked()
 /*
   * Double-click table event
   */
-void CfgForm::tLang_doubleClicked( int, int, int, const QPoint & )
+void CfgForm::tLang_doubleClicked( int, int )
 {
     bEdit_clicked();		// call edit button click event
 }
@@ -674,75 +675,76 @@ int CfgForm::activateExist( QListViewItem *item )
 /*
   * When tab switches some actions reconnect to corresponding toolbar buttons and toolbars recombinate
   */
-void CfgForm::tabWidget_selected( const QString &tab )
+void CfgForm::tabWidget_selected( int index )
 {
+    const QString tab = tabWidget->tabText( index );
     bool fM, fA, fI, fR, fL, fIC;
 
     if ( tab == tr("Metadata") ) {
-	connect(mainform->objTBDeleteAction, SIGNAL(activated()), mdtree, SLOT( itemDelete() ) );
-	connect(mainform->objTBRenameAction, SIGNAL(activated()), mdtree, SLOT( itemRename() ) );
-	connect(mainform->objTBMoveUpAction, SIGNAL(activated()), mdtree, SLOT( itemMoveUp() ) );
-	connect(mainform->objTBMoveDownAction, SIGNAL(activated()), mdtree, SLOT( itemMoveDown() ) );
+	connect(mainform->objTBDeleteAction, SIGNAL(triggered()), mdtree, SLOT( itemDelete() ) );
+	connect(mainform->objTBRenameAction, SIGNAL(triggered()), mdtree, SLOT( itemRename() ) );
+	connect(mainform->objTBMoveUpAction, SIGNAL(triggered()), mdtree, SLOT( itemMoveUp() ) );
+	connect(mainform->objTBMoveDownAction, SIGNAL(triggered()), mdtree, SLOT( itemMoveDown() ) );
 	fM = true;
     } else {
-	    disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), mdtree, SLOT( itemDelete() ) );
-	    disconnect(mainform->objTBRenameAction, SIGNAL(activated()), mdtree, SLOT( itemRename() ) );
-	    disconnect(mainform->objTBMoveUpAction, SIGNAL(activated()), mdtree, SLOT( itemMoveUp() ) );
-	    disconnect(mainform->objTBMoveDownAction, SIGNAL(activated()), mdtree, SLOT( itemMoveDown() ) );
+	    disconnect(mainform->objTBDeleteAction, SIGNAL(triggered()), mdtree, SLOT( itemDelete() ) );
+	    disconnect(mainform->objTBRenameAction, SIGNAL(triggered()), mdtree, SLOT( itemRename() ) );
+	    disconnect(mainform->objTBMoveUpAction, SIGNAL(triggered()), mdtree, SLOT( itemMoveUp() ) );
+	    disconnect(mainform->objTBMoveDownAction, SIGNAL(triggered()), mdtree, SLOT( itemMoveDown() ) );
 	    fM= false;
 	}
     if ( tab == tr("Actions") ) {
-	connect(mainform->objTBDeleteAction, SIGNAL(activated()), actiontree, SLOT( itemDelete() ) );
-	connect(mainform->objTBRenameAction, SIGNAL(activated()), actiontree, SLOT( itemRename() ) );
-	connect(mainform->objTBMoveUpAction, SIGNAL(activated()), actiontree, SLOT( itemMoveUp() ) );
-	connect(mainform->objTBMoveDownAction, SIGNAL(activated()), actiontree, SLOT( itemMoveDown() ) );
+	connect(mainform->objTBDeleteAction, SIGNAL(triggered()), actiontree, SLOT( itemDelete() ) );
+	connect(mainform->objTBRenameAction, SIGNAL(triggered()), actiontree, SLOT( itemRename() ) );
+	connect(mainform->objTBMoveUpAction, SIGNAL(triggered()), actiontree, SLOT( itemMoveUp() ) );
+	connect(mainform->objTBMoveDownAction, SIGNAL(triggered()), actiontree, SLOT( itemMoveDown() ) );
 	fA = true;
     } else {
-	    disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), actiontree, SLOT( itemDelete() ) );
-	    disconnect(mainform->objTBRenameAction, SIGNAL(activated()), actiontree, SLOT( itemRename() ) );
-	    disconnect(mainform->objTBMoveUpAction, SIGNAL(activated()), actiontree, SLOT( itemMoveUp() ) );
-	    disconnect(mainform->objTBMoveDownAction, SIGNAL(activated()), actiontree, SLOT( itemMoveDown() ) );
+	    disconnect(mainform->objTBDeleteAction, SIGNAL(triggered()), actiontree, SLOT( itemDelete() ) );
+	    disconnect(mainform->objTBRenameAction, SIGNAL(triggered()), actiontree, SLOT( itemRename() ) );
+	    disconnect(mainform->objTBMoveUpAction, SIGNAL(triggered()), actiontree, SLOT( itemMoveUp() ) );
+	    disconnect(mainform->objTBMoveDownAction, SIGNAL(triggered()), actiontree, SLOT( itemMoveDown() ) );
 	    fA = false;
 	}
     if ( tab == tr("Interface") ) {
-	connect(mainform->objTBDeleteAction, SIGNAL(activated()), interfacetree, SLOT( itemDelete() ) );
-	connect(mainform->objTBRenameAction, SIGNAL(activated()), interfacetree, SLOT( itemRename() ) );
-	connect(mainform->objTBMoveUpAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveUp() ) );
-	connect(mainform->objTBMoveDownAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveDown() ) );
+	connect(mainform->objTBDeleteAction, SIGNAL(triggered()), interfacetree, SLOT( itemDelete() ) );
+	connect(mainform->objTBRenameAction, SIGNAL(triggered()), interfacetree, SLOT( itemRename() ) );
+	connect(mainform->objTBMoveUpAction, SIGNAL(triggered()), interfacetree, SLOT( itemMoveUp() ) );
+	connect(mainform->objTBMoveDownAction, SIGNAL(triggered()), interfacetree, SLOT( itemMoveDown() ) );
 	fI = true;
     } else {
-	    disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), interfacetree, SLOT( itemDelete() ) );
-	    disconnect(mainform->objTBRenameAction, SIGNAL(activated()), interfacetree, SLOT( itemRename() ) );
-	    disconnect(mainform->objTBMoveUpAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveUp() ) );
-	    disconnect(mainform->objTBMoveDownAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveDown() ) );
+	    disconnect(mainform->objTBDeleteAction, SIGNAL(triggered()), interfacetree, SLOT( itemDelete() ) );
+	    disconnect(mainform->objTBRenameAction, SIGNAL(triggered()), interfacetree, SLOT( itemRename() ) );
+	    disconnect(mainform->objTBMoveUpAction, SIGNAL(triggered()), interfacetree, SLOT( itemMoveUp() ) );
+	    disconnect(mainform->objTBMoveDownAction, SIGNAL(triggered()), interfacetree, SLOT( itemMoveDown() ) );
 	    fI = false;
 	}
     if ( tab == tr("Rights") )
     {
-	 connect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDeleteRole_clicked() ) );
+	 connect(mainform->objTBDeleteAction, SIGNAL(triggered()), this, SLOT( bDeleteRole_clicked() ) );
 	 fR = true;
 	 if ( !tRole->rowCount() ) mainform->objTBDeleteAction->setEnabled( false );
 	 else mainform->objTBDeleteAction->setEnabled( true );
      } else {
-	 disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDeleteRole_clicked() ) );
+	 disconnect(mainform->objTBDeleteAction, SIGNAL(triggered()), this, SLOT( bDeleteRole_clicked() ) );
 	 fR = false;
      }
      if ( tab == tr("Languages") ) {
-	 connect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDelete_clicked() ) );
+	 connect(mainform->objTBDeleteAction, SIGNAL(triggered()), this, SLOT( bDelete_clicked() ) );
 	 fL = true;
 	 if ( !tLang->rowCount() ) mainform->objTBDeleteAction->setEnabled( false );
 	 else mainform->objTBDeleteAction->setEnabled( true );
      } else {
-	 disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDelete_clicked() ) );
+	 disconnect(mainform->objTBDeleteAction, SIGNAL(triggered()), this, SLOT( bDelete_clicked() ) );
 	 fL = false;
      }
      if ( tab == tr("Image collection") ) {
-	 connect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bRemoveImage_clicked() ) );
+	 connect(mainform->objTBDeleteAction, SIGNAL(triggered()), this, SLOT( bRemoveImage_clicked() ) );
 	 fIC = true;
 	 if ( !vImageCollection->count() ) mainform->objTBDeleteAction->setEnabled( false );
 	 else mainform->objTBDeleteAction->setEnabled( true );
      } else {
-	 disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bRemoveImage_clicked() ) );
+	 disconnect(mainform->objTBDeleteAction, SIGNAL(triggered()), this, SLOT( bRemoveImage_clicked() ) );
 	 fIC = false;
      }
      if ( tab == tr("Image collection") || tab == tr("Languages") || tab == tr("Rights") ) {
@@ -868,7 +870,7 @@ void CfgForm::bKillRole_clicked()
 }
 
 
-void CfgForm::tRole_doubleClicked( int, int, int, const QPoint & )
+void CfgForm::tRole_doubleClicked( int, int )
 {
     bEditRole_clicked();	// call role edit method
 }

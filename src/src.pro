@@ -1,8 +1,8 @@
 TEMPLATE = subdirs
 SUBDIRS += editor
 SUBDIRS  += lib plugins
-# Designer is excluded from the first porting milestone (see tools/docs/PORTING.md).
-#SUBDIRS += designer/formdesigner designer
+# The metadata editor (ananas-designer) is part of the Qt6 build since Phase 6.
+SUBDIRS += designer
 SUBDIRS += ananas admin
 SUBDIRS += extensions
 

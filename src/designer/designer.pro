@@ -9,6 +9,8 @@ INCLUDEPATH += . ./designer6 ../lib ../../tmp/ui/ananas ../plugins ../editor
 LIBS += -L../../lib -lananas -L../../lib/designer -lananasplugin -lqdataschema -L../editor -lqtscriptedit
 unix {
     LIBS += -lQt6DesignerComponents
+    # Locate libananasplugin.so (the widget plugin) at its install path.
+    QMAKE_RPATHDIR += /usr/lib/ananas/designer
 }
 win32{
     LIBS += -lQt6DesignerComponents

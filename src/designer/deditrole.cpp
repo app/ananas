@@ -14,8 +14,9 @@
  *
  */
 dEditRole::dEditRole(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
+    Q_UNUSED(name);
     setupUi(this);
 
     (void)statusBar();
@@ -50,9 +51,9 @@ void dEditRole::setData( CfgForm *c, aCfgItem o )
     cf = c;
     obj = o;
 
-    setCaption( tr("Role:") + cf->cfg.attr( obj, mda_name ) );
+    setWindowTitle( tr("Role:") + cf->cfg.attr( obj, mda_name ) );
     eName->setText( cf->cfg.attr( obj, mda_name ) );
-    eDescription->setText( cf->cfg.sText( obj, md_description ) );
+    eDescription->setPlainText( cf->cfg.sText( obj, md_description ) );
 }
 
 void dEditRole::init()
@@ -63,13 +64,13 @@ void dEditRole::init()
 void dEditRole::destroy()
 {
     updateMD();
-    ( (MainForm*)this->topLevelWidget() )->removeTab(name());
+    ( (MainForm*)this->topLevelWidget() )->removeTab(objectName());
 }
 void
 dEditRole::updateMD()
 {
-    cf->cfg.setAttr( obj, mda_name, eName->text().stripWhiteSpace() );
-    cf->cfg.setSText( obj, md_description, eDescription->text() );
+    cf->cfg.setAttr( obj, mda_name, eName->text().trimmed() );
+    cf->cfg.setSText( obj, md_description, eDescription->toPlainText() );
     cf->initRoles();
     ( (MainForm*)this->topLevelWidget() )->wl->remove( this );
 }

@@ -22,8 +22,9 @@
  *
  */
 dEditField::dEditField(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
+    Q_UNUSED(name);
     setupUi(this);
 
     (void)statusBar();
@@ -58,7 +59,7 @@ void dEditField::destroy()
 {
     updateMD();
     ( (MainForm*)this->topLevelWidget() )->wl->remove( this );
-    ( (MainForm*)this->topLevelWidget() )->removeTab(name());
+    ( (MainForm*)this->topLevelWidget() )->removeTab(objectName());
 }
 
 
@@ -71,7 +72,7 @@ void dEditField::init()
 	artypes.clear();
 	eType->clear();
 	otypes.append(" ");
-	eType->insertItem(tr("Unknown"), 0);
+	eType->addItem(tr("Unknown"));
 
 }
 
@@ -112,8 +113,8 @@ void dEditField::setData( aListViewItem *o )
 //		updateGeometry();
 	}
 	// eType0->setText( ts );
-	// eModule->setText( md->sText( obj, md_sourcecode ) );
-	eDescription->setText( md->sText( obj, md_description ) );
+	// eModule->setPlainText( md->sText( obj, md_sourcecode ) );
+	eDescription->setPlainText( md->sText( obj, md_description ) );
 
 	if( md->attr( obj, mda_sort ) == "1" ) efSort->setChecked( true );
 	else efSort->setChecked( false );
@@ -138,12 +139,12 @@ void dEditField::setData( aListViewItem *o )
 	eType->clear();
 	for ( QStringList::Iterator it = tlist.begin(); it != tlist.end(); ++it ) {
 		otypes.append( (*it).section( "\t", 0, 0 ) );
-	 	eType->insertItem( (*it).section("\t", 1, 1 ), idx++ );
+	 	eType->insertItem( idx++, (*it).section("\t", 1, 1 ) );
 	}
 
 	if ( !ts.isEmpty() )
 	{
-		 sscanf( ts, "%c %d %d", &t, &w, &d );
+		 sscanf( ts.toLatin1().constData(), "%c %d %d", &t, &w, &d );
 	}
 	else
 	{
@@ -153,30 +154,30 @@ void dEditField::setData( aListViewItem *o )
 	if ( t=='O' ) {
 		for( i = 0 ; i < otypes.count(); i++ ) {
 	  		if( otypes[i][0] == 'O' ) {
-	   			sscanf( (const char *)otypes[ i ], "O %d", &oid );
+	   			sscanf( otypes[ i ].toLatin1().constData(), "O %d", &oid );
 	   			if ( oid == w ) {
-	   				 eType->setCurrentItem( i );
+	   				 eType->setCurrentIndex( i );
 	   				 break;
 	   			}
 	  		}
 		}
 	} else {
-		 if ( t == ' ' ) eType->setCurrentItem( 0 );
+		 if ( t == ' ' ) eType->setCurrentIndex( 0 );
 	 	 if ( t == 'N' )
 		 {
-			eWidth->setMaxValue(20);
-			eDec->setMaxValue(99);
-			eType->setCurrentItem( 1 );
+			eWidth->setMaximum(20);
+			eDec->setMaximum(99);
+			eType->setCurrentIndex( 1 );
 		 }
 	 	 if ( t == 'C' )
 		 {
 
-			eWidth->setMaxValue(254);
-			eDec->setMaxValue(99);
-			eType->setCurrentItem( 2 );
+			eWidth->setMaximum(254);
+			eDec->setMaximum(99);
+			eType->setCurrentIndex( 2 );
 		 }
-	 	 if ( t == 'D' ) eType->setCurrentItem( 3 );
-	 	 if ( t == 'B' ) eType->setCurrentItem( 4 );
+	 	 if ( t == 'D' ) eType->setCurrentIndex( 3 );
+	 	 if ( t == 'B' ) eType->setCurrentIndex( 4 );
 		 eWidth->setValue( w );
 		 eDec->setValue( d );
 	}
@@ -187,7 +188,7 @@ void dEditField::setData( aListViewItem *o )
  //long oid;
 	aCfgItem context = md->findChild(md->find(mdc_metadata),md_registers);
 	comboBox2->clear();
-	comboBox2->insertItem(" ");
+	comboBox2->addItem(" ");
 	artypes.clear();
 	artypes.append(" ");
 	n = md->count( context, md_aregister );
@@ -198,7 +199,7 @@ void dEditField::setData( aListViewItem *o )
 		if ( !obj.isNull() )
 		{
 			aregid=md->attr(obj,mda_id).toInt();
-			str = tr(QString("AccumulationRegister."))+md->attr( obj, mda_name );
+			str = tr("AccumulationRegister.")+md->attr( obj, mda_name );
 			//printf("`%s'\n",str.ascii());
 			obj = md->findChild(obj,md_resources);
 			n1 = md->count( obj, md_field);
@@ -210,13 +211,13 @@ void dEditField::setData( aListViewItem *o )
 				{
 					aregfid = md->attr(obj2, mda_id).toInt();
 					artypes.append(QString(" %1 %2").arg(aregid).arg(aregfid));
-					comboBox2->insertItem(str+"."+md->attr( obj2, mda_name ));
-					if(w==aregid && d==aregfid) comboBox2->setCurrentItem(comboBox2->count()-1);
+					comboBox2->addItem(str+"."+md->attr( obj2, mda_name ));
+					if(w==aregid && d==aregfid) comboBox2->setCurrentIndex(comboBox2->count()-1);
 				}
 			}
 		}
 	}
-	typeSelect( eType->currentItem() );
+	typeSelect( eType->currentIndex() );
 }
 
 void dEditField::updateMD()
@@ -227,10 +228,10 @@ void dEditField::updateMD()
  aCfgItem obj = item->obj;
 
  al->updateMD();
- item->setText( 0, eName->text().stripWhiteSpace() );
- md->setAttr( obj, mda_name, eName->text().stripWhiteSpace() );
- md->setSText( obj, md_description, eDescription->text() );
-// md->setSText( obj, md_sourcecode, eModule->text() );
+ item->setText( 0, eName->text().trimmed() );
+ md->setAttr( obj, mda_name, eName->text().trimmed() );
+ md->setSText( obj, md_description, eDescription->toPlainText() );
+// md->setSText( obj, md_sourcecode, eModule->toPlainText() );
 
  if ( md->objClass(md->parent(obj)) == md_resources )
   efSort->setChecked( true );
@@ -244,14 +245,14 @@ void dEditField::updateMD()
      md->setAttr( obj, mda_sum, "1" );
  else
      md->setAttr( obj, mda_sum, "0" );
- if(eType->currentItem()==0)
+ if(eType->currentIndex()==0)
  {
-	 st.sprintf(artypes[comboBox2->currentItem()]);
+	 st = artypes[comboBox2->currentIndex()];
  }
  else
  {
- 	st.sprintf( otypes[ eType->currentItem() ], eWidth->value(), eDec->value() );
-	printf("type is %s\n",st.ascii());
+ 	st = QString::asprintf( otypes[ eType->currentIndex() ].toLatin1().constData(), eWidth->value(), eDec->value() );
+	printf("type is %s\n",qPrintable(st));
   	if ( efSort->isChecked() )
   		st.append(" I");
  }
@@ -264,9 +265,9 @@ void dEditField::typeSelect( int idx )
 {
 	if ( otypes[ idx ][0] == 'N' )
 	{
-		eWidth->setMaxValue(20);
+		eWidth->setMaximum(20);
 		eWidth->show();
-		eDec->setMaxValue(99);
+		eDec->setMaximum(99);
 		eDec->show();
 		tWidth->show();
 		tDec->show();
@@ -277,7 +278,7 @@ void dEditField::typeSelect( int idx )
 	{
 		if ( otypes[ idx ][0] == 'C' )
 		{
-			eWidth->setMaxValue(254);
+			eWidth->setMaximum(254);
 			eWidth->show();
 			eDec->hide();
 			tWidth->show();
@@ -316,7 +317,7 @@ void dEditField::typeSelect( int idx )
 
 void dEditField::nameChanged()
 {
-	setCaption( tr("Field:") + eName->text() );
+	setWindowTitle( tr("Field:") + eName->text() );
 }
 
 

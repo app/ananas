@@ -4,12 +4,12 @@
 #include "ui_dedittoolbar.h"
 
 
-class dEditToolbar : public Q3MainWindow, public Ui::dEditToolbar
+class dEditToolbar : public QMainWindow, public Ui::dEditToolbar
 {
     Q_OBJECT
 
 public:
-    dEditToolbar(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditToolbar(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditToolbar();
 
     ananasTreeView *vComActions;

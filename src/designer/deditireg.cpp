@@ -13,8 +13,9 @@
  *
  */
 dEditIReg::dEditIReg(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
+    Q_UNUSED(name);
     setupUi(this);
 
     (void)statusBar();
@@ -48,7 +49,7 @@ void dEditIReg::destroy()
 {
     updateMD();
     ( (MainForm*)this->topLevelWidget() )->wl->remove( this );
-    ( (MainForm*)this->topLevelWidget() )->removeTab(name());
+    ( (MainForm*)this->topLevelWidget() )->removeTab(objectName());
 }
 
 void dEditIReg::setData( aListViewItem *o )
@@ -59,7 +60,7 @@ void dEditIReg::setData( aListViewItem *o )
             aAliasEditor *a = new aAliasEditor( md, obj, tAliases );
 	al = a;
 	al->setData();
-	setCaption( tr("Information register:") + md->attr( obj, mda_name ) );
+	setWindowTitle( tr("Information register:") + md->attr( obj, mda_name ) );
 	eName->setText( md->attr( obj, mda_name ) );
 	if(md->attr(obj, mda_no_unconduct)=="1")
 	{
@@ -69,7 +70,7 @@ void dEditIReg::setData( aListViewItem *o )
 	{
 	   	checkBox1->setChecked(false);
 	}
-	eDescription->setText( md->sText( obj, md_description ) );
+	eDescription->setPlainText( md->sText( obj, md_description ) );
 }
 
 void dEditIReg::updateMD()
@@ -78,8 +79,8 @@ void dEditIReg::updateMD()
 	aCfgItem obj = item->obj;
 
 	al->updateMD();
-	item->setText( 0, eName->text().stripWhiteSpace() );
-	md->setAttr( obj, mda_name, eName->text().stripWhiteSpace() );
+	item->setText( 0, eName->text().trimmed() );
+	md->setAttr( obj, mda_name, eName->text().trimmed() );
 	md->setAttr( obj, mda_no_unconduct, checkBox1->isChecked()?"1":"0");
-	md->setSText( obj, md_description, eDescription->text() );
+	md->setSText( obj, md_description, eDescription->toPlainText() );
 }

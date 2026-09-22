@@ -30,8 +30,8 @@
 #ifndef ROLEDITOR_H
 #define ROLEDITOR_H
 
-#include <q3table.h>
 #include <qobject.h>
+#include <QTableWidget>
 #include "acfg.h"
 
 class aRoleEditor : public QObject
@@ -40,10 +40,10 @@ class aRoleEditor : public QObject
 public:
     aCfg *ac;
     aCfgItem obj;
-    Q3Table *tRoles;
+    QTableWidget *tRoles;
     int roleCount;
 
-    aRoleEditor( aCfg *c, aCfgItem o, Q3Table *tRoles, const char *p );
+    aRoleEditor( aCfg *c, aCfgItem o, QTableWidget *tRoles, const char *p );
     ~aRoleEditor();
 
     void setData();

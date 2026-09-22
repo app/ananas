@@ -4,12 +4,12 @@
 #include "ui_deditimagecollection.h"
 
 
-class dEditImageCollection : public Q3MainWindow, public Ui::dEditImageCollection
+class dEditImageCollection : public QMainWindow, public Ui::dEditImageCollection
 {
     Q_OBJECT
 
 public:
-    dEditImageCollection(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditImageCollection(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditImageCollection();
 
     aCfgItem obj;

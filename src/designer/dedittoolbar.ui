@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>dEditToolbar</class>
- <widget class="Q3MainWindow" name="dEditToolbar" >
+ <widget class="QMainWindow" name="dEditToolbar" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -12,7 +12,7 @@
   <property name="windowTitle" >
    <string>Form1</string>
   </property>
-  <widget class="QWidget" name="widget" >
+  <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -48,7 +48,7 @@
            </widget>
           </item>
           <item>
-           <widget class="Q3TextEdit" name="eDescription" />
+           <widget class="QTextEdit" name="eDescription" />
           </item>
          </layout>
         </item>
@@ -446,13 +446,7 @@
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
-         <widget class="Q3Table" name="tAliases" >
-          <property name="numRows" >
-           <number>0</number>
-          </property>
-          <property name="numCols" >
-           <number>2</number>
-          </property>
+         <widget class="QTableWidget" name="tAliases" >
           <column>
            <property name="text" >
             <string>Lang</string>
@@ -473,24 +467,7 @@
   </widget>
  </widget>
  <layoutdefault spacing="5" margin="5" />
- <pixmapfunction>rcIcon</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>Q3MainWindow</class>
-   <extends>QWidget</extends>
-   <header>q3mainwindow.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3Table</class>
-   <extends>Q3Frame</extends>
-   <header>q3table.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends>Q3Frame</extends>
-   <header>q3textedit.h</header>
-  </customwidget>
  </customwidgets>
  <includes>
   <include location="local" >actiontree.h</include>

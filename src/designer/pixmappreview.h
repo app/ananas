@@ -29,23 +29,14 @@
 #ifndef PIXMAPPREVIEW_H
 #define PIXMAPPREVIEW_H
 
-#include <qlabel.h>
-#include <qpixmap.h>
-#include <q3filedialog.h>
-#include <qinputdialog.h>
+#include <QLabel>
+#include <QPixmap>
 
-class PixmapPreview : public QLabel, public Q3FilePreview
+class PixmapPreview : public QLabel
 {
     Q_OBJECT
 public:
     PixmapPreview( QWidget *parent=0 ) : QLabel( parent ) {}
-    void previewUrl( const Q3Url &u )
-    {
-	QString path = u.path();
-	QPixmap pix( path );
-	if ( pix.isNull() ) setText( tr("This is not a pixmap") );
-	else setPixmap( pix );
-    }
 };
 
 #endif

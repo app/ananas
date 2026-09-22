@@ -28,8 +28,6 @@
 
 #ifndef INTERFACETREE_H
 #define INTERFACETREE_H
-#include <q3listview.h>
-#include <q3intdict.h>
 //#include "acfg.h"
 #include "atreeitems.h"
 
@@ -38,9 +36,9 @@ class QWidget;
 class InterfaceListViewItem : public ananasListViewItem
 {
 public:
-	InterfaceListViewItem( Q3ListView *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
+	InterfaceListViewItem( QTreeWidget *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString() );
 	InterfaceListViewItem( ananasListViewItem *parent, ananasListViewItem *after, aCfg * cfgmd, aCfgItem cfgobj,
-						const QString &name = QString::null );
+						const QString &name = QString() );
 	void loadTree();
 	void newCommand ();
 	void newSubmenu ();

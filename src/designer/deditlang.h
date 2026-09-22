@@ -4,12 +4,12 @@
 #include "ui_deditlang.h"
 
 
-class dEditLang : public Q3MainWindow, public Ui::dEditLang
+class dEditLang : public QMainWindow, public Ui::dEditLang
 {
     Q_OBJECT
 
 public:
-    dEditLang(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditLang(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditLang();
 
 public slots:

@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>dEditAction</class>
- <widget class="Q3MainWindow" name="dEditAction" >
+ <widget class="QMainWindow" name="dEditAction" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -12,7 +12,7 @@
   <property name="windowTitle" >
    <string>Action</string>
   </property>
-  <widget class="QWidget" name="widget" >
+  <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -111,7 +111,7 @@
          </layout>
         </item>
         <item row="3" column="0" >
-         <widget class="Q3TextEdit" name="eDescription" />
+         <widget class="QTextEdit" name="eDescription" />
         </item>
         <item row="1" column="0" >
          <layout class="QHBoxLayout" >
@@ -132,7 +132,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="Q3GroupBox" name="groupBox1" >
+           <widget class="QGroupBox" name="groupBox1" >
             <property name="title" >
              <string>Enabled icon</string>
             </property>
@@ -180,7 +180,7 @@
            </widget>
           </item>
           <item>
-           <widget class="Q3GroupBox" name="groupBox2" >
+           <widget class="QGroupBox" name="groupBox2" >
             <property name="title" >
              <string>Disabled icon</string>
             </property>
@@ -249,7 +249,7 @@
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
-         <widget class="Q3WidgetStack" name="wStack" >
+         <widget class="QStackedWidget" name="wStack" >
           <widget class="QWidget" name="WStackPage" >
            <property name="geometry" >
             <rect>
@@ -469,13 +469,7 @@
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
-         <widget class="Q3Table" name="tAliases" >
-          <property name="numRows" >
-           <number>0</number>
-          </property>
-          <property name="numCols" >
-           <number>2</number>
-          </property>
+         <widget class="QTableWidget" name="tAliases" >
           <column>
            <property name="text" >
             <string>Lang</string>
@@ -518,36 +512,7 @@
   </action>
  </widget>
  <layoutdefault spacing="5" margin="5" />
- <pixmapfunction>rcIcon</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3MainWindow</class>
-   <extends>QWidget</extends>
-   <header>q3mainwindow.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3WidgetStack</class>
-   <extends>Q3WidgetStack</extends>
-   <header>q3widgetstack.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3Table</class>
-   <extends>Q3Frame</extends>
-   <header>q3table.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends>Q3Frame</extends>
-   <header>q3textedit.h</header>
-  </customwidget>
   <customwidget>
    <class>ScriptEdit</class>
    <extends>QWidget</extends>

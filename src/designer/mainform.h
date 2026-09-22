@@ -3,17 +3,20 @@
 
 #include "ui_mainform.h"
 
+#include <QLabel>
+#include <QMdiArea>
 
-class MainForm : public Q3MainWindow, public Ui::MainForm
+
+class MainForm : public QMainWindow, public Ui::MainForm
 {
     Q_OBJECT
 
 public:
-    MainForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    MainForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~MainForm();
 
     QLabel *msg;
-    QWorkspace *ws;
+    QMdiArea *ws;
     CfgForm *cfgform;
     QString rcfile;
     aCfg *md;
@@ -54,7 +57,7 @@ public slots:
     virtual void addTab( int uid, const QString & winName );
     // -- Help for add to workspace
     virtual void addTab(QWidget* window) {
-        ws->addWindow(window);
+        ws->addSubWindow(window);
         window->show();
         addTab(++lastTabId, window->objectName());
     };
@@ -69,7 +72,7 @@ protected slots:
     virtual void languageChange();
 
 private:
-    Q3PopupMenu *windowsMenu;
+    QMenu *windowsMenu;
 
 private slots:
     virtual void windowsMenuActivated( int id );

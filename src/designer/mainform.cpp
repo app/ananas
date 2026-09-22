@@ -8,14 +8,18 @@
 
 #include <qapplication.h>
 #include <qsettings.h>
-#include "q3filedialog.h"
 #include "qstatusbar.h"
 #include "qmessagebox.h"
 #include <qapplication.h>
 //Added by qt3to4:
 #include <QCloseEvent>
-#include <Q3Frame>
-#include <Q3PopupMenu>
+#include <QFrame>
+#include <QIcon>
+#include <QMenu>
+#include <QMdiArea>
+#include <QMdiSubWindow>
+#include <QToolBar>
+#include <QVBoxLayout>
 
 #include "ananas.h"
 //#include "adatabase.h"
@@ -37,9 +41,10 @@ extern void messageproc(int n, const char *msg);
  *
  */
 MainForm::MainForm(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
     setupUi(this);
+    if ( name ) setObjectName( name );
 
     (void)statusBar();
     init();
@@ -134,22 +139,22 @@ void MainForm::init()
 {
 
 
-    setName("ananas-designer_mainwindow");
+    setObjectName("ananas-designer_mainwindow");
     rcfile="";
-    windowsMenu = new Q3PopupMenu( this );
-    windowsMenu->setCheckable( TRUE );
+    windowsMenu = new QMenu( this );
+    windowsMenu->menuAction()->setCheckable( true );
     connect( windowsMenu, SIGNAL( aboutToShow() ),
 	     this, SLOT( windowsMenuAboutToShow() ) );
-    menuBar()->insertItem( tr("&Windows"), windowsMenu );
+    menuBar()->addMenu( windowsMenu );
 
-    menuBar()->insertSeparator();
-    Q3PopupMenu * help = new Q3PopupMenu( this );
-    menuBar()->insertItem( tr("&Help"), help );
+    menuBar()->addSeparator();
+    QMenu * help = new QMenu( this );
+    menuBar()->addMenu( help );
 
-    help->insertItem( tr("&About"), this, SLOT(helpAbout()), Qt::Key_F1);
+    help->addAction( tr("&About"), QKeySequence( Qt::Key_F1 ), this, SLOT(helpAbout()) );
   //  help->insertItem( tr("&Test"), this, SLOT(helpTest()));
     //    help->insertItem( "About &Qt", this, SLOT(aboutQt()));
-    help->insertSeparator();
+    help->addSeparator();
     //    help->insertItem( trUtf8("Что &это"), this, SLOT(whatsThis()), SHIFT+Key_F1);
 
 
@@ -159,11 +164,11 @@ void MainForm::init()
 //    QStringList lst = settings.entryList("/engine");
     QSettings designer_settings;
     designer_settings.beginGroup("/designer");
-    bool maximize = designer_settings.readBoolEntry( "/maximize", 0 );
-    int width = designer_settings.readNumEntry( "/geometry/width", 600 );
-    int height = designer_settings.readNumEntry( "/geometry/height", 480 );
-    int offset_x = designer_settings.readNumEntry( "/geometry/x", 0 );
-    int offset_y = designer_settings.readNumEntry( "/geometry/y", 0 );
+    bool maximize = designer_settings.value( "/maximize", 0 ).toBool();
+    int width = designer_settings.value( "/geometry/width", 600 ).toInt();
+    int height = designer_settings.value( "/geometry/height", 480 ).toInt();
+    int offset_x = designer_settings.value( "/geometry/x", 0 ).toInt();
+    int offset_y = designer_settings.value( "/geometry/y", 0 ).toInt();
     designer_settings.endGroup();
     resize( QSize(width, height) );//  .expandedTo(minimumSizeHint()) );
     move(offset_x,offset_y);
@@ -172,31 +177,32 @@ void MainForm::init()
 //	   setWindowState(windowState() ^ WindowMaximized);
     }
 
-    setIcon( rcIcon("a-system.png"));
-    setCaption(tr("Ananas: Designer"));
-    Q3VBox* vb = new Q3VBox( this );
-    vb->setFrameStyle( Q3Frame::StyledPanel | Q3Frame::Sunken );
-    ws = new QWorkspace( vb );
+    setWindowIcon( rcIcon("a-system.png"));
+    setWindowTitle(tr("Ananas: Designer"));
+    QFrame *vb = new QFrame( this );
+    QVBoxLayout* vbl = new QVBoxLayout( vb );
+    vb->setFrameStyle( QFrame::StyledPanel | QFrame::Sunken );
+    ws = new QMdiArea( vb );
+    vbl->addWidget( ws );
     wl = new aWindowsList();
-    ws->setScrollBarsEnabled( TRUE );
     setCentralWidget( vb );
     cfgform=NULL;
 
     MessagesWindow *msgWindow = new MessagesWindow( this ); // , WDestructiveClose );
-    moveDockWindow( msgWindow, Qt::DockBottom );
-    setMessageHandler( TRUE );
+    addDockWidget( Qt::BottomDockWidgetArea, msgWindow );
+    setMessageHandler( true );
     msgWindow->hide();
-    tbMetadata->setShown( FALSE );
-    tbActions->setShown( FALSE );
-    tbInterface->setShown( FALSE );
-    tbRights->setShown( FALSE );
-    tbLanguages->setShown( FALSE );
-    tbImageCollection->setShown( FALSE );
-    TBToolbar->setShown( FALSE );
-    tbTabs->setShown( FALSE );
+    tbMetadata->setVisible( false );
+    tbActions->setVisible( false );
+    tbInterface->setVisible( false );
+    tbRights->setVisible( false );
+    tbLanguages->setVisible( false );
+    tbImageCollection->setVisible( false );
+    TBToolbar->setVisible( false );
+    tbTabs->setVisible( false );
     lastTabId = 0;
 	lastFormId = 0;
-    configSaveAction->setVisible( FALSE );
+    configSaveAction->setVisible( false );
 }
 
 void MainForm::configNew()
@@ -206,10 +212,11 @@ void MainForm::configNew()
 	{
 		if ( !cf->close() ) return; // close configuration form if opened
     	}
-    	cf = new CfgForm(ws, 0, Qt::WDestructiveClose); // create new cfgform
+    	cf = new CfgForm(ws, 0); // create new cfgform
    	if ( cf )
 	{
-		cf->init( rcfile, TRUE ); // initialization NEW configuration
+		cf->setAttribute(Qt::WA_DeleteOnClose);
+		cf->init( rcfile, true ); // initialization NEW configuration
 		connectSignals( cf );
 		cf->ws=ws;
 		cf->show();
@@ -227,10 +234,11 @@ void MainForm::configOpen()
 		if ( !cf->close() ) return;
    	}
 	if ( rcfile.isEmpty()) return;
-	cf = new CfgForm( ws, 0, Qt::WDestructiveClose);
+	cf = new CfgForm( ws, 0);
 	if ( cf )
 	{
-		cf->init( rcfile, FALSE );	//	initialization configuration
+		cf->setAttribute(Qt::WA_DeleteOnClose);
+		cf->init( rcfile, false );	//	initialization configuration
 		connectSignals( cf );
 		cf->ws=ws;
 		cf->show();
@@ -275,7 +283,7 @@ void MainForm::fileNew()
 
 void MainForm::windowsMenuActivated( int id )
 {
-    QWidget* w = ws->windowList().at( id );
+    QMdiSubWindow* w = ws->subWindowList().at( id );
     if ( w ) w->showNormal();
     w->setFocus();
 }
@@ -284,43 +292,44 @@ void MainForm::windowsMenuActivated( int id )
 void MainForm::windowsMenuAboutToShow()
 {
     windowsMenu->clear();
-    int cascadeId = windowsMenu->insertItem(tr("&Cascade"), ws, SLOT(cascade() ) );
-    int tileId = windowsMenu->insertItem(tr("&Tile"), ws, SLOT(tile() ) );
-    int horTileId = windowsMenu->insertItem(tr("Tile &horizontal"), this, SLOT(tileHorizontal() ) );
-    if ( ws->windowList().isEmpty() ) {
-	windowsMenu->setItemEnabled( cascadeId, FALSE );
-	windowsMenu->setItemEnabled( tileId, FALSE );
-	windowsMenu->setItemEnabled( horTileId, FALSE );
+    QAction *cascadeAction = windowsMenu->addAction(tr("&Cascade"), ws, SLOT(cascadeSubWindows() ) );
+    QAction *tileAction = windowsMenu->addAction(tr("&Tile"), ws, SLOT(tileSubWindows() ) );
+    QAction *horTileAction = windowsMenu->addAction(tr("Tile &horizontal"), this, SLOT(tileHorizontal() ) );
+    if ( ws->subWindowList().isEmpty() ) {
+	cascadeAction->setEnabled( false );
+	tileAction->setEnabled( false );
+	horTileAction->setEnabled( false );
     }
-    windowsMenu->insertSeparator();
-    QWidgetList windows = ws->windowList();
+    windowsMenu->addSeparator();
+    QList<QMdiSubWindow*> windows = ws->subWindowList();
     for ( int i = 0; i < int( windows.count() ); ++i ) {
-	int id = windowsMenu->insertItem(windows.at(i)->caption(), this, SLOT( windowsMenuActivated( int ) ) );
-	windowsMenu->setItemParameter( id, i );
-	windowsMenu->setItemChecked( id, ws->activeWindow() == windows.at(i) );
+	QAction *a = windowsMenu->addAction(windows.at(i)->windowTitle() );
+	connect( a, &QAction::triggered, this, [this, i]() { windowsMenuActivated( i ); } );
+	a->setCheckable( true );
+	a->setChecked( ws->activeSubWindow() == windows.at(i) );
     }
 }
 
 void MainForm::tileHorizontal()
 {
     // primitive horizontal tiling
-    QWidgetList windows = ws->windowList();
+    QList<QMdiSubWindow*> windows = ws->subWindowList();
     if ( !windows.count() )
 	return;
 
     int heightForEach = ws->height() / windows.count();
     int y = 0;
     for ( int i = 0; i < int(windows.count()); ++i ) {
-	QWidget *window = windows.at(i);
+	QMdiSubWindow *window = windows.at(i);
 	if ( window->windowState() == Qt::WindowMaximized ) {
 	    // prevent flicker
 	    window->hide();
 	    window->showNormal();
 	}
-	int preferredHeight = window->minimumHeight()+window->parentWidget()->baseSize().height();
-	int actHeight = QMAX(heightForEach, preferredHeight);
+	int preferredHeight = window->minimumHeight();
+	int actHeight = qMax(heightForEach, preferredHeight);
 
-	window->parentWidget()->setGeometry( 0, y, ws->width(), actHeight );
+	window->setGeometry( 0, y, ws->width(), actHeight );
 	y += actHeight;
     }
 }
@@ -340,13 +349,13 @@ void MainForm::closeEvent( QCloseEvent *e )
     QSettings designer_settings;
     designer_settings.beginGroup("/designer");
 //	designer_settings.writeEntry( "/maximize", windowState()&WindowMaximized ? true: false);
-	designer_settings.writeEntry( "/geometry/width", width() );
-	designer_settings.writeEntry( "/geometry/height", height() );
-	designer_settings.writeEntry( "/geometry/x", pos().x() );
-	designer_settings.writeEntry( "/geometry/y", pos().y() );
+	designer_settings.setValue( "/geometry/width", width() );
+	designer_settings.setValue( "/geometry/height", height() );
+	designer_settings.setValue( "/geometry/x", pos().x() );
+	designer_settings.setValue( "/geometry/y", pos().y() );
 	designer_settings.endGroup();
 	//aLog::print(aLog::Debug,"exit");
-    Q3MainWindow::closeEvent( e );
+    QMainWindow::closeEvent( e );
 }
 
 
@@ -381,10 +390,11 @@ CfgForm *
 MainForm::cfgForm()
 {
 	CfgForm *res = 0;
-	QWidgetList windows = ws->windowList();
+	QList<QMdiSubWindow*> windows = ws->subWindowList();
 	for ( int i = 0; i < int( windows.count() ); ++i ) {
-		if ( strcmp( windows.at(i)->className(),"CfgForm") == 0 ){
-			res = ( CfgForm *) windows.at(i);
+		QWidget *w = windows.at(i)->widget();
+		if ( strcmp( w->metaObject()->className(),"CfgForm") == 0 ){
+			res = ( CfgForm *) w;
 			break;
 		}
 	}
@@ -395,7 +405,7 @@ MainForm::cfgForm()
 QWidget *
 MainForm::activeWindow()
 {
-	return ws->activeWindow();
+	return ws->activeSubWindow() ? ws->activeSubWindow()->widget() : nullptr;
 }
 
 void MainForm::setId( qulonglong* id )
@@ -412,24 +422,22 @@ MainForm::getId(qulonglong* objId)
 
 void MainForm::addTab(int uid, const QString& winName )
 {
-    QWidgetList windows = ws->windowList();
+    QList<QMdiSubWindow*> windows = ws->subWindowList();
     QToolButton* bt;
 
     QString S = winName;
     for ( int i = 0; i < int( windows.count() ); i++ ) {
-		if( !strcmp(windows.at(i)->name(), S.ascii()))
+		QWidget *w = windows.at(i)->widget();
+		if( w->objectName() == S )
 		{
-			windows.at(i)->setName(QString(windows.at(i)->name()+QString("_%1").arg(uid)));
+			w->setObjectName( w->objectName() + QString("_%1").arg(uid) );
 			//ixmap pixmap(*windows.at(i)->icon());
-			bt = new QToolButton(QIcon(),
-					     windows.at(i)->caption(),
-					     "",
-					     windows.at(i),
-					     SLOT(setFocus( )),
-					     tbTabs,
-					     windows.at(i)->name() );
-
-			bt->setUsesTextLabel ( true );
+			bt = new QToolButton( tbTabs );
+			bt->setText( w->windowTitle() );
+			bt->setObjectName( w->objectName() );
+			bt->setToolButtonStyle( Qt::ToolButtonTextOnly );
+			connect( bt, SIGNAL(clicked()), w, SLOT(setFocus( )) );
+			tbTabs->addWidget( bt );
 //		 	bt->setAutoRaise ( true );
 		//	aLog::print(aLog::Debug, QString("button name = %1").arg(bt->name()));
 			break;
@@ -455,16 +463,16 @@ void MainForm::addTab(int uid, const QString& winName )
 	}
    // }
 //    if(windows.count()>1)
-    if(tbTabs->queryList ("QToolButton").size() > 0)
+    if(tbTabs->findChildren<QToolButton*>().size() > 0)
     {
 	//    tbTabs->show();
 
-    	tbTabs->setShown( true );
+    	tbTabs->setVisible( true );
     }
     else
     {
 	//   tbTabs->hide();
-    	tbTabs->setShown( false );
+    	tbTabs->setVisible( false );
     }
 }
 
@@ -475,7 +483,7 @@ void MainForm::removeTab(const  QString &winName )
 //	printf("winName = %s\n",winName.ascii());
 //	QString str = winName;
 //	str = str.remove(ind,winName.length()-ind);
-	QObject *button = tbTabs->child( winName );
+	QToolButton *button = tbTabs->findChild<QToolButton*>( winName );
 	if(button)
 	{
 
@@ -490,12 +498,13 @@ void MainForm::removeTab(const  QString &winName )
 void MainForm::closeChildWindows()
 {
 
-    QWidgetList windows = ws->windowList();
+    QList<QMdiSubWindow*> windows = ws->subWindowList();
     for ( int i = 0; i < int( windows.count() ); i++ )
     {
- if(    windows.at(i)->className() != "CfgForm")
+ QWidget *w = windows.at(i)->widget();
+ if(    w->metaObject()->className() != "CfgForm")
  {
-  windows.at(i)->close();
+  w->close();
  }
     }
 }

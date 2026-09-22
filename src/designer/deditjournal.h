@@ -4,12 +4,12 @@
 #include "ui_deditjournal.h"
 
 
-class dEditJournal : public Q3MainWindow, public Ui::dEditJournal
+class dEditJournal : public QMainWindow, public Ui::dEditJournal
 {
     Q_OBJECT
 
 public:
-    dEditJournal(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditJournal(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditJournal();
 
     aListViewItem *item;

@@ -4,12 +4,12 @@
 #include "ui_deditdialog.h"
 
 
-class dEditDialog : public Q3MainWindow, public Ui::dEditDialog
+class dEditDialog : public QMainWindow, public Ui::dEditDialog
 {
     Q_OBJECT
 
 public:
-    dEditDialog(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditDialog(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditDialog();
 
     qulonglong docId;

@@ -4,12 +4,12 @@
 #include "ui_deditwebform.h"
 
 
-class dEditWebForm : public Q3MainWindow, public Ui::dEditWebForm
+class dEditWebForm : public QMainWindow, public Ui::dEditWebForm
 {
     Q_OBJECT
 
 public:
-    dEditWebForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditWebForm(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditWebForm();
 
     aAliasEditor *al;

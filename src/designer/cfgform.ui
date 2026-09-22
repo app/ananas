@@ -1,7 +1,7 @@
 <ui version="4.0" >
  <author>Leader</author>
  <class>CfgForm</class>
- <widget class="Q3MainWindow" name="CfgForm" >
+ <widget class="QMainWindow" name="CfgForm" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -19,7 +19,7 @@
   <property name="windowTitle" >
    <string>CfgForm</string>
   </property>
-  <widget class="QWidget" name="widget" >
+  <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -57,18 +57,9 @@
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
-         <widget class="Q3Table" name="tRole" >
-          <property name="numRows" >
-           <number>0</number>
-          </property>
-          <property name="numCols" >
-           <number>2</number>
-          </property>
-          <property name="readOnly" >
-           <bool>true</bool>
-          </property>
+         <widget class="QTableWidget" name="tRole" >
           <property name="selectionMode" >
-           <enum>Q3Table::Multi</enum>
+           <enum>QAbstractItemView::MultiSelection</enum>
           </property>
           <column>
            <property name="text" >
@@ -186,18 +177,9 @@
          </layout>
         </item>
         <item row="0" column="0" >
-         <widget class="Q3Table" name="tLang" >
-          <property name="numRows" >
-           <number>0</number>
-          </property>
-          <property name="numCols" >
-           <number>3</number>
-          </property>
-          <property name="readOnly" >
-           <bool>true</bool>
-          </property>
+         <widget class="QTableWidget" name="tLang" >
           <property name="selectionMode" >
-           <enum>Q3Table::Multi</enum>
+           <enum>QAbstractItemView::MultiSelection</enum>
           </property>
           <column>
            <property name="text" >
@@ -224,16 +206,7 @@
        </attribute>
        <layout class="QGridLayout" >
         <item rowspan="2" row="0" column="0" >
-         <widget class="Q3IconView" name="vImageCollection" >
-          <property name="maxItemWidth" >
-           <number>50</number>
-          </property>
-          <property name="maxItemTextLength" >
-           <number>50</number>
-          </property>
-          <property name="itemsMovable" >
-           <bool>false</bool>
-          </property>
+         <widget class="QListWidget" name="vImageCollection" >
          </widget>
         </item>
         <item row="0" column="1" >
@@ -415,33 +388,13 @@
   </actiongroup>
  </widget>
  <layoutdefault spacing="2" margin="1" />
- <pixmapfunction>rcIcon</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>Q3IconView</class>
-   <extends>Q3Frame</extends>
-   <header>q3iconview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3MainWindow</class>
-   <extends>QWidget</extends>
-   <header>q3mainwindow.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3Table</class>
-   <extends>Q3Frame</extends>
-   <header>q3table.h</header>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <includes>
   <include location="local" >acfg.h</include>
-  <include location="local" >qworkspace.h</include>
-  <include location="local" >q3socket.h</include>
-  <include location="local" >q3serversocket.h</include>
   <include location="local" >acfgrc.h</include>
   <include location="local" >mdtree.h</include>
   <include location="local" >actiontree.h</include>
@@ -661,9 +614,9 @@
   </connection>
   <connection>
    <sender>vImageCollection</sender>
-   <signal>itemRenamed(Q3IconViewItem*,QString)</signal>
+   <signal>itemRenamed(QListWidgetItem*,QString)</signal>
    <receiver>CfgForm</receiver>
-   <slot>vImageCollection_itemRenamed(Q3IconViewItem*,QString)</slot>
+   <slot>vImageCollection_itemRenamed(QListWidgetItem*,QString)</slot>
    <hints>
     <hint type="sourcelabel" >
      <x>20</x>

@@ -4,12 +4,12 @@
 #include "ui_deditireg.h"
 
 
-class dEditIReg : public Q3MainWindow, public Ui::dEditIReg
+class dEditIReg : public QMainWindow, public Ui::dEditIReg
 {
     Q_OBJECT
 
 public:
-    dEditIReg(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditIReg(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditIReg();
 
     aListViewItem *item;

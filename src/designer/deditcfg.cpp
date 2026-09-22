@@ -22,9 +22,10 @@
  *
  */
 dEditCfg::dEditCfg(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
     setupUi(this);
+    setObjectName(name);
 
     (void)statusBar();
     init();
@@ -53,9 +54,9 @@ void dEditCfg::init()
 	delete statusBar();
 
 	eDBType->clear();
-	eDBType->insertItem(trUtf8("Unknown"), 0);
-	eDBType->insertItem(trUtf8("MySQL"), 1);
-	eDBType->insertItem(trUtf8("Postgres"), 2);
+	eDBType->insertItem(0, tr("Unknown"));
+	eDBType->insertItem(1, tr("MySQL"));
+	eDBType->insertItem(2, tr("Postgres"));
 //	QGridLayout *l=new QGridLayout(tabWidget->page(2));
 //	eModule=NULL;
 //	eModule = new QSEditor(tabWidget->page(2), "global module");
@@ -68,8 +69,8 @@ void dEditCfg::init()
 void dEditCfg::destroy()
 {
     updateMD();
-    ( (MainForm*)this->topLevelWidget() )->wl->remove( this );
-    ( (MainForm*)this->topLevelWidget() )->removeTab(name());
+    ( (MainForm*)this->window() )->wl->remove( this );
+    ( (MainForm*)this->window() )->removeTab(objectName());
     //	item->editor = 0;
 }
 
@@ -87,11 +88,11 @@ void dEditCfg::setData( aListViewItem *o )
 	QString v;
 //	int rc=0;
 
-	setCaption( tr("Business scheme parameters: ") + md->info( md_info_name ) );
+	setWindowTitle( tr("Business scheme parameters: ") + md->info( md_info_name ) );
 	v = md->rc.value("dbtype");
-	eDBType->setCurrentItem(0);
-	if ( v == "postgres" ) eDBType->setCurrentItem(2);
-	if ( v == "mysql" ) eDBType->setCurrentItem(1);
+	eDBType->setCurrentIndex(0);
+	if ( v == "postgres" ) eDBType->setCurrentIndex(2);
+	if ( v == "mysql" ) eDBType->setCurrentIndex(1);
 
 	eCfgName->setText( md->rc.value("configfile") );
 	eWorkDir->setText( md->rc.value("workdir") );
@@ -103,7 +104,7 @@ void dEditCfg::setData( aListViewItem *o )
 	eName->setText( md->info( md_info_name ) );
 	eAuthor->setText( md->info( md_info_author ) );
 	eDate->setText( md->info( md_info_date ) );
-	eDescription->setText( md->info( md_info_remark ) );
+	eDescription->setPlainText( md->info( md_info_remark ) );
 	globals = md->find( obj, md_globals, 0 );
         eModule->setPlainText( md->sText( globals, md_sourcecode ) );
 
@@ -116,7 +117,7 @@ void dEditCfg::setData( aListViewItem *o )
 	n=cfgobj_count(context, aot_sourcecode);
 	if (n) {
 		id0=cfgobj_idn(context, aot_sourcecode, 1, &code);
-		if (code) eModule->setText(trUtf8(cfgobj_text(code)));
+		if (code) eModule->setPlainText(trUtf8(cfgobj_text(code)));
 	}
 */
 }
@@ -134,18 +135,18 @@ void dEditCfg::updateMD()
 	aCfgItem obj = item->obj;
 
 	md->setInfo( md_info_name, eName->text() );
-	md->setInfo( md_info_remark, eDescription->text() );
+	md->setInfo( md_info_remark, eDescription->toPlainText() );
 	md->setInfo( md_info_author, eAuthor->text() );
 	md->setInfo( md_info_date, eDate->text() );
-	md->rc.setValue( "configfile", eCfgName->text().stripWhiteSpace() );
-	md->rc.setValue( "workdir", eWorkDir->text().stripWhiteSpace() );
-	md->rc.setValue( "dbhost", eDBHost->text().stripWhiteSpace() );
-	md->rc.setValue( "dbtitle", eDBHeader->text().stripWhiteSpace() );
-	md->rc.setValue( "dbname", eDBName->text().stripWhiteSpace() );
-	md->rc.setValue( "dbpass", eDBPass->text().stripWhiteSpace() );
-	md->rc.setValue( "dbuser", eDBUserName->text().stripWhiteSpace() );
-	if (eDBType->currentItem()==1) md->rc.setValue( "dbtype", "mysql" );
-	if (eDBType->currentItem()==2) md->rc.setValue( "dbtype", "postgres" );
+	md->rc.setValue( "configfile", eCfgName->text().trimmed() );
+	md->rc.setValue( "workdir", eWorkDir->text().trimmed() );
+	md->rc.setValue( "dbhost", eDBHost->text().trimmed() );
+	md->rc.setValue( "dbtitle", eDBHeader->text().trimmed() );
+	md->rc.setValue( "dbname", eDBName->text().trimmed() );
+	md->rc.setValue( "dbpass", eDBPass->text().trimmed() );
+	md->rc.setValue( "dbuser", eDBUserName->text().trimmed() );
+	if (eDBType->currentIndex()==1) md->rc.setValue( "dbtype", "mysql" );
+	if (eDBType->currentIndex()==2) md->rc.setValue( "dbtype", "postgres" );
 	globals = md->find( obj, md_globals, 0 );
         md->setSText( globals, md_sourcecode, eModule->toPlainText() );
 
@@ -165,7 +166,7 @@ void dEditCfg::updateMD()
 	n=cfgobj_count(context, aot_sourcecode);
 	if (!n) code=cfgobj_new(context, aot_sourcecode, trUtf8("Глобальный модуль"), NULL);
 	else id=cfgobj_idn(context, aot_sourcecode, 1, &code);
-	if (code) cfgobj_settext(code, eModule->text().utf8());
+	if (code) cfgobj_settext(code, eModule->toPlainText().utf8());
 
 */
 }

@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>dEditCfg</class>
- <widget class="Q3MainWindow" name="dEditCfg" >
+ <widget class="QMainWindow" name="dEditCfg" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -18,7 +18,7 @@
   <property name="windowTitle" >
    <string>Business scheme parameters</string>
   </property>
-  <widget class="QWidget" name="widget" >
+  <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -128,7 +128,7 @@
            </widget>
           </item>
           <item>
-           <widget class="Q3TextEdit" name="eDescription" />
+           <widget class="QTextEdit" name="eDescription" />
           </item>
          </layout>
         </item>
@@ -418,19 +418,7 @@
   </widget>
  </widget>
  <layoutdefault spacing="5" margin="5" />
- <pixmapfunction>rcIcon</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>Q3MainWindow</class>
-   <extends>QWidget</extends>
-   <header>q3mainwindow.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends>Q3Frame</extends>
-   <header>q3textedit.h</header>
-  </customwidget>
   <customwidget>
    <class>ScriptEdit</class>
    <extends>QWidget</extends>

@@ -586,7 +586,7 @@ aDataTable::prepareInsertBuffer()
 {
 	m_editBuffer = m_dbRecord;
 	// Seed every field with a non-null default of its type (empty string, 0,
-	// ...) instead of a null QVariant.  Q3SqlCursor::primeInsert() did the
+	// ...) instead of a null QVariant.  The Qt3 SqlCursor::primeInsert() did the
 	// same, so NOT NULL columns without an explicit value do not fail on
 	// insert.  A null QString must be avoided: the SQLite driver binds it as
 	// SQL NULL, whereas an empty QString binds as ''.

@@ -4,12 +4,12 @@
 #include "ui_deditfield.h"
 
 
-class dEditField : public Q3MainWindow, public Ui::dEditField
+class dEditField : public QMainWindow, public Ui::dEditField
 {
     Q_OBJECT
 
 public:
-    dEditField(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditField(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditField();
 
     QStringList otypes;

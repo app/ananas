@@ -4,12 +4,12 @@
 #include "ui_deditcommand.h"
 
 
-class dEditCommand : public Q3MainWindow, public Ui::dEditCommand
+class dEditCommand : public QMainWindow, public Ui::dEditCommand
 {
     Q_OBJECT
 
 public:
-    dEditCommand(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditCommand(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditCommand();
 
     ananasTreeView *vComActions;

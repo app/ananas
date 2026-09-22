@@ -29,10 +29,8 @@
 #include <aapplication.h>
 #include <qtranslator.h>
 #include <qsplashscreen.h>
-#include <qtextcodec.h>
 //Added by qt3to4:
 #include <QPixmap>
-#include <q3mimefactory.h>
 #include "alog.h"
 #include "ananas.h"
 #include "mainform.h"
@@ -87,13 +85,13 @@ parseCommandLine( AApplication *a )
 //        lang = locale;
         setTranslator( a->langDir(), a->lang() );
 //	printf("locale=%s\n", locale );
-	QString str_ru=QString::null, str_en=QString::null;
+	QString str_ru=QString(), str_en=QString();
 	bool lang_setted = false;
 	bool help_setted = false;
 	for ( i=1; i<argc; i++)
 	{
 	    param = argv[i];
-	    name = param.section("=",0,0).lower();
+	    name = param.section("=",0,0).toLower();
 	    value = param.section("=",1);
 	    if (param == "--help")
 	    {
@@ -118,11 +116,11 @@ parseCommandLine( AApplication *a )
 	{
 		if(lang == "ru")
 		{
-			printf("%s",(const char*)str_ru.local8Bit());
+			printf("%s",str_ru.toLocal8Bit().constData());
 		}
 		else
 		{
-			printf("%s",str_en.ascii());
+			printf("%s",str_en.toLocal8Bit().constData());
 		}
 		return 1;
 	}
@@ -133,9 +131,6 @@ int main( int argc, char ** argv )
 {
 	AApplication app ( argc, argv, AApplication::Designer );
 	MainForm *appWindow = new MainForm();
-//#ifndef _Windows
-	QTextCodec::setCodecForCStrings( QTextCodec::codecForName("UTF8") );
-//#endif
 
     // Для QSettings
 	app.setOrganizationName("ananasgroup");
@@ -147,7 +142,7 @@ int main( int argc, char ** argv )
 //	application = &app;
 //	dSelectDB dselectdb;
 	QPixmap pixmap;
-	QString configWorkDir = QDir::homeDirPath()+"./ananas";
+	QString configWorkDir = QDir::homePath()+"./ananas";
 	QString logLevel =  "0";
 
 	if ( parseCommandLine( &app ) ) return 1;
@@ -207,19 +202,17 @@ int main( int argc, char ** argv )
 	}
 
 	splash->show();
-	splash->message( QObject::tr("Init application"), Qt::AlignBottom, Qt::white );
+	splash->showMessage( QObject::tr("Init application"), Qt::AlignBottom, QColor(Qt::white) );
 	appWindow->rcfile = rcfile;
 	appWindow->md = &database->cfg;
-	qApp->setMainWidget( appWindow );
-	splash->message( QObject::tr("Init forms designer"), Qt::AlignBottom, Qt::white  );
+	splash->showMessage( QObject::tr("Init forms designer"), Qt::AlignBottom, QColor(Qt::white)  );
 	formdesigner = new aFormDesigner();
 
 	//--formdesigner->reparent( mainformws, 0, QPoint( 5, 5 ), false );
 	//		mainformws->addWindow(formdesigner);
-	formdesigner->setCaption( QObject::tr("Dialog forms designer") );
+	formdesigner->setWindowTitle( QObject::tr("Dialog forms designer") );
 	formdesigner->hide();
 	appWindow->show();
-	splash->clear();
 	splash->finish( appWindow );
 	delete splash;
 	qApp->connect( qApp, SIGNAL( lastWindowClosed() ), qApp, SLOT( quit() ) );

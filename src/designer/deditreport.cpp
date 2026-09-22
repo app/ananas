@@ -15,8 +15,9 @@
  *
  */
 dEditReport::dEditReport(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
+    Q_UNUSED(name);
     setupUi(this);
 
     (void)statusBar();
@@ -49,9 +50,9 @@ void dEditReport::setData( aListViewItem *o )
             aAliasEditor *a = new aAliasEditor( md, obj, tAliases );
 	al = a;
 	al->setData();
-	setCaption( tr("Report:") + md->attr( obj, mda_name ) );
+	setWindowTitle( tr("Report:") + md->attr( obj, mda_name ) );
 	eName->setText( md->attr( obj, mda_name ) );
-	eDescription->setText( md->sText( obj, md_description ) );
+	eDescription->setPlainText( md->sText( obj, md_description ) );
         eModule->setPlainText( md->sText( obj, md_sourcecode ) );
 }
 
@@ -69,9 +70,9 @@ void dEditReport::updateMD()
 	aCfgItem obj = item->obj;
 
 	al->updateMD();
-	item->setText( 0, eName->text().stripWhiteSpace() );
-	md->setAttr( obj, mda_name, eName->text().stripWhiteSpace() );
-	md->setSText( obj, md_description, eDescription->text() );
+	item->setText( 0, eName->text().trimmed() );
+	md->setAttr( obj, mda_name, eName->text().trimmed() );
+	md->setSText( obj, md_description, eDescription->toPlainText() );
         md->setSText( obj, md_sourcecode, eModule->toPlainText() );
 }
 
@@ -79,5 +80,5 @@ void dEditReport::destroy()
 {
     updateMD();
     ( (MainForm*)this->topLevelWidget() )->wl->remove( this );
-    ( (MainForm*)this->topLevelWidget() )->removeTab(name());
+    ( (MainForm*)this->topLevelWidget() )->removeTab(objectName());
 }

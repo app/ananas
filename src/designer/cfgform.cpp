@@ -4,36 +4,36 @@
 #include <qimage.h>
 #include <qpixmap.h>
 
-#include <q3listview.h>
 #include <qlabel.h>
 #include <qpixmap.h>
-#include <q3popupmenu.h>
 #include <qstatusbar.h>
 #include <qlineedit.h>
 #include <qmessagebox.h>
-#include <q3valuelist.h>
 #include <qimage.h>
 #include <qbitmap.h>
-#include <q3table.h>
-#include <q3dragobject.h>
-#include <qmime.h>
-#include <q3filedialog.h>
 #include <qinputdialog.h>
-#include <q3cstring.h>
 //Added by qt3to4:
-#include <Q3GridLayout>
 #include <QCloseEvent>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QGridLayout>
+#include <QIcon>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QMdiSubWindow>
+#include <QTabWidget>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 //#include <iostream.h>
 
 #include "ananas.h"
 #include "mainform.h"
 #include "deditfield.h"
 #include "deditcfg.h"
-#include "deditdoc.h"
 #include "deditrole.h"
 #include "deditreport.h"
 #include "deditdialog.h"
-#include "deditcat.h"
 #include "deditlang.h"
 #include "mdtree.h"
 #include "actiontree.h"
@@ -45,9 +45,10 @@
  *
  */
 CfgForm::CfgForm(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
     setupUi(this);
+    if ( name ) setObjectName( name );
 
     (void)statusBar();
 }
@@ -73,12 +74,12 @@ void CfgForm::languageChange()
 extern MainForm *mainform;
 
 void
-set_Icon(Q3ListViewItem *item, const char *name)
+set_Icon(QTreeWidgetItem *item, const char *name)
 {
     char in[200];
     strcpy(in, name);
     strcat(in,".png");
-    item->setPixmap(0, rcIcon(in));
+    item->setIcon(0, QIcon(rcIcon(in)));
 }
 
 
@@ -133,7 +134,7 @@ CfgForm::init( QString &rcf, bool flagNew )	//	flagNew shows if it needs to crea
     statusBar()->hide();
     configform=this;
     rcfile = rcf;	//	resource file
-    setIcon( rcIcon("a-system.png"));
+    setWindowIcon( rcIcon("a-system.png"));
     if ( !flagNew ) {	// read rcfile
 	if ( cfg.readrc( rcfile ) ) {
 		aLog::print(aLog::Error,tr("CfgForm readrc error"));
@@ -141,25 +142,31 @@ CfgForm::init( QString &rcf, bool flagNew )	//	flagNew shows if it needs to crea
 	}
     }
 //    globalCfg = &cfg;
-    setCaption(tr("Business scheme: ")+cfg.info( mda_name ));
+    setWindowTitle(tr("Business scheme: ")+cfg.info( mda_name ));
 //	QWidget *tab_0 = new QWidget( tabWidget, "tab" );
-    Q3GridLayout *l = new Q3GridLayout( tabWidget->page(0), 1, 1, 1,  2, "tablayout" );
-    mdtree = new aMetadataTreeView( tabWidget->page(0), &cfg );	// metadata tree creation
+    QGridLayout *l = new QGridLayout( tabWidget->widget(0) );
+    l->setContentsMargins(1, 1, 1, 1);
+    l->setSpacing(2);
+    mdtree = new aMetadataTreeView( tabWidget->widget(0), &cfg );	// metadata tree creation
     l->addWidget( mdtree, 0, 0);
 //	tabWidget->insertTab( tab_0, tr( "Business scheme" ), 0 );
 //	tabWidget->setCurrentPage( 0 );
     initLang();	//	languages tab initialization
     initRoles();	//	rights tab initialization
     initImageCollection();	//	image collection tab initialization
-    mainform->TBToolbar->setShown( TRUE );	//	show edit toolbar
-    mainform->configSaveAction->setVisible( TRUE );	//	show save button
+    mainform->TBToolbar->setVisible( true );	//	show edit toolbar
+    mainform->configSaveAction->setVisible( true );	//	show save button
 
-    actiontree = new aActionTreeView ( tabWidget->page(1), &cfg );	//	action tree creation
-    Q3GridLayout *j = new Q3GridLayout( tabWidget->page(1), 1, 1, 1,  2, "atablayout" );
+    actiontree = new aActionTreeView ( tabWidget->widget(1), &cfg );	//	action tree creation
+    QGridLayout *j = new QGridLayout( tabWidget->widget(1) );
+    j->setContentsMargins(1, 1, 1, 1);
+    j->setSpacing(2);
     j->addWidget( actiontree, 0, 0);
 
-    interfacetree = new InterfaceTreeView ( tabWidget->page(2), &cfg );	//	interface tree creation
-    Q3GridLayout *k = new Q3GridLayout( tabWidget->page(2), 1, 1, 1,  2, "itablayout" );
+    interfacetree = new InterfaceTreeView ( tabWidget->widget(2), &cfg );	//	interface tree creation
+    QGridLayout *k = new QGridLayout( tabWidget->widget(2) );
+    k->setContentsMargins(1, 1, 1, 1);
+    k->setSpacing(2);
     k->addWidget( interfacetree, 0, 0);
     // connection toolbar actions
     connect(mainform->objMetadataNewAction, SIGNAL(activated()), mdtree, SLOT( itemNew() ) );
@@ -192,18 +199,18 @@ void CfgForm::initImageCollection()
 
     oroot = cfg.find( mdc_root );	// get root
     image_collection = cfg.find( oroot, md_image_collection, 0 );	// get image col part
-    if ( image_collection.isNull() ) cfg.insert( oroot, md_image_collection, QString::null, -1 );
+    if ( image_collection.isNull() ) cfg.insert( oroot, md_image_collection, QString(), -1 );
     n = cfg.countChild( image_collection, md_image );	// count images
     for ( i = 0; i < n; i++ ) {
 	image = cfg.findChild( image_collection, md_image, i );	// foreach
 	name = cfg.attr( image, mda_name );	// get name
 	pix.loadFromData( cfg.binary( image ) );	// load binary
-	Q3IconViewItem *item = new Q3IconViewItem( vImageCollection, name, pix );	// create image
-	item->setRenameEnabled( TRUE );	// set rename enabled
-	vImageCollection->insertItem( item, 0 );	// insert image
+	QListWidgetItem *item = new QListWidgetItem( QIcon(pix), name, vImageCollection );	// create image
+	item->setFlags( item->flags() | Qt::ItemIsEditable );	// set rename enabled
+	vImageCollection->insertItem( 0, item );	// insert image
 	idList.insert( cfg.id( image ), item );		// add image into dict
     }
-    if ( vImageCollection->count() ) bRemoveImage->setEnabled( TRUE );	// enable remove button
+    if ( vImageCollection->count() ) bRemoveImage->setEnabled( true );	// enable remove button
 }
 
 /*
@@ -212,19 +219,14 @@ void CfgForm::initImageCollection()
 void CfgForm::bAddImage_clicked()
 {
     QPixmap pix;
-    Q3FileDialog *fd = new Q3FileDialog( "", "Images (*.png *.xpm *.jpg *.jpeg *.bmp)", 0, 0, TRUE );
+    QFileDialog *fd = new QFileDialog( 0, tr("Open image dialog"), QString(), "Images (*.png *.xpm *.jpg *.jpeg *.bmp)" );
     QByteArray ba;
     QString name;
     QStringList names;
     aCfgItem image_collection, image;
     QFile f;
-    PixmapPreview *p = new PixmapPreview;
 
-    fd->setContentsPreview( p, p );
-    fd->setPreviewMode( Q3FileDialog::Contents );
-    fd->setContentsPreviewEnabled( TRUE );
-    fd->setCaption( tr("Open image dialog" ) );
-    fd->setMode( Q3FileDialog::ExistingFiles );		// tune file dialogue
+    fd->setFileMode( QFileDialog::ExistingFiles );		// tune file dialogue
     if ( fd->exec() == QDialog::Accepted ) {		// if accepted
 	names = fd->selectedFiles();			// get selected filenames
 	QStringList::Iterator it = names.begin();
@@ -232,7 +234,7 @@ void CfgForm::bAddImage_clicked()
 	    name = *it;
 	    ++it;
 	    if ( !name.isEmpty() ) {			// if not empty
-		f.setName( name );
+		f.setFileName( name );
 		if ( f.open( QIODevice::ReadOnly ) ){		// open r\o mode
 				ba = f.readAll();	// get binary
 				f.close();
@@ -241,17 +243,17 @@ void CfgForm::bAddImage_clicked()
 		}
 		QFileInfo fi( name );
 		name = fi.baseName();
-		Q3IconViewItem *item = new Q3IconViewItem( vImageCollection, name, pix );
-		item->setRenameEnabled( TRUE );		// set rename enabled
-		vImageCollection->insertItem( item, 0 );	// insert image
+		QListWidgetItem *item = new QListWidgetItem( QIcon(pix), name, vImageCollection );
+		item->setFlags( item->flags() | Qt::ItemIsEditable );		// set rename enabled
+		vImageCollection->insertItem( 0, item );	// insert image
 		image_collection = cfg.findChild( cfg.find( mdc_root ), md_image_collection, 0 );
 		image = cfg.insert( image_collection, md_image, name );	// insert image metaitem
 		cfg.setBinary( image, ba );		// set binary
 		idList.insert( cfg.id( image ), item );	// add image into dict
 	    }
 	delete fd;					// delete file dialogue
-	bRemoveImage->setEnabled( TRUE );		// remove button enable
-	mainform->objTBDeleteAction->setEnabled( TRUE );	// toolbar button enable
+	bRemoveImage->setEnabled( true );		// remove button enable
+	mainform->objTBDeleteAction->setEnabled( true );	// toolbar button enable
     }
 }
 
@@ -260,7 +262,7 @@ void CfgForm::bAddImage_clicked()
   */
 void CfgForm::bRemoveImage_clicked()
 {
-    Q3IconViewItem *current;
+    QListWidgetItem *current;
     aCfgItem image_collection, image;
     int i, n, id;
 
@@ -270,7 +272,7 @@ void CfgForm::bRemoveImage_clicked()
     for ( i = 0; i < n; i++ ) {
 	image = cfg.findChild( image_collection, md_image, i );	// get metaitem
 	id = cfg.id( image );					// get id
-	if ( current == idList.find( id ) ) {			// if corresponds
+	if ( current == idList.value( id ) ) {			// if corresponds
 	    cfg.remove( image );
 	    idList.remove( id );				// rmove from metadata and from dict
 	    delete current;
@@ -278,16 +280,16 @@ void CfgForm::bRemoveImage_clicked()
 	}
     }
     if ( !vImageCollection->count() ) {				// if last image removed
-	bRemoveImage->setEnabled( FALSE );			// disable remove button and toolbar button
-	mainform->objTBDeleteAction->setEnabled( FALSE );
+	bRemoveImage->setEnabled( false );			// disable remove button and toolbar button
+	mainform->objTBDeleteAction->setEnabled( false );
     }
-    vImageCollection->sort( TRUE );	// turn image sorting on
+    vImageCollection->sortItems( Qt::AscendingOrder );	// turn image sorting on
 }
 
 /*
   * Image rename event handler
   */
-void CfgForm::vImageCollection_itemRenamed( Q3IconViewItem *item, const QString &name )
+void CfgForm::vImageCollection_itemRenamed( QListWidgetItem *item, const QString &name )
 {
     aCfgItem image_collection, image;
     int i, n;
@@ -296,7 +298,7 @@ void CfgForm::vImageCollection_itemRenamed( Q3IconViewItem *item, const QString 
     n = cfg.countChild( image_collection, md_image );		// count images
     for ( i = 0; i < n; i++ ) {
 	image = cfg.findChild( image_collection, md_image, i );	// get timage
-	if ( item == idList.find( cfg.id( image ) ) ) {		// if corresponds
+	if ( item == idList.value( cfg.id( image ) ) ) {		// if corresponds
 	    cfg.setAttr( image, mda_name, name );		// rename metaitem
 	    break;
 	}
@@ -312,7 +314,7 @@ void CfgForm::initLang()
 	aCfgItem lang, obj;
 	int i, n;
 
-	tLang->setNumRows( 0 );
+	tLang->setRowCount( 0 );
 	oroot = cfg.find( mdc_root );		// get root
 	if ( oroot.isNull() ) {
 		aLog::print(aLog::Info,tr("CfgForm metadata root is null"));
@@ -321,23 +323,26 @@ void CfgForm::initLang()
 	if ( lang.isNull() ) {
 		aLog::print(aLog::Info,tr("CfgForm metadata lang is null"));
 	}
-	if ( lang.isNull() ) lang = cfg.insert( oroot, md_languages, QString::null, -1 );
+	if ( lang.isNull() ) lang = cfg.insert( oroot, md_languages, QString(), -1 );
 	n = cfg.count( lang, md_language );		// count languages
 	aLog::print(aLog::Debug,QString(tr("lang = %1")).arg(n));
 	for ( i = 0; i < n; i++ ) {			// foreach
 		obj = cfg.find( lang, md_language, i);		// get lang
 		if ( obj.isNull() ) aLog::print(aLog::Debug,QString(tr("CfgForm %1 metadata lang is null")).arg(i));
-		tLang->insertRows( tLang->numRows(), 1 );	// insert into table
-		tLang->setText( tLang->numRows()-1, 0, cfg.attr( obj, mda_tag ) );
-		tLang->setText( tLang->numRows()-1, 1, cfg.attr( obj, mda_name ) );
-		tLang->setText( tLang->numRows()-1, 2, cfg.attr( obj, mda_trfile ) );	// fill cols
+		tLang->insertRow( tLang->rowCount() );	// insert into table
+		if ( !tLang->item( tLang->rowCount()-1, 0 ) ) tLang->setItem( tLang->rowCount()-1, 0, new QTableWidgetItem() );
+		tLang->item( tLang->rowCount()-1, 0 )->setText( cfg.attr( obj, mda_tag ) );
+		if ( !tLang->item( tLang->rowCount()-1, 1 ) ) tLang->setItem( tLang->rowCount()-1, 1, new QTableWidgetItem() );
+		tLang->item( tLang->rowCount()-1, 1 )->setText( cfg.attr( obj, mda_name ) );
+		if ( !tLang->item( tLang->rowCount()-1, 2 ) ) tLang->setItem( tLang->rowCount()-1, 2, new QTableWidgetItem() );
+		tLang->item( tLang->rowCount()-1, 2 )->setText( cfg.attr( obj, mda_trfile ) );	// fill cols
 	}
-	if ( !tLang->numRows() ) {	//	turn buttons off
-		bDelete->setEnabled( FALSE );
-		bEdit->setEnabled( FALSE );
-		bKill->setEnabled( FALSE);
-		mainform->objLanguagesClearAction->setEnabled( FALSE );
-		mainform->objLanguagesEditAction->setEnabled( FALSE );
+	if ( !tLang->rowCount() ) {	//	turn buttons off
+		bDelete->setEnabled( false );
+		bEdit->setEnabled( false );
+		bKill->setEnabled( false);
+		mainform->objLanguagesClearAction->setEnabled( false );
+		mainform->objLanguagesEditAction->setEnabled( false );
 	}
 }
 
@@ -351,25 +356,27 @@ void CfgForm::initRoles()
     int i, n;
     QString rd;
 
-    tRole->setNumRows( 0 );				// no rows
+    tRole->setRowCount( 0 );				// no rows
     oroot = cfg.find( mdc_root );			// get root
     role = cfg.find( oroot, md_roles, 0 );		// get role part
-    if ( role.isNull() ) role = cfg.insert( oroot, md_roles, QString::null, -1 );
+    if ( role.isNull() ) role = cfg.insert( oroot, md_roles, QString(), -1 );
     n = cfg.count( role, md_role );			// count roles
     for ( i = 0; i < n; i++ ) {
 	obj = cfg.find( role, md_role, i);		// get role
-	tRole->insertRows( tRole->numRows(), 1 );	// insert this
-	tRole->setText( tRole->numRows()-1, 0, cfg.attr( obj, mda_name ) );
+	tRole->insertRow( tRole->rowCount() );	// insert this
+	if ( !tRole->item( tRole->rowCount()-1, 0 ) ) tRole->setItem( tRole->rowCount()-1, 0, new QTableWidgetItem() );
+	tRole->item( tRole->rowCount()-1, 0 )->setText( cfg.attr( obj, mda_name ) );
 	rd = cfg.sText( obj, md_description );
 	rd.replace( QChar('\n'), " " );			// remove \n symbol for good perception
-	tRole->setText( tRole->numRows()-1, 1, rd ); // fill cols
+	if ( !tRole->item( tRole->rowCount()-1, 1 ) ) tRole->setItem( tRole->rowCount()-1, 1, new QTableWidgetItem() );
+	tRole->item( tRole->rowCount()-1, 1 )->setText( rd ); // fill cols
     }
-    if ( !tRole->numRows() ) {	//	turn unneccessary buttons off
-	bDeleteRole->setEnabled( FALSE );
-	bEditRole->setEnabled( FALSE );
-	bKillRole->setEnabled( FALSE);
-	mainform->objRoleClearAction->setEnabled( FALSE );
-	mainform->objRoleEditAction->setEnabled( FALSE );
+    if ( !tRole->rowCount() ) {	//	turn unneccessary buttons off
+	bDeleteRole->setEnabled( false );
+	bEditRole->setEnabled( false );
+	bKillRole->setEnabled( false);
+	mainform->objRoleClearAction->setEnabled( false );
+	mainform->objRoleEditAction->setEnabled( false );
     }
 }
 
@@ -381,7 +388,7 @@ void CfgForm::destroy()
 	configform = 0;
 //	globalCfg = 0;			// clear pointers
 	mainform->cfgform = NULL;
-        mainform->removeTab(name());
+        mainform->removeTab(objectName());
 }
 
 /*
@@ -393,7 +400,7 @@ void CfgForm::save()
 //    aCfgItem oroot, lang, obj;
     aDatabase *database = aDatabase::database();
 
-    if ( cfg.writerc( rcfile ) ) cfg_message(0, tr("Unable to write rc file."));
+    if ( cfg.writerc( rcfile ) ) cfg_message(0, tr("Unable to write rc file.").toUtf8().constData());
     else {
 //    	if ( database.init( rcfile ) ){
 		database->update();
@@ -409,19 +416,20 @@ void CfgForm::bAdd_clicked()
 {
     aCfgItem lang, obj;
 
-    tLang->insertRows( tLang->numRows(), 1 );			// insert new row
-    tLang->setCurrentCell( tLang->numRows()-1, 0 );		// focus on new role
+    tLang->insertRow( tLang->rowCount() );			// insert new row
+    tLang->setCurrentCell( tLang->rowCount()-1, 0 );		// focus on new role
     lang = cfg.find( cfg.find( mdc_root ), md_languages, 0 );	// get lang part
     obj = cfg.insert( lang, md_language, tr("New language") );	// insert new metaitem
-    dEditLang *e = new dEditLang( ws, 0, Qt::WDestructiveClose );
+    dEditLang *e = new dEditLang( ws, 0 );
+    e->setAttribute(Qt::WA_DeleteOnClose);
     e->setData( configform, obj );
     e->show();						// create editor, set its data and show this one
-    bDelete->setEnabled( TRUE );
-    bEdit->setEnabled( TRUE );
-    bKill->setEnabled( TRUE );				// enable control buttons and toolbar actions
-    mainform->objLanguagesClearAction->setEnabled( TRUE );
-    mainform->objLanguagesEditAction->setEnabled( TRUE );
-    mainform->objTBDeleteAction->setEnabled( TRUE );
+    bDelete->setEnabled( true );
+    bEdit->setEnabled( true );
+    bKill->setEnabled( true );				// enable control buttons and toolbar actions
+    mainform->objLanguagesClearAction->setEnabled( true );
+    mainform->objLanguagesEditAction->setEnabled( true );
+    mainform->objTBDeleteAction->setEnabled( true );
 }
 
 /*
@@ -429,7 +437,8 @@ void CfgForm::bAdd_clicked()
   */
 void CfgForm::bDelete_clicked()
 {
-   if ( ! QMessageBox::warning( this, tr("Deleting row"), tr("Delete '%1'?").arg( tLang->text( tLang->currentRow(), 1 ) ), tr("Yes"), tr("No") ) ) {
+   QTableWidgetItem *curLangName = tLang->item( tLang->currentRow(), 1 );
+   if ( QMessageBox::warning( this, tr("Deleting row"), tr("Delete '%1'?").arg( curLangName ? curLangName->text() : QString() ), QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
 // request for delete
        aCfgItem lang, obj, alias;
        int i, n;
@@ -438,19 +447,20 @@ void CfgForm::bDelete_clicked()
        n = cfg.count( lang, md_language );	// count langs
        for ( i = 0; i < n; i++ ) {
 	obj = cfg.find( lang, md_language, i );		// foreach lang
-	if ( cfg.attr( obj, mda_tag ) == tLang->text( tLang->currentRow(), 0 ) ) {
+	QTableWidgetItem *curLangTag = tLang->item( tLang->currentRow(), 0 );
+	if ( cfg.attr( obj, mda_tag ) == ( curLangTag ? curLangTag->text() : QString() ) ) {
 	    cfg.remove( obj );			// if tags corresponding remove metaitem
 	    break;
 	}
        }
        tLang->removeRow( tLang->currentRow() );		// remove row
-       if ( !tLang->numRows() ) {
-	   bDelete->setEnabled( FALSE );
-	   bEdit->setEnabled( FALSE );
-	   bKill->setEnabled( FALSE );		// if last row removed then buttons and actions are disabled
-	   mainform->objLanguagesClearAction->setEnabled( FALSE );
-	   mainform->objLanguagesEditAction->setEnabled( FALSE );
-	   mainform->objTBDeleteAction->setEnabled( FALSE );
+       if ( !tLang->rowCount() ) {
+	   bDelete->setEnabled( false );
+	   bEdit->setEnabled( false );
+	   bKill->setEnabled( false );		// if last row removed then buttons and actions are disabled
+	   mainform->objLanguagesClearAction->setEnabled( false );
+	   mainform->objLanguagesEditAction->setEnabled( false );
+	   mainform->objTBDeleteAction->setEnabled( false );
        }
    }
 }
@@ -464,7 +474,8 @@ void CfgForm::bEdit_clicked()
 
     obj = cfg.find( cfg.find( cfg.find( mdc_root ), md_languages, 0 ), md_language, tLang->currentRow() );
     // get lang metaitem
-    dEditLang *e = new dEditLang( ws, 0, Qt::WDestructiveClose );
+    dEditLang *e = new dEditLang( ws, 0 );
+    e->setAttribute(Qt::WA_DeleteOnClose);
     e->setData( configform, obj );
     e->show();				// create editor, set its data and show this one
 }
@@ -490,8 +501,8 @@ void CfgForm::bKill_clicked()
     while ( i < n ) {				// foreach
 	ac = 0;					// unset counter
 	alias = cfg.find( oroot, md_alias, i );	// get alias
-	for ( s = 0; s < tLang->numRows(); s++ ) // check aliase tag on existing in lang list
-	    if ( cfg.attr( alias, mda_tag ) == tLang->text( s, 0 ) ) ac++;
+	for ( s = 0; s < tLang->rowCount(); s++ ) // check aliase tag on existing in lang list
+	    if ( cfg.attr( alias, mda_tag ) == ( tLang->item( s, 0 ) ? tLang->item( s, 0 )->text() : QString() ) ) ac++;
 	if ( !ac ) {
 	    cfg.remove( alias );
 	    killed++;
@@ -507,7 +518,7 @@ void CfgForm::newObj()
 }
 
 
-void CfgForm::listCfg_onItem( Q3ListViewItem * )
+void CfgForm::listCfg_onItem( QTreeWidgetItem * )
 {
 
 }
@@ -536,18 +547,18 @@ void CfgForm::closeEvent( QCloseEvent *e )
 {
 
 	if ( !cfg.modified() ) {		// if data didn't modify send event further
-	Q3MainWindow::closeEvent( e );
+	QMainWindow::closeEvent( e );
 	return;
     }
     switch( QMessageBox::warning( this, tr("Saving changes"),
-				  tr("Save changes %1?").arg( caption() ),
+				  tr("Save changes %1?").arg( windowTitle() ),
 				  tr("Yes"), tr("No"), tr("Cancel") ) ) {
 	// request for saving before exit
     case 0:	// yes
 	{
 		mainform->closeChildWindows();
 		save();			// save data and send event further
-		Q3MainWindow::closeEvent( e );
+		QMainWindow::closeEvent( e );
 /*
 	    cancelupdate=0;
 	    if (closeSubWindows()) e->ignore();
@@ -566,19 +577,19 @@ void CfgForm::closeEvent( QCloseEvent *e )
 //	    //e->accept();
 //	}				// send event further
 		mainform->closeChildWindows();
-        	Q3MainWindow::closeEvent(e);
+        	QMainWindow::closeEvent(e);
 	break;
     default:
 	e->ignore();			// ignore event by default
 	break;
-	mainform->TBToolbar->setShown( FALSE );
-	mainform->configSaveAction->setVisible( FALSE );
-	mainform->tbMetadata->setShown( FALSE );
-	mainform->tbActions->setShown( FALSE );
-	mainform->tbInterface->setShown( FALSE );		// disable toolbars anyway
-	mainform->tbRights->setShown( FALSE );
-	mainform->tbLanguages->setShown( FALSE );
-	mainform->tbImageCollection->setShown( FALSE );
+	mainform->TBToolbar->setVisible( false );
+	mainform->configSaveAction->setVisible( false );
+	mainform->tbMetadata->setVisible( false );
+	mainform->tbActions->setVisible( false );
+	mainform->tbInterface->setVisible( false );		// disable toolbars anyway
+	mainform->tbRights->setVisible( false );
+	mainform->tbLanguages->setVisible( false );
+	mainform->tbImageCollection->setVisible( false );
 //	closeSubWindows();
     }
     //    } else {
@@ -592,12 +603,12 @@ void CfgForm::closeEvent( QCloseEvent *e )
 int
 CfgForm::closeSubWindows()
 {
-    QWidgetList windows = ws->windowList();		// workspace windows list
+    QList<QMdiSubWindow*> windows = ws->subWindowList();		// workspace windows list
     if ( windows.count() ) {				// if there're opened windows
 	for ( int i = 0; i < int(windows.count()); ++i ) {	// foreach
-	    QWidget *window = windows.at( i );
+	    QWidget *window = windows.at( i )->widget();
 	    if (window!=this) {				// if not this
-	    	if ( window->className() == tr ( "messageswindow" ) ) {
+	    	if ( QString( window->metaObject()->className() ) == tr ( "messageswindow" ) ) {
 			delete window;	// if messageswindow remove it
 			continue;
 		}
@@ -672,84 +683,84 @@ void CfgForm::tabWidget_selected( const QString &tab )
 	connect(mainform->objTBRenameAction, SIGNAL(activated()), mdtree, SLOT( itemRename() ) );
 	connect(mainform->objTBMoveUpAction, SIGNAL(activated()), mdtree, SLOT( itemMoveUp() ) );
 	connect(mainform->objTBMoveDownAction, SIGNAL(activated()), mdtree, SLOT( itemMoveDown() ) );
-	fM = TRUE;
+	fM = true;
     } else {
 	    disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), mdtree, SLOT( itemDelete() ) );
 	    disconnect(mainform->objTBRenameAction, SIGNAL(activated()), mdtree, SLOT( itemRename() ) );
 	    disconnect(mainform->objTBMoveUpAction, SIGNAL(activated()), mdtree, SLOT( itemMoveUp() ) );
 	    disconnect(mainform->objTBMoveDownAction, SIGNAL(activated()), mdtree, SLOT( itemMoveDown() ) );
-	    fM= FALSE;
+	    fM= false;
 	}
     if ( tab == tr("Actions") ) {
 	connect(mainform->objTBDeleteAction, SIGNAL(activated()), actiontree, SLOT( itemDelete() ) );
 	connect(mainform->objTBRenameAction, SIGNAL(activated()), actiontree, SLOT( itemRename() ) );
 	connect(mainform->objTBMoveUpAction, SIGNAL(activated()), actiontree, SLOT( itemMoveUp() ) );
 	connect(mainform->objTBMoveDownAction, SIGNAL(activated()), actiontree, SLOT( itemMoveDown() ) );
-	fA = TRUE;
+	fA = true;
     } else {
 	    disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), actiontree, SLOT( itemDelete() ) );
 	    disconnect(mainform->objTBRenameAction, SIGNAL(activated()), actiontree, SLOT( itemRename() ) );
 	    disconnect(mainform->objTBMoveUpAction, SIGNAL(activated()), actiontree, SLOT( itemMoveUp() ) );
 	    disconnect(mainform->objTBMoveDownAction, SIGNAL(activated()), actiontree, SLOT( itemMoveDown() ) );
-	    fA = FALSE;
+	    fA = false;
 	}
     if ( tab == tr("Interface") ) {
 	connect(mainform->objTBDeleteAction, SIGNAL(activated()), interfacetree, SLOT( itemDelete() ) );
 	connect(mainform->objTBRenameAction, SIGNAL(activated()), interfacetree, SLOT( itemRename() ) );
 	connect(mainform->objTBMoveUpAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveUp() ) );
 	connect(mainform->objTBMoveDownAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveDown() ) );
-	fI = TRUE;
+	fI = true;
     } else {
 	    disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), interfacetree, SLOT( itemDelete() ) );
 	    disconnect(mainform->objTBRenameAction, SIGNAL(activated()), interfacetree, SLOT( itemRename() ) );
 	    disconnect(mainform->objTBMoveUpAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveUp() ) );
 	    disconnect(mainform->objTBMoveDownAction, SIGNAL(activated()), interfacetree, SLOT( itemMoveDown() ) );
-	    fI = FALSE;
+	    fI = false;
 	}
     if ( tab == tr("Rights") )
     {
 	 connect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDeleteRole_clicked() ) );
-	 fR = TRUE;
-	 if ( !tRole->numRows() ) mainform->objTBDeleteAction->setEnabled( FALSE );
-	 else mainform->objTBDeleteAction->setEnabled( TRUE );
+	 fR = true;
+	 if ( !tRole->rowCount() ) mainform->objTBDeleteAction->setEnabled( false );
+	 else mainform->objTBDeleteAction->setEnabled( true );
      } else {
 	 disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDeleteRole_clicked() ) );
-	 fR = FALSE;
+	 fR = false;
      }
      if ( tab == tr("Languages") ) {
 	 connect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDelete_clicked() ) );
-	 fL = TRUE;
-	 if ( !tLang->numRows() ) mainform->objTBDeleteAction->setEnabled( FALSE );
-	 else mainform->objTBDeleteAction->setEnabled( TRUE );
+	 fL = true;
+	 if ( !tLang->rowCount() ) mainform->objTBDeleteAction->setEnabled( false );
+	 else mainform->objTBDeleteAction->setEnabled( true );
      } else {
 	 disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bDelete_clicked() ) );
-	 fL = FALSE;
+	 fL = false;
      }
      if ( tab == tr("Image collection") ) {
 	 connect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bRemoveImage_clicked() ) );
-	 fIC = TRUE;
-	 if ( !vImageCollection->count() ) mainform->objTBDeleteAction->setEnabled( FALSE );
-	 else mainform->objTBDeleteAction->setEnabled( TRUE );
+	 fIC = true;
+	 if ( !vImageCollection->count() ) mainform->objTBDeleteAction->setEnabled( false );
+	 else mainform->objTBDeleteAction->setEnabled( true );
      } else {
 	 disconnect(mainform->objTBDeleteAction, SIGNAL(activated()), this, SLOT( bRemoveImage_clicked() ) );
-	 fIC = FALSE;
+	 fIC = false;
      }
      if ( tab == tr("Image collection") || tab == tr("Languages") || tab == tr("Rights") ) {
-	 mainform->objTBRenameAction->setVisible( FALSE );
-	 mainform->objTBMoveUpAction->setVisible( FALSE );
-	 mainform->objTBMoveDownAction->setVisible( FALSE );
+	 mainform->objTBRenameAction->setVisible( false );
+	 mainform->objTBMoveUpAction->setVisible( false );
+	 mainform->objTBMoveDownAction->setVisible( false );
      } else {
-	 mainform->objTBRenameAction->setVisible( TRUE );
-	 mainform->objTBMoveUpAction->setVisible( TRUE );
-	 mainform->objTBMoveDownAction->setVisible( TRUE );
-	 mainform->objTBDeleteAction->setEnabled( TRUE );
+	 mainform->objTBRenameAction->setVisible( true );
+	 mainform->objTBMoveUpAction->setVisible( true );
+	 mainform->objTBMoveDownAction->setVisible( true );
+	 mainform->objTBDeleteAction->setEnabled( true );
      }
-     mainform->tbMetadata->setShown( fM );
-     mainform->tbActions->setShown( fA );
-     mainform->tbInterface->setShown( fI );
-     mainform->tbRights->setShown( fR );
-     mainform->tbLanguages->setShown( fL );
-     mainform->tbImageCollection->setShown( fIC );
+     mainform->tbMetadata->setVisible( fM );
+     mainform->tbActions->setVisible( fA );
+     mainform->tbInterface->setVisible( fI );
+     mainform->tbRights->setVisible( fR );
+     mainform->tbLanguages->setVisible( fL );
+     mainform->tbImageCollection->setVisible( fIC );
 }
 
 /*
@@ -759,19 +770,20 @@ void CfgForm::bAddRole_clicked()
 {
     aCfgItem role, obj, roles;
 
-    tRole->insertRows( tRole->numRows(), 1 );	// insert row into table
-    tRole->setCurrentCell( tRole->numRows()-1, 0 );	// focus on new cell
+    tRole->insertRow( tRole->rowCount() );	// insert row into table
+    tRole->setCurrentCell( tRole->rowCount()-1, 0 );	// focus on new cell
     roles = cfg.find( cfg.find( mdc_root ), md_roles, 0 ); // get role part of configuration
     obj = cfg.insert( roles, md_role, tr("New role") );	// insert new role into part
-    dEditRole *e = new dEditRole( ws, 0, Qt::WDestructiveClose );
+    dEditRole *e = new dEditRole( ws, 0 );
+    e->setAttribute(Qt::WA_DeleteOnClose);
     e->setData( configform, obj );
     e->show();	// create role editor, set its data and show this one
-    bDeleteRole->setEnabled( TRUE );
-    bEditRole->setEnabled( TRUE );
-    bKillRole->setEnabled( TRUE );
-    mainform->objRoleClearAction->setEnabled( TRUE );
-    mainform->objRoleEditAction->setEnabled( TRUE );
-    mainform->objTBDeleteAction->setEnabled( TRUE ); // enable buttons and actions
+    bDeleteRole->setEnabled( true );
+    bEditRole->setEnabled( true );
+    bKillRole->setEnabled( true );
+    mainform->objRoleClearAction->setEnabled( true );
+    mainform->objRoleEditAction->setEnabled( true );
+    mainform->objTBDeleteAction->setEnabled( true ); // enable buttons and actions
 }
 
 /*
@@ -779,7 +791,8 @@ void CfgForm::bAddRole_clicked()
   */
 void CfgForm::bDeleteRole_clicked()
 {
-    if ( ! QMessageBox::warning( this, tr("Deleting row"), tr("Delete '%1'?").arg( tRole->text( tRole->currentRow(), 0 ) ), tr("Yes"), tr("No") ) ) {
+    QTableWidgetItem *curRoleName = tRole->item( tRole->currentRow(), 0 );
+    if ( QMessageBox::warning( this, tr("Deleting row"), tr("Delete '%1'?").arg( curRoleName ? curRoleName->text() : QString() ), QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes ) {
 // request for deleting
 	aCfgItem roles, obj, role;
 	int i, n;
@@ -788,19 +801,20 @@ void CfgForm::bDeleteRole_clicked()
 	n = cfg.count( roles, md_role );	// count roles
 	for ( i = 0; i < n; i++ ) {	// foreach role
 	    obj = cfg.find( roles, md_role, i );	// get this one
-	    if ( cfg.attr( obj, mda_name ) == tRole->text( tRole->currentRow(), 0 ) ) {
+	    QTableWidgetItem *roleName = tRole->item( tRole->currentRow(), 0 );
+	    if ( cfg.attr( obj, mda_name ) == ( roleName ? roleName->text() : QString() ) ) {
 		cfg.remove( obj );
 		break;			// if found delete and break the cycle
 	    }
 	}
 	tRole->removeRow( tRole->currentRow() );	// remove row from table
-	if ( !tRole->numRows() ) {		// if there're no rows disable buttons and actions
-	    bDeleteRole->setEnabled( FALSE );
-	    bEditRole->setEnabled( FALSE );
-	    bKillRole->setEnabled( FALSE );
-	    mainform->objRoleClearAction->setEnabled( FALSE );
-	    mainform->objRoleEditAction->setEnabled( FALSE );
-	    mainform->objTBDeleteAction->setEnabled( FALSE );
+	if ( !tRole->rowCount() ) {		// if there're no rows disable buttons and actions
+	    bDeleteRole->setEnabled( false );
+	    bEditRole->setEnabled( false );
+	    bKillRole->setEnabled( false );
+	    mainform->objRoleClearAction->setEnabled( false );
+	    mainform->objRoleEditAction->setEnabled( false );
+	    mainform->objTBDeleteAction->setEnabled( false );
 	}
     }
 }
@@ -822,7 +836,8 @@ void CfgForm::bEditRole_clicked()
 	return;
     }
 */
-    dEditRole *e = new dEditRole( ws, 0, Qt::WDestructiveClose );
+    dEditRole *e = new dEditRole( ws, 0 );
+    e->setAttribute(Qt::WA_DeleteOnClose);
     e->setData( configform, obj );
     e->show();		// create role editor, set its data and show this one
 }
@@ -840,8 +855,8 @@ void CfgForm::bKillRole_clicked()
     while ( i < n ) {	// foreach role
 	ac = 0;		// unset counter
 	role = cfg.find( oroot, md_role, i );	// get this one
-	for ( s = 0; s < tRole->numRows(); s++ ) // look through role table for correspondence
-	    if ( cfg.attr( role, mda_name ) == tRole->text( s, 0 ) ) ac++; // inc counter
+	for ( s = 0; s < tRole->rowCount(); s++ ) // look through role table for correspondence
+	    if ( cfg.attr( role, mda_name ) == ( tRole->item( s, 0 ) ? tRole->item( s, 0 )->text() : QString() ) ) ac++; // inc counter
 	if ( !ac ) {
 	    cfg.remove( role );
 	    killed++;

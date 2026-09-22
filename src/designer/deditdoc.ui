@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>dEditDoc</class>
- <widget class="Q3MainWindow" name="dEditDoc" >
+ <widget class="QMainWindow" name="dEditDoc" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -12,7 +12,7 @@
   <property name="windowTitle" >
    <string>Document</string>
   </property>
-  <widget class="QWidget" name="widget" >
+  <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -63,7 +63,7 @@
          </widget>
         </item>
         <item>
-         <widget class="Q3TextEdit" name="eDescription" />
+         <widget class="QTextEdit" name="eDescription" />
         </item>
        </layout>
       </widget>
@@ -83,13 +83,7 @@
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
-         <widget class="Q3Table" name="tAliases" >
-          <property name="numRows" >
-           <number>0</number>
-          </property>
-          <property name="numCols" >
-           <number>1</number>
-          </property>
+         <widget class="QTableWidget" name="tAliases" >
           <column>
            <property name="text" >
             <string>Name</string>
@@ -122,18 +116,12 @@
        </attribute>
        <layout class="QGridLayout" >
         <item row="0" column="0" >
-         <widget class="Q3Table" name="tRoles" >
-          <property name="numRows" >
-           <number>0</number>
-          </property>
-          <property name="numCols" >
-           <number>2</number>
-          </property>
+         <widget class="QTableWidget" name="tRoles" >
           <property name="showGrid" >
            <bool>false</bool>
           </property>
           <property name="selectionMode" >
-           <enum>Q3Table::Multi</enum>
+           <enum>QAbstractItemView::MultiSelection</enum>
           </property>
           <column>
            <property name="text" >
@@ -155,24 +143,7 @@
   </widget>
  </widget>
  <layoutdefault spacing="5" margin="5" />
- <pixmapfunction>rcIcon</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>Q3MainWindow</class>
-   <extends>QWidget</extends>
-   <header>q3mainwindow.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3Table</class>
-   <extends>Q3Frame</extends>
-   <header>q3table.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends>Q3Frame</extends>
-   <header>q3textedit.h</header>
-  </customwidget>
   <customwidget>
    <class>ScriptEdit</class>
    <extends>QWidget</extends>

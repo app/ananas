@@ -28,8 +28,6 @@
 
 #ifndef MDTREE_H
 #define MDTREE_H
-#include <q3listview.h>
-#include <q3intdict.h>
 #include "acfg.h"
 #include "formdesigner.h"
 #include "atreeitems.h"
@@ -46,13 +44,11 @@ public:
 	QWidget *editor;
 	aCfg *md;
 */
-	aListViewItem(ananasListViewItem *parent, ananasListViewItem *after, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
-//	aListViewItem(QListViewItem *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString::null );
-	aListViewItem(Q3ListView *parent, aCfg * cfgmd, aCfgItem obj, const QString &name = QString::null );
+	aListViewItem(ananasListViewItem *parent, ananasListViewItem *after, aCfg * cfgmd, aCfgItem cfgobj, const QString &name = QString() );
+	aListViewItem(QTreeWidget *parent, aCfg * cfgmd, aCfgItem obj, const QString &name = QString() );
 	~aListViewItem();
 	QString text( int column ) const;
 	void loadTree();
-	void setup();
 	void update();
 	void edit();
 	void newObject();
@@ -70,10 +66,6 @@ public:
 	void saveItem();
 	void loadItem();
 
-
-protected:
-//	virtual void okRename( int col );
-	virtual int compare( Q3ListViewItem *i, int col, bool accending ) const;
 private:
 	void loadDocument ();
 	void loadJournal ();
@@ -107,9 +99,7 @@ public slots:
 	void itemSave();
 	void itemLoad();
 private slots:
-	void on_collapsed( Q3ListViewItem *item );
-private:
-	Q3IntDict<QWidget> editors;
+	void on_collapsed( QTreeWidgetItem *item );
 };
 
 #endif

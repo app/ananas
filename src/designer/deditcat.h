@@ -3,17 +3,19 @@
 
 #include "ui_deditcat.h"
 
+#include <QHash>
 
-class dEditCat : public Q3MainWindow, public Ui::dEditCat
+
+class dEditCat : public QMainWindow, public Ui::dEditCat
 {
     Q_OBJECT
 
 public:
-    dEditCat(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditCat(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditCat();
 
     aRoleEditor *re;
-    Q3IntDict<int> fields, fieldsg;
+    QHash<int, int> fields, fieldsg;
     aAliasEditor *al;
     aListViewItem *item;
 

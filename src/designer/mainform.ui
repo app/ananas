@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>MainForm</class>
- <widget class="Q3MainWindow" name="MainForm" >
+ <widget class="QMainWindow" name="MainForm" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -21,7 +21,7 @@
   <property name="windowTitle" >
    <string>Ananas: Designer</string>
   </property>
-  <widget class="QWidget" name="widget" >
+  <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -31,7 +31,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="Q3ToolBar" name="Toolbar" >
+  <widget class="QToolBar" name="Toolbar" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -40,14 +40,11 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="configNewAction" />
    <addaction name="configOpenAction" />
    <addaction name="configSaveAction" />
   </widget>
-  <widget class="Q3ToolBar" name="tbInterface" >
+  <widget class="QToolBar" name="tbInterface" >
    <property name="geometry" >
     <rect>
      <x>105</x>
@@ -56,15 +53,12 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="objInterfaceNewCommandAction" />
    <addaction name="objInterfaceNewSubmenuAction" />
    <addaction name="objInterfaceNewSeparatorAction" />
    <addaction name="objInterfaceEditAction" />
   </widget>
-  <widget class="Q3ToolBar" name="tbMetadata" >
+  <widget class="QToolBar" name="tbMetadata" >
    <property name="geometry" >
     <rect>
      <x>240</x>
@@ -73,13 +67,10 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="objMetadataNewAction" />
    <addaction name="objMetadataEditAction" />
   </widget>
-  <widget class="Q3ToolBar" name="tbActions" >
+  <widget class="QToolBar" name="tbActions" >
    <property name="geometry" >
     <rect>
      <x>315</x>
@@ -88,14 +79,11 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="objActionsNewAction" />
    <addaction name="objActionsNewGroupAction" />
    <addaction name="objActionsEditAction" />
   </widget>
-  <widget class="Q3ToolBar" name="tbRights" >
+  <widget class="QToolBar" name="tbRights" >
    <property name="geometry" >
     <rect>
      <x>420</x>
@@ -104,14 +92,11 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="objRoleNewAction" />
    <addaction name="objRoleEditAction" />
    <addaction name="objRoleClearAction" />
   </widget>
-  <widget class="Q3ToolBar" name="tbLanguages" >
+  <widget class="QToolBar" name="tbLanguages" >
    <property name="geometry" >
     <rect>
      <x>525</x>
@@ -120,14 +105,11 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="objLanguagesNewAction" />
    <addaction name="objLanguagesEditAction" />
    <addaction name="objLanguagesClearAction" />
   </widget>
-  <widget class="Q3ToolBar" name="tbImageCollection" >
+  <widget class="QToolBar" name="tbImageCollection" >
    <property name="geometry" >
     <rect>
      <x>630</x>
@@ -136,12 +118,9 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="objImageCollectionAddAction" />
   </widget>
-  <widget class="Q3ToolBar" name="TBToolbar" >
+  <widget class="QToolBar" name="TBToolbar" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -150,15 +129,12 @@
      <height>30</height>
     </rect>
    </property>
-   <property name="label" >
-    <string/>
-   </property>
    <addaction name="objTBRenameAction" />
    <addaction name="objTBMoveUpAction" />
    <addaction name="objTBMoveDownAction" />
    <addaction name="objTBDeleteAction" />
   </widget>
-  <widget class="Q3ToolBar" name="tbTabs" >
+  <widget class="QToolBar" name="tbTabs" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -166,15 +142,6 @@
      <width>19</width>
      <height>16</height>
     </rect>
-   </property>
-   <property name="movingEnabled" >
-    <bool>true</bool>
-   </property>
-   <property name="newLine" >
-    <bool>true</bool>
-   </property>
-   <property name="label" >
-    <string>Tabs</string>
    </property>
   </widget>
   <widget class="QMenuBar" name="menubar" >
@@ -1057,25 +1024,10 @@
   </actiongroup>
  </widget>
  <layoutdefault spacing="5" margin="5" />
- <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>Q3ToolBar</class>
-   <extends>Q3Frame</extends>
-   <header>q3listview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3MainWindow</class>
-   <extends>QWidget</extends>
-   <header>q3mainwindow.h</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
  <includes>
-  <include location="local" >qworkspace.h</include>
-  <include location="local" >q3vbox.h</include>
   <include location="local" >cfgform.h</include>
-  <include location="local" >q3popupmenu.h</include>
   <include location="local" >awindowslist.h</include>
   <include location="local" >qsettings.h</include>
  </includes>

@@ -4,12 +4,12 @@
 #include "ui_deditreport.h"
 
 
-class dEditReport : public Q3MainWindow, public Ui::dEditReport
+class dEditReport : public QMainWindow, public Ui::dEditReport
 {
     Q_OBJECT
 
 public:
-    dEditReport(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditReport(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditReport();
 
     aListViewItem *item;

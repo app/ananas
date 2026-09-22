@@ -26,13 +26,12 @@
 **
 **********************************************************************/
 
-#include <q3listview.h>
-#include <q3header.h>
-#include <q3popupmenu.h>
 #include <qlabel.h>
 #include <qcursor.h>
 //Added by qt3to4:
 #include <QPixmap>
+#include <QIcon>
+#include <QMdiArea>
 
 #include "acfg.h"
 #include "interfacetree.h"
@@ -43,13 +42,12 @@
 
 extern MainForm *mainform;
 extern QPixmap rcIcon(const char *name);
-extern void set_Icon(Q3ListViewItem *item, const char *name);
+extern void set_Icon(QTreeWidgetItem *item, const char *name);
 
-InterfaceListViewItem::InterfaceListViewItem( Q3ListView *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name )
+InterfaceListViewItem::InterfaceListViewItem( QTreeWidget *parent, aCfg * cfgmd, aCfgItem cfgobj, const QString &name )
 : ananasListViewItem( parent, cfgmd, cfgobj, name )
 {
 	id = md->id(obj);
-	if ( ( id ) && ( md->objClass(obj) != md_separator ) ) setRenameEnabled(0, true);
 	aCfgItem comaction, active;
 	QPixmap pix;
 	int idd;
@@ -58,8 +56,8 @@ InterfaceListViewItem::InterfaceListViewItem( Q3ListView *parent, aCfg * cfgmd, 
 	idd = md->text( comaction ).toInt();
 	active = md->findChild( md->find( idd ), md_active_picture, 0 );
 	pix.loadFromData( md->binary( active ) );
-	setPixmap( 0, pix );
-	pix = 0;
+	setIcon( 0, QIcon(pix) );
+	pix = QPixmap();
 };
 
 InterfaceListViewItem::InterfaceListViewItem( ananasListViewItem *parent, ananasListViewItem
@@ -67,7 +65,6 @@ InterfaceListViewItem::InterfaceListViewItem( ananasListViewItem *parent, ananas
 : ananasListViewItem( parent, after, cfgmd, cfgobj, name )
 {
 	id = md->id( obj );
-	if ( ( id ) && ( md->objClass(obj) != md_separator ) ) setRenameEnabled(0, true);
 
 	aCfgItem comaction, active;
 	int idd;
@@ -77,8 +74,8 @@ InterfaceListViewItem::InterfaceListViewItem( ananasListViewItem *parent, ananas
 	idd = md->text( comaction ).toInt();
 	active = md->findChild( md->find( idd ), md_active_picture, 0 );
 	pix.loadFromData( md->binary( active ) );
-	setPixmap( 0, pix );
-	pix = 0;
+	setIcon( 0, QIcon(pix) );
+	pix = QPixmap();
 };
 
 void
@@ -119,8 +116,8 @@ InterfaceListViewItem::loadSubmenu ( ananasListViewItem * parent, ananasListView
 	QString				oclass;
 	aCfgItem			cobj;
 
-	mparent = new InterfaceListViewItem( parent, after, md, child, QString::null );
-	mparent->setPixmap(0, rcIcon("submenu.png"));
+	mparent = new InterfaceListViewItem( parent, after, md, child, QString() );
+	mparent->setIcon(0, QIcon(rcIcon("submenu.png")));
 	cobj = md->firstChild ( mparent->obj );
 	while ( !cobj.isNull() )
 	{
@@ -146,7 +143,7 @@ InterfaceListViewItem::loadSubmenu ( ananasListViewItem * parent, ananasListView
 void
 InterfaceListViewItem::loadCommand ( ananasListViewItem * parent, ananasListViewItem *after, aCfgItem child )
 {
-	new InterfaceListViewItem(  parent, after, md, child, QString::null );
+	new InterfaceListViewItem(  parent, after, md, child, QString() );
 };
 
 void
@@ -154,7 +151,7 @@ InterfaceListViewItem::loadSeparator ( ananasListViewItem * parent, ananasListVi
 {
 	InterfaceListViewItem 	*newitem;
 	newitem = new InterfaceListViewItem( parent, after, md,child,QObject::tr("-------------------") );
-	newitem->setPixmap(0, rcIcon("separator.png"));
+	newitem->setIcon(0, QIcon(rcIcon("separator.png")));
 
 };
 
@@ -170,11 +167,11 @@ InterfaceListViewItem::newCommand ()
 */	if ( oclass == md_popupmenu || oclass == md_submenu ||
 		oclass == md_mainmenu || oclass == md_toolbar )
 	{
-		setSelected( FALSE );
-		setOpen( TRUE );
+		setSelected( false );
+		setExpanded( true );
 		newobj = md->insert( obj, md_command, QObject::tr("New Command") );
 		newitem = new InterfaceListViewItem( this, getLastChild(), md, newobj );
-//		newitem->setSelected( TRUE );
+//		newitem->setSelected( true );
 		newitem->edit();
 	};
 }
@@ -189,16 +186,16 @@ InterfaceListViewItem::newSubmenu ()
 	if ( oclass == md_submenu || oclass ==  md_mainmenu ||
 		oclass == md_toolbars || oclass == md_popupmenus || oclass == md_popupmenu )
 	{
-		setSelected( FALSE );
-		setOpen( TRUE );
+		setSelected( false );
+		setExpanded( true );
 		if ( oclass == md_popupmenus ) newobj = md->insert( obj, md_popupmenu, QObject::tr("New Popup menu") );
 		else
 		if ( oclass == md_toolbars ) newobj = md->insert( obj, md_toolbar, QObject::tr("New tool bar") );
 		else
 		newobj = md->insert( obj, md_submenu, QObject::tr("New Submenu") );
 		newitem = new InterfaceListViewItem( this, getLastChild(), md, newobj );
-		newitem->setPixmap(0, rcIcon("submenu.png"));
-//		newitem->setSelected( TRUE );
+		newitem->setIcon(0, QIcon(rcIcon("submenu.png")));
+//		newitem->setSelected( true );
 	};
 
 }
@@ -212,12 +209,12 @@ InterfaceListViewItem::newSeparator ()
 
 	if ( oclass == md_submenu || oclass == md_mainmenu || oclass == md_popupmenu )
 	{
-		setSelected( FALSE );
-		setOpen( TRUE );
+		setSelected( false );
+		setExpanded( true );
 		newobj = md->insert( obj, md_separator );
 		newitem = new InterfaceListViewItem( this, getLastChild(), md, newobj, QObject::tr("-------------------") );
-		newitem->setPixmap(0, rcIcon("separator.png"));
-//		newitem->setSelected( TRUE );
+		newitem->setIcon(0, QIcon(rcIcon("separator.png")));
+//		newitem->setSelected( true );
 
 	};
 }
@@ -225,7 +222,7 @@ InterfaceListViewItem::newSeparator ()
 void
 InterfaceListViewItem::edit ()
 {
-    QWorkspace *ws = mainform->ws;
+    QMdiArea *ws = mainform->ws;
     aWindowsList *wl = mainform->wl;
     QString oclass = md->objClass( obj );
     int objid = md->id( obj );
@@ -236,7 +233,8 @@ InterfaceListViewItem::edit ()
 
     if ( oclass == md_command )
     {
-	dEditCommand * e = new dEditCommand ( ws, 0, Qt::WDestructiveClose );
+	dEditCommand * e = new dEditCommand ( ws, 0 );
+	e->setAttribute( Qt::WA_DeleteOnClose );
 	wl->insert( objid, e );
 	editor = e;
 	QObject::connect( mainform, SIGNAL( tosave() ), editor, SLOT( updateMD() ) );
@@ -255,35 +253,35 @@ InterfaceTreeView::InterfaceTreeView ( QWidget *parent, aCfg *cfgmd )
 	InterfaceListViewItem *mainmenu, *toolbars, *popups;
 	aCfgItem iface, item;
 	iface = md->find ( mdc_interface );
-	if ( iface.isNull() ) iface = md->insert( md->find ( mdc_root ), md_interface, QString::null, -1 );
+	if ( iface.isNull() ) iface = md->insert( md->find ( mdc_root ), md_interface, QString(), -1 );
 	item = md->find ( iface, md_toolbars );
-	if ( item.isNull() ) item = md->insert( iface, md_toolbars, QString::null, -1 );
+	if ( item.isNull() ) item = md->insert( iface, md_toolbars, QString(), -1 );
 	toolbars = new InterfaceListViewItem ( this, md, item, QObject::tr ( "Toolbars" ) );
-	toolbars->setPixmap(0, rcIcon("toolbar.png"));
+	toolbars->setIcon(0, QIcon(rcIcon("toolbar.png")));
 	toolbars->loadTree();
-	toolbars->setOpen ( TRUE );
+	toolbars->setExpanded ( true );
 	item = md->find ( iface, md_mainmenu );
-	if ( item.isNull() ) item = md->insert( iface, md_mainmenu, QString::null, -1 );
+	if ( item.isNull() ) item = md->insert( iface, md_mainmenu, QString(), -1 );
 	mainmenu = new InterfaceListViewItem ( this, md, item, QObject::tr ( "Main menu" ) );
-	mainmenu->setPixmap(0, rcIcon("m_menu.png"));
+	mainmenu->setIcon(0, QIcon(rcIcon("m_menu.png")));
 	mainmenu->loadTree();
-	mainmenu->setOpen ( TRUE );
+	mainmenu->setExpanded ( true );
 	item = md->find ( iface, md_popupmenus );
-	if ( item.isNull() ) item = md->insert( iface, md_popupmenus, QString::null, -1 );
+	if ( item.isNull() ) item = md->insert( iface, md_popupmenus, QString(), -1 );
 	popups = new InterfaceListViewItem ( this, md, item, QObject::tr ( "Popup menus" ) );
-	popups->setPixmap(0, rcIcon("p_menus.png"));
+	popups->setIcon(0, QIcon(rcIcon("p_menus.png")));
 	popups->loadTree();
-	popups->setOpen ( TRUE );
-	connect( this, SIGNAL( contextMenuRequested( Q3ListViewItem*, const QPoint&, int) ), this, SLOT(ContextMenu() ) );
-	connect( this, SIGNAL( returnPressed( Q3ListViewItem*) ), this, SLOT( itemEdit() ) );
-	connect( this, SIGNAL( doubleClicked( Q3ListViewItem*) ), this, SLOT( itemEdit() ) );
+	popups->setExpanded ( true );
+	connect( this, SIGNAL( customContextMenuRequested( const QPoint& ) ), this, SLOT( ContextMenu() ) );
+	connect( this, SIGNAL( itemActivated( QTreeWidgetItem*, int ) ), this, SLOT( itemEdit() ) );
+	connect( this, SIGNAL( itemDoubleClicked( QTreeWidgetItem*, int ) ), this, SLOT( itemEdit() ) );
 };
 
 
 void
 InterfaceTreeView::ContextMenu()
 {
-	Q3PopupMenu *m=new Q3PopupMenu( this, "PopupMenu" );
+	QMenu *m=new QMenu( this );
 	Q_CHECK_PTR(m);
 
 /*	QLabel *caption = new QLabel( "<font color=darkblue><u><b>" "Context Menu</b></u></font>", this );
@@ -296,9 +294,9 @@ InterfaceTreeView::ContextMenu()
 	m->insertItem( tr("&MoveDown"), this, SLOT( itemMoveDown() ), CTRL+Key_M );
 */
 	ananasTreeView::ContextMenuAdd( m );
-	m->insertItem( tr("&New Submenu"),  this, SLOT( itemNewSubmenu() ), Qt::CTRL+Qt::Key_N );
-	m->insertItem( tr("New &Command"),  this, SLOT( itemNewCommand() ), Qt::CTRL+Qt::Key_C );
-	m->insertItem( tr("New &Separator"),  this, SLOT( itemNewSeparator() ), Qt::CTRL+Qt::Key_S );
+	m->addAction( tr("&New Submenu"), QKeySequence(Qt::ControlModifier | Qt::Key_N), this, SLOT( itemNewSubmenu() ) );
+	m->addAction( tr("New &Command"), QKeySequence(Qt::ControlModifier | Qt::Key_C), this, SLOT( itemNewCommand() ) );
+	m->addAction( tr("New &Separator"), QKeySequence(Qt::ControlModifier | Qt::Key_S), this, SLOT( itemNewSeparator() ) );
 	m->exec( QCursor::pos() );
 	delete m;
 };
@@ -306,7 +304,7 @@ InterfaceTreeView::ContextMenu()
 void
 InterfaceTreeView::itemNewSubmenu()
 {
-	InterfaceListViewItem *i = (InterfaceListViewItem *) selectedItem();
+	InterfaceListViewItem *i = (InterfaceListViewItem *) currentItem();
 	if ( i )
 		i->newSubmenu();
 };
@@ -314,7 +312,7 @@ InterfaceTreeView::itemNewSubmenu()
 void
 InterfaceTreeView::itemNewCommand()
 {
-	InterfaceListViewItem *i = (InterfaceListViewItem *) selectedItem();
+	InterfaceListViewItem *i = (InterfaceListViewItem *) currentItem();
 	if ( i )
 		i->newCommand();
 };
@@ -322,7 +320,7 @@ InterfaceTreeView::itemNewCommand()
 void
 InterfaceTreeView::itemNewSeparator()
 {
-	InterfaceListViewItem *i = (InterfaceListViewItem *) selectedItem();
+	InterfaceListViewItem *i = (InterfaceListViewItem *) currentItem();
 	if ( i )
 		i->newSeparator();
 };
@@ -348,7 +346,7 @@ InterfaceTreeView::itemMoveDown()
 void
 InterfaceTreeView::itemEdit()
 {
-	InterfaceListViewItem *i = (InterfaceListViewItem *) selectedItem();
+	InterfaceListViewItem *i = (InterfaceListViewItem *) currentItem();
 	if ( i ) i->edit();
 };
 void

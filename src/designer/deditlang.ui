@@ -1,6 +1,6 @@
 <ui version="4.0" >
  <class>dEditLang</class>
- <widget class="Q3MainWindow" name="dEditLang" >
+ <widget class="QMainWindow" name="dEditLang" >
   <property name="geometry" >
    <rect>
     <x>0</x>
@@ -12,7 +12,7 @@
   <property name="windowTitle" >
    <string>Language</string>
   </property>
-  <widget class="QWidget" name="widget" >
+  <widget class="QWidget" name="centralwidget" >
    <property name="geometry" >
     <rect>
      <x>0</x>
@@ -104,14 +104,7 @@
   </widget>
  </widget>
  <layoutdefault spacing="5" margin="5" />
- <pixmapfunction>rcIcon</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>Q3MainWindow</class>
-   <extends>QWidget</extends>
-   <header>q3mainwindow.h</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
  <includes>
   <include location="local" >mdtree.h</include>

@@ -4,12 +4,12 @@
 #include "ui_deditcolumns.h"
 
 
-class dEditColumns : public Q3MainWindow, public Ui::dEditColumns
+class dEditColumns : public QMainWindow, public Ui::dEditColumns
 {
     Q_OBJECT
 
 public:
-    dEditColumns(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditColumns(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditColumns();
 
 public slots:

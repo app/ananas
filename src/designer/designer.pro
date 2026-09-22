@@ -3,19 +3,15 @@ include(../lib/lib.pri)
 TARGET = ananas-designer
 TEMPLATE = app
 
-CONFIG += designer debug
-
 DESTDIR = ../../bin
 
 INCLUDEPATH += . ./designer6 ../lib ../../tmp/ui/ananas ../plugins ../editor
-LIBS += -L../../lib -lananas -lqt4designer -L../../lib/designer -lananasplugin -lqdataschema -L../editor -lqtscriptedit
+LIBS += -L../../lib -lananas -L../../lib/designer -lananasplugin -lqdataschema -L../editor -lqtscriptedit
 unix {
-    #LIBS += -L$(QTINC)/QtDesigner
-    LIBS += -lQtDesignerComponents
-#    LIBS += -lqt4designer
+    LIBS += -lQt6DesignerComponents
 }
 win32{
-    LIBS += -lQtDesignerComponents4
+    LIBS += -lQt6DesignerComponents
 }
 
 MOC_DIR = ../../tmp/moc/$$TARGET
@@ -28,9 +24,8 @@ UI_DIR = ../../tmp/ui/$$TARGET
 #INCLUDEPATH	+= ../lib ../lib/tmp/ui ../lib/.ui ./formdesigner /usr/lib
 
 include ( ../ananas.pri )
-#load(qsa)
-QT += script
-QT += scripttools
+QT += designer
+QT += qml
 
 HEADERS	= \
     actiontree.h \

@@ -3,13 +3,15 @@
 
 #include "ui_deditaction.h"
 
+#include <QPixmap>
 
-class dEditAction : public Q3MainWindow, public Ui::dEditAction
+
+class dEditAction : public QMainWindow, public Ui::dEditAction
 {
     Q_OBJECT
 
 public:
-    dEditAction(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditAction(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditAction();
 
     ActionListViewItem * item;

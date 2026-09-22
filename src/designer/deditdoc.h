@@ -1,20 +1,21 @@
 #ifndef DEDITDOC_H
 #define DEDITDOC_H
 
+#include <QHash>
 #include "ui_deditdoc.h"
 
 
-class dEditDoc : public Q3MainWindow, public Ui::dEditDoc
+class dEditDoc : public QMainWindow, public Ui::dEditDoc
 {
     Q_OBJECT
 
 public:
-    dEditDoc(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WType_TopLevel);
+    dEditDoc(QWidget* parent = 0, const char* name = 0, Qt::WindowFlags fl = Qt::WindowFlags());
     ~dEditDoc();
 
     aListViewItem *item;
     aAliasEditor *al;
-    Q3IntDict<int> fields;
+    QHash<int,int> fields;
     aRoleEditor *re;
 
 public slots:

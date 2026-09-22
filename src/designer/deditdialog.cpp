@@ -4,7 +4,7 @@
 #include <qimage.h>
 #include <qpixmap.h>
 
-#include "qtextcodec.h"
+
 
 #include <qstring.h>
 #include <qfile.h>
@@ -17,12 +17,11 @@
 //--#include <qwidgetfactory.h>
 #include <QFormBuilder>
 #include <qobject.h>
-#include <q3textstream.h>
 #include <qbuffer.h>
 //#include <qsinterpreter.h>
 //#include <qseditor.h>
-#include <q3process.h>
 #include <qapplication.h>
+#include <QTextStream>
 
 #include "formdesigner.h"
 #include "mainform.h"
@@ -39,8 +38,9 @@
  *
  */
 dEditDialog::dEditDialog(QWidget* parent, const char* name, Qt::WindowFlags fl)
-    : Q3MainWindow(parent, name, fl)
+    : QMainWindow(parent, fl)
 {
+    Q_UNUSED(name);
     setupUi(this);
 
     (void)statusBar();
@@ -78,7 +78,7 @@ void dEditDialog::destroy()
 {
     updateMD();
     ( (MainForm*)this->topLevelWidget() )->wl->remove( this );
-    ( (MainForm*)this->topLevelWidget() )->removeTab(name());
+    ( (MainForm*)this->topLevelWidget() )->removeTab(objectName());
 }
 
 
@@ -94,10 +94,10 @@ void dEditDialog::setData( aListViewItem *o )
 		al = a;
 		al->setData();
 		eName->setText( md->attr( obj, mda_name ) );
-		eDescription->setText( md->sText( obj, md_description ) );
+		eDescription->setPlainText( md->sText( obj, md_description ) );
                 eModule->setPlainText( md->sText( obj, md_sourcecode ) );
 		eFormFile->setText( QString("inputform_")+QString::number(item->id)+QString(".ui"));
-		setCaption( tr("Form:") + eName->text() );
+		setWindowTitle( tr("Form:") + eName->text() );
 		parentClass = md->objClass( md->parent ( md->parent( obj ) ) );
 		docId = md->id(md->parent(md->parent( obj )));
 		if ( parentClass == md_document ) {
@@ -106,9 +106,9 @@ void dEditDialog::setData( aListViewItem *o )
 		if ( parentClass == md_catalogue ) {
 //			cbDefault->insertItem(QObject::tr("selection"));
 			cbFormMode->clear();
-			cbFormMode->insertItem(QObject::tr("Elements list dialog"));
-			cbFormMode->insertItem(QObject::tr("Element dialog"));
-			cbFormMode->insertItem(QObject::tr("Group dialog"));
+			cbFormMode->addItem(QObject::tr("Elements list dialog"));
+			cbFormMode->addItem(QObject::tr("Element dialog"));
+			cbFormMode->addItem(QObject::tr("Group dialog"));
 		}
 		else cbSelect->setHidden( true );
 		int i = md->sText(obj, md_defaultmod).toInt();
@@ -117,7 +117,7 @@ void dEditDialog::setData( aListViewItem *o )
 		cbEdit->setChecked( (i>>md_form_edit)%2 );
 		cbSelect->setChecked( (i>>md_form_select)%2 );
 		i = md->attr( obj, mda_type ).toInt();
-		cbFormMode->setCurrentItem( i );
+		cbFormMode->setCurrentIndex( i );
 		i = md->attr( obj, mda_readonly ).toInt();
 		cbReadOnly->setChecked( i );
 		QString ui= md->sText( obj, md_formdesign );
@@ -132,7 +132,7 @@ void dEditDialog::setData( aListViewItem *o )
 void dEditDialog::EditForm()
 {
 	foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-		if (widget->name() == QString("ananas-designer_mainwindow") )
+		if (widget->objectName() == QString("ananas-designer_mainwindow") )
 		{
 			connect( this, SIGNAL( setId( qulonglong * ) ), widget, SLOT( setId( qulonglong * ) ));
 			emit ( setId( &docId ));
@@ -182,7 +182,7 @@ void dEditDialog::EditForm()
 		aLog::print(aLog::Debug, tr("dEditDialog create form file from metadata"));
 		QFile f1(eFormFile->text());
 		f1.open(QIODevice::WriteOnly);
-		f1.writeBlock(ui, strlen(ui));
+		f1.write(ui.toUtf8());
 		f1.close();
 
 	}
@@ -199,8 +199,7 @@ void dEditDialog::EditForm()
 		{
 			if(f.open( QIODevice::WriteOnly ))
 			{
-				Q3TextStream tso( &f );
-				tso.setEncoding( Q3TextStream::UnicodeUTF8 );
+				QTextStream tso( &f );
 				QString form = fi.readAll();
 //			printf("obj id = %i\n", md->id( o ) );
 				form.replace( QString("$$$id$$$"), QString("%1").arg( md->id( o ) ) );
@@ -212,7 +211,7 @@ void dEditDialog::EditForm()
 			}
 			else
 			{
-				aLog::print(aLog::Error, tr("dEditDialog open file %1 for write").arg(f.name()));
+				aLog::print(aLog::Error, tr("dEditDialog open file %1 for write").arg(f.fileName()));
 			}
 		}
 		else
@@ -271,11 +270,11 @@ void dEditDialog::updateMD()
 	QFile f(eFormFile->text());
 //if (cancelupdate) return;
 	al->updateMD();
-	item->setText( 0, eName->text().stripWhiteSpace() );
-	md->setAttr( obj, mda_name, eName->text().stripWhiteSpace() );
-	md->setAttr( obj, mda_type, cbFormMode->currentItem() );
+	item->setText( 0, eName->text().trimmed() );
+	md->setAttr( obj, mda_name, eName->text().trimmed() );
+	md->setAttr( obj, mda_type, cbFormMode->currentIndex() );
 	md->setAttr( obj, mda_readonly, cbReadOnly->isChecked() );
-	md->setSText( obj, md_description, eDescription->text() );
+	md->setSText( obj, md_description, eDescription->toPlainText() );
         md->setSText( obj, md_sourcecode, eModule->toPlainText() );
 //	ui.arg(cbDefault->currentItem());
 //	md->setSText( obj, md_defaultmod, QString( "%1" ).arg( cbDefault->currentItem() ) );
@@ -285,9 +284,8 @@ void dEditDialog::updateMD()
 		(1<<md_form_select) * cbSelect->isChecked();
 	md->setSText( obj, md_defaultmod, QString( "%1" ).arg( i ) );
 	if (f.open(QIODevice::ReadOnly)){
-		Q3TextStream ts(&f);
-		ts.setEncoding(Q3TextStream::UnicodeUTF8);
-		ui=ts.read();
+		QTextStream ts(&f);
+		ui=ts.readAll();
 		md->setSText( obj, md_formdesign, ui );
 		f.close();
 		f.remove();
@@ -310,14 +308,14 @@ void dEditDialog::formPreview()
 		ui= md->sText( obj, md_formdesign );
 		if (!ui.isEmpty()) {
 			f.open(QIODevice::WriteOnly);
-			f.writeBlock(ui, strlen(ui));
+			f.write(ui.toUtf8());
 			f.close();
 		} else {
 		    return;
 			QFile fi("inputform.ui.tpl");
 			if ( fi.open( QIODevice::ReadOnly ) && f.open( QIODevice::WriteOnly ) ){
-				Q3TextStream tsi( &fi ), tso( &f );
-				tso << tsi.read();
+				QTextStream tsi( &fi ), tso( &f );
+				tso << tsi.readAll();
 				fi.close();
 				f.close();
 			}

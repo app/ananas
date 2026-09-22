@@ -327,6 +327,9 @@ void dEditDialog::formPreview()
 	d->open(QIODevice::ReadOnly);
 	//--QWidget *form = QWidgetFactory::create(d);
     QFormBuilder fb;
+    fb.addPluginPath(QCoreApplication::applicationDirPath());
+    fb.addPluginPath(QCoreApplication::applicationDirPath() + "/../lib/designer");
+    fb.addPluginPath("/usr/lib/ananas/designer");
     QWidget *form = fb.load(d);
 	d->close();
 	if (form) form->show();

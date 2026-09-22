@@ -1,0 +1,3 @@
+# The Containerfile does not COPY anything from the build context; ignore
+# everything so the context stays empty.
+*

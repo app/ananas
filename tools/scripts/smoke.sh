@@ -1,58 +1,38 @@
 #!/usr/bin/env bash
-# Phase 4 smoke harness: build ananas-legacy-qt4 in the Qt6 container and run
-# the QtTest suite headlessly under Xvfb.
+# Build the whole tree with CMake in the Qt6 image and run the QtTest suite
+# headlessly under Xvfb.
 #
-# The tree is cleaned of previous build artifacts first, because the generated
-# Makefiles/objects from the Qt4/Qt5 images are not reusable.
-#
-# Usage: smoke-qt6.sh [path-to-ananas-legacy-qt4]
+# Usage: smoke.sh [path-to-ananas]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="${1:-$SCRIPT_DIR/../../ananas-legacy-qt4}"
+REPO="${1:-$SCRIPT_DIR/../..}"
 IMAGE="${ANANAS_IMAGE:-ananas-qt6-builder}"
 
 if [[ ! -d "$REPO" ]]; then
     echo "Repository not found: $REPO" >&2
     exit 1
 fi
-
 REPO="$(cd "$REPO" && pwd)"
-WORKSPACE="$(dirname "$REPO")"
-REPO_NAME="$(basename "$REPO")"
 
 podman run --rm \
-    -v "$WORKSPACE":/workspace:z \
-    -w "/workspace/$REPO_NAME" \
+    -v "$REPO":/repo:z \
+    -w /repo \
     "$IMAGE" \
     bash -c '
         set -e
-
-        export CCACHE_DIR=/workspace/tmp/ccache
+        export CCACHE_DIR=/repo/tmp/ccache
         mkdir -p "$CCACHE_DIR"
-        REPO_DIR="$PWD"
 
-        echo "===> Cleaning previous build artifacts..."
-        find src -name Makefile -delete
-        rm -rf lib bin
-        find src -type d \( -name .obj -o -name .moc -o -name .ui \) -prune -exec rm -rf {} +
-
-        echo "===> Building the project..."
-        if ! make >/tmp/build.log 2>&1; then
-            echo "BUILD FAILED"; tail -40 /tmp/build.log; exit 1
-        fi
-        echo "     build ok"
-
-        echo "===> Building ananas-test..."
-        cd src/test
-        qmake test.pro -o Makefile >/dev/null 2>&1
-        if ! make >/tmp/test-build.log 2>&1; then
-            echo "TEST BUILD FAILED"; grep -E "error:|fatal error|undefined reference" /tmp/test-build.log | head -20; exit 1
-        fi
+        echo "===> Building the project (CMake)..."
+        rm -rf cmake-build
+        cmake -S . -B cmake-build -DCMAKE_BUILD_TYPE=Release
+        cmake --build cmake-build -j"$(nproc)"
 
         echo "===> Running ananas-test (Xvfb)..."
-        export LD_LIBRARY_PATH="$REPO_DIR/lib:$REPO_DIR/lib/designer"
-        xvfb-run -a ./ananas-test
+        export LD_LIBRARY_PATH=/repo/lib:/repo/lib/designer:/repo/src/editor
+        export QT_PLUGIN_PATH=/repo/lib
+        xvfb-run -a ./bin/ananas-test
 
         echo "===> ccache stats:"
         ccache -s

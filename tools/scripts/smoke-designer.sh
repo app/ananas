@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Phase 6 smoke harness: build the Qt6 form-designer wrapper and the
-# ananas-designer application, then run two checks under Xvfb:
-#   1. the wrapper open/save round-trip on a form from the inventory scheme;
+# Build with CMake and run the designer checks under Xvfb:
+#   1. the form-designer wrapper open/save round-trip on a form from the
+#      inventory scheme;
 #   2. the designer application starts (MainForm construction) via --help.
 #
-# Usage: smoke-designer-qt6.sh [path-to-ananas-legacy-qt4]
+# Usage: smoke-designer.sh [path-to-ananas]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="${1:-$SCRIPT_DIR/../../ananas-legacy-qt4}"
+REPO="${1:-$SCRIPT_DIR/../..}"
 IMAGE="${ANANAS_IMAGE:-ananas-qt6-builder}"
 FIXTURE_FORM="${DESIGNER_FIXTURE_FORM:-406}"
 
@@ -16,11 +16,8 @@ if [[ ! -d "$REPO" ]]; then
     echo "Repository not found: $REPO" >&2
     exit 1
 fi
-
 REPO="$(cd "$REPO" && pwd)"
-WORKSPACE="$(dirname "$REPO")"
-REPO_NAME="$(basename "$REPO")"
-FIXTURE_DIR="$WORKSPACE/tmp/designer-fixtures"
+FIXTURE_DIR="$REPO/tmp/designer-fixtures"
 FIXTURE_UI="$FIXTURE_DIR/inventory-form-$FIXTURE_FORM.ui"
 
 echo "===> Extracting fixture form $FIXTURE_FORM..."
@@ -30,38 +27,28 @@ python3 "$SCRIPT_DIR/extract-cfg-form.py" \
     "$FIXTURE_FORM" "$FIXTURE_UI"
 
 podman run --rm \
-    -v "$WORKSPACE":/workspace:z \
-    -w "/workspace/$REPO_NAME/src/designer" \
+    -v "$REPO":/repo:z \
+    -w /repo \
     "$IMAGE" \
     bash -c '
         set -e
-
-        export CCACHE_DIR=/workspace/tmp/ccache
+        export CCACHE_DIR=/repo/tmp/ccache
         mkdir -p "$CCACHE_DIR"
 
-        echo "===> Building the main tree (widget plugin, libs)..."
-        make -C /workspace/'"$REPO_NAME"' -j"$(nproc)" >/tmp/main-build.log 2>&1 \
-            || { echo "MAIN BUILD FAILED"; tail -40 /tmp/main-build.log; exit 1; }
+        echo "===> Building the project (CMake)..."
+        rm -rf cmake-build
+        cmake -S . -B cmake-build -DCMAKE_BUILD_TYPE=Release
+        cmake --build cmake-build -j"$(nproc)"
 
-        echo "===> Building the designer wrapper smoke target..."
-        ( cd designer6 && qmake designer6.pro -o Makefile >/dev/null \
-            && make -j"$(nproc)" >/tmp/designer6-build.log 2>&1 ) \
-            || { echo "WRAPPER BUILD FAILED"; grep -E "error:|fatal error" /tmp/designer6-build.log | head; exit 1; }
-
-        echo "===> Building ananas-designer..."
-        qmake designer.pro -o Makefile >/dev/null
-        make -j"$(nproc)" >/tmp/designer-build.log 2>&1 \
-            || { echo "DESIGNER BUILD FAILED"; grep -E "error:|fatal error" /tmp/designer-build.log | head -20; exit 1; }
-
-        export QT_PLUGIN_PATH=/workspace/'"$REPO_NAME"'/lib
-        export LD_LIBRARY_PATH=/workspace/'"$REPO_NAME"'/lib:/workspace/'"$REPO_NAME"'/lib/designer:/workspace/'"$REPO_NAME"'/src/editor
+        export QT_PLUGIN_PATH=/repo/lib
+        export LD_LIBRARY_PATH=/repo/lib:/repo/lib/designer:/repo/src/editor
 
         echo "===> Running the wrapper smoke (Xvfb)..."
-        timeout 120 xvfb-run -a ../../bin/designer-smoke \
-            /workspace/tmp/designer-fixtures/inventory-form-'"$FIXTURE_FORM"'.ui
+        timeout 120 xvfb-run -a ./bin/designer-smoke \
+            /repo/tmp/designer-fixtures/inventory-form-'"$FIXTURE_FORM"'.ui
 
         echo "===> Running ananas-designer --help (Xvfb)..."
-        out=$(timeout 120 xvfb-run -a ../../bin/ananas-designer --help 2>&1 || true)
+        out=$(timeout 120 xvfb-run -a ./bin/ananas-designer --help 2>&1 || true)
         if echo "$out" | grep -q "Usage: ananas-designer"; then
             echo "     designer start ok"
         else

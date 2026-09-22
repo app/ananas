@@ -14,6 +14,7 @@ moc_*.cpp
 /bin
 /lib
 /tmp
+/dist
 translations/*.qm
 src/test/ananas-test
 src/test/test*.cfg

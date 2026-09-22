@@ -1,11 +1,28 @@
 # Ananas build tooling
 
 Containers and scripts used to build, test and package the Ananas monorepo on a
-modern host with Podman. Everything is built with **CMake** on **Qt6**
-(Ubuntu 24.04 + Qt 6.4); there is no qmake build.
+modern host with Podman or Docker. Everything is built with **CMake** on
+**Qt6** (Ubuntu 24.04 + Qt 6.4); there is no qmake build.
 
 The repository contains the whole system: the engine, the administrator, the
 designer, the libraries and the bundled `src/qdataschema`.
+
+## Quick start
+
+After cloning, build and test the whole tree in the container — no host
+Qt6/CMake toolchain is needed:
+
+```sh
+bash tools/scripts/smoke.sh
+```
+
+To build the Debian packages instead (written to `dist/`):
+
+```sh
+bash tools/scripts/build-deb.sh
+```
+
+The first run builds the `ananas-qt6-builder` image; later runs reuse it.
 
 ## Layout
 
@@ -28,7 +45,8 @@ ananas/
 
 ## Requirements
 
-- `podman` (rootless is fine)
+- `podman` (recommended, rootless is fine) or `docker`. If both are installed,
+  Podman is used; force the other one with `CONTAINER=docker bash …`.
 - Network access to `archive.ubuntu.com`, `security.ubuntu.com` and
   `ports.ubuntu.com` (for the Ubuntu 24.04 image)
 

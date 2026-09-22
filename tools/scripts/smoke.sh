@@ -2,6 +2,8 @@
 # Build the whole tree with CMake in the Qt6 image and run the QtTest suite
 # headlessly under Xvfb.
 #
+# Container engine: podman (preferred) or docker; override with CONTAINER=...
+#
 # Usage: smoke.sh [path-to-ananas]
 set -euo pipefail
 
@@ -15,7 +17,18 @@ if [[ ! -d "$REPO" ]]; then
 fi
 REPO="$(cd "$REPO" && pwd)"
 
-podman run --rm \
+CONTAINER="${CONTAINER:-$(command -v podman || command -v docker || true)}"
+if [[ -z "$CONTAINER" ]]; then
+    echo "ERROR: podman or docker is required" >&2
+    exit 1
+fi
+
+if ! "$CONTAINER" image inspect "$IMAGE" >/dev/null 2>&1; then
+    echo "===> Building the Qt6 image..."
+    "$CONTAINER" build -t "$IMAGE" -f "$REPO/tools/docker/Containerfile" "$REPO"
+fi
+
+"$CONTAINER" run --rm \
     -v "$REPO":/repo:z \
     -w /repo \
     "$IMAGE" \

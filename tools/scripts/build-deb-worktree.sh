@@ -4,6 +4,8 @@
 # with `git archive`. Intended for testing local changes before they are
 # committed.
 #
+# Container engine: podman (preferred) or docker; override with CONTAINER=...
+#
 # Usage: build-deb-worktree.sh
 set -euo pipefail
 
@@ -11,7 +13,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$SCRIPT_DIR/../.." && pwd)"
 IMAGE="${ANANAS_IMAGE:-ananas-qt6-builder}"
 
-podman run --rm \
+CONTAINER="${CONTAINER:-$(command -v podman || command -v docker || true)}"
+if [[ -z "$CONTAINER" ]]; then
+    echo "ERROR: podman or docker is required" >&2
+    exit 1
+fi
+
+"$CONTAINER" run --rm \
     -v "$REPO":/repo:z \
     "$IMAGE" \
     bash -c '

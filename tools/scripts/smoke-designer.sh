@@ -4,6 +4,8 @@
 #      inventory scheme;
 #   2. the designer application starts (MainForm construction) via --help.
 #
+# Container engine: podman (preferred) or docker; override with CONTAINER=...
+#
 # Usage: smoke-designer.sh [path-to-ananas]
 set -euo pipefail
 
@@ -20,13 +22,24 @@ REPO="$(cd "$REPO" && pwd)"
 FIXTURE_DIR="$REPO/tmp/designer-fixtures"
 FIXTURE_UI="$FIXTURE_DIR/inventory-form-$FIXTURE_FORM.ui"
 
+CONTAINER="${CONTAINER:-$(command -v podman || command -v docker || true)}"
+if [[ -z "$CONTAINER" ]]; then
+    echo "ERROR: podman or docker is required" >&2
+    exit 1
+fi
+
 echo "===> Extracting fixture form $FIXTURE_FORM..."
 mkdir -p "$FIXTURE_DIR"
 python3 "$SCRIPT_DIR/extract-cfg-form.py" \
     "$REPO/applications/inventory/inventory.cfg" \
     "$FIXTURE_FORM" "$FIXTURE_UI"
 
-podman run --rm \
+if ! "$CONTAINER" image inspect "$IMAGE" >/dev/null 2>&1; then
+    echo "===> Building the Qt6 image..."
+    "$CONTAINER" build -t "$IMAGE" -f "$REPO/tools/docker/Containerfile" "$REPO"
+fi
+
+"$CONTAINER" run --rm \
     -v "$REPO":/repo:z \
     -w /repo \
     "$IMAGE" \

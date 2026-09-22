@@ -13,11 +13,12 @@ fi
 
 cd "$REPO"
 
-# The form designer (src/designer) is excluded from the first porting
-# milestone, so it is not counted in the burndown.
+# src/designer is included: it became part of the port in Phase 6. The
+# archived Qt4 Designer fork (tools/archive/qt4-designer-fork) is outside this
+# repository and is not counted.
 src_files() {
-    find . -path ./.git -prune -o -path ./src/designer -prune -o \
-        -type d \( -name .moc -o -name .obj -o -name .ui \) -prune -o -type f \
+    find . -path ./.git -prune -o \
+        -type d \( -name .moc -o -name .obj -o -name .ui -o -name designer6 \) -prune -o -type f \
         \( -name '*.cpp' -o -name '*.h' -o -name '*.ui' -o -name '*.pro' -o -name '*.pri' \) -print
 }
 

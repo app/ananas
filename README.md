@@ -16,7 +16,9 @@ Built with **Qt6** and **CMake** (qmake is no longer used).
 
 ## Building and testing
 
-See [`tools/README.md`](tools/README.md).
+By default the project is built, tested and packaged in a container (Podman);
+no Qt6/CMake toolchain is required on the host. See
+[`tools/README.md`](tools/README.md).
 
 ## License
 

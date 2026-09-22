@@ -288,3 +288,17 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
     the smoke asserts `core->topLevel()`.
   - Note: Qt6 Designer's widget box only supports drag-and-drop, not
     double-click insertion (the list view only handles `pressed`).
+- **2026-09-22** — **Widget property editors did not open.**
+  - `aWidget::widgetEditor()` created the editor via `createEditor()` and only
+    then checked that the widget's top-level window was named
+    `ananas-designer_mainwindow`. In the form designer the edited form lives in
+    the separate designer window, so the check failed and the dialog was
+    created and discarded without being shown (the leaked dialog produced the
+    `QObject::connect` warnings for its UI).
+  - The editor now calls `aWidget::getMd()`, which locates the designer main
+    window among all top-level widgets (and returns null in the runtime
+    engine); the dialog is deleted when no metadata is available.
+  - Also fixed the Qt3 signals in the plugin forms: `QComboBox
+    activated(QString)` -> `textActivated(QString)` and `QListWidget
+    highlighted(int)` -> `currentRowChanged(int)` (`efield.ui`,
+    `edbfield.ui`, `edbtable.ui`, `etable.ui`).

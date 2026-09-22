@@ -302,3 +302,10 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
     activated(QString)` -> `textActivated(QString)` and `QListWidget
     highlighted(int)` -> `currentRowChanged(int)` (`efield.ui`,
     `edbfield.ui`, `edbtable.ui`, `etable.ui`).
+- **2026-09-22** — **Crash opening the wDBTable editor.**
+  - `eDBTable::setData()` populated `ListCol` before assigning the
+    `cwidth`/`fname`/`idlist` lists. Inserting the first header emits
+    `currentRowChanged`, which calls `ColumnSel()` and indexes those lists
+    (still empty), asserting on the Qt6 `QStringList` bounds check.
+  - Assign the lists before inserting the headers and guard the indexing in
+    `ColumnSel()`, `getData()` and `ColWidthChange()`.

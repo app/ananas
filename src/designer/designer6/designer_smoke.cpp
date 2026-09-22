@@ -12,6 +12,7 @@
 #include <QFileInfo>
 
 #include <QtDesigner/QDesignerComponents>
+#include <QtDesigner/abstractformeditor.h>
 #include <QtDesigner/abstractformwindow.h>
 
 #include "formdesigner.h"
@@ -45,6 +46,9 @@ int main(int argc, char **argv)
 
     if (designer.formWindowCount() != 1)
         return fail(QString("expected 1 form window, got %1").arg(designer.formWindowCount()));
+
+    if (!designer.core()->topLevel())
+        return fail("core->topLevel() is null: widget box drag-and-drop will not work");
 
     designer.fileSaveAll();
     if (QFileInfo(roundtrip).size() == 0)

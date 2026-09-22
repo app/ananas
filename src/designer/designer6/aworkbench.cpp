@@ -68,6 +68,10 @@ aDesignerWorkbench::aDesignerWorkbench(QWidget *parent)
 
     new QDesignerIntegration(m_core, this);
 
+    // The widget box drag uses core->topLevel() as the drag source; without it
+    // dragging widgets onto a form does nothing.
+    m_core->setTopLevel(this);
+
     createMenus();
 }
 
@@ -164,6 +168,10 @@ QDesignerFormWindowInterface *aDesignerWorkbench::openForm(const QString &fileNa
     m_mdiArea->addSubWindow(formWindow);
     formWindow->show();
     manager->setActiveFormWindow(formWindow);
+
+    // Activate the widget-editing tool so the widget box can insert widgets.
+    formWindow->editWidgets();
+
     return formWindow;
 }
 

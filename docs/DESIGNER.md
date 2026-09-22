@@ -312,3 +312,18 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
   - The form editor wrote its temporary `inputform_<id>.ui` files into the
     process working directory; they now go to `QDir::tempPath()` (and the
     preview file is removed after loading).
+- **2026-09-22** — **Crash opening the wDBField editor.**
+  - `wDBField::getFields()` called `md->attr(..., mda_type).at(0)` on a
+    possibly empty type attribute; Qt6 asserts on an out-of-range
+    `QString::at()` (Qt3 returned a null QChar). This aborted the process
+    from `wDBFieldTaskMenu::edit()` → `aWidget::widgetEditor()` →
+    `addfdialog::setData()`.
+  - Guard the empty string in both loops, and apply the same fix to the
+    identical `type.section(...).at(0)` pattern in `aField`/`aDataField`
+    constructors and to `aService::parts2money()`.
+  - Also fixed `aCfg::init()`: it declared a local `rootnode`, shadowing the
+    member, so `find(mdc_root)` returned an empty configuration instead of
+    the loaded one.
+  - Found with a temporary SIGABRT/SIGSEGV backtrace handler and trace prints
+    (removed after the fix); `build-qt6-worktree.sh` was added to build a
+    `.deb` from the working tree for such debugging.

@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
-# Phase 6 smoke harness: build the Qt6 form-designer wrapper and exercise the
-# open/save round-trip on a form extracted from the inventory scheme.
-#
-# The fixture is extracted on the host (python3), then the wrapper is built and
-# run inside the Qt6 image. The Ananas widget plugin must be available on the
-# Designer plugin path; the main tree is built first for that.
+# Phase 6 smoke harness: build the Qt6 form-designer wrapper and the
+# ananas-designer application, then run two checks under Xvfb:
+#   1. the wrapper open/save round-trip on a form from the inventory scheme;
+#   2. the designer application starts (MainForm construction) via --help.
 #
 # Usage: smoke-designer-qt6.sh [path-to-ananas-legacy-qt4]
 set -euo pipefail
@@ -33,7 +31,7 @@ python3 "$SCRIPT_DIR/extract-cfg-form.py" \
 
 podman run --rm \
     -v "$WORKSPACE":/workspace:z \
-    -w "/workspace/$REPO_NAME/src/designer/designer6" \
+    -w "/workspace/$REPO_NAME/src/designer" \
     "$IMAGE" \
     bash -c '
         set -e
@@ -41,23 +39,34 @@ podman run --rm \
         export CCACHE_DIR=/workspace/tmp/ccache
         mkdir -p "$CCACHE_DIR"
 
-        echo "===> Building the main tree (widget plugin)..."
+        echo "===> Building the main tree (widget plugin, libs)..."
         make -C /workspace/'"$REPO_NAME"' -j"$(nproc)" >/tmp/main-build.log 2>&1 \
             || { echo "MAIN BUILD FAILED"; tail -40 /tmp/main-build.log; exit 1; }
 
-        echo "===> Building the designer wrapper..."
-        qmake designer6.pro -o Makefile >/dev/null
-        if ! make -j"$(nproc)" >/tmp/designer-build.log 2>&1; then
-            echo "DESIGNER BUILD FAILED"
-            grep -E "error:|fatal error" /tmp/designer-build.log | head -20
-            exit 1
-        fi
+        echo "===> Building the designer wrapper smoke target..."
+        ( cd designer6 && qmake designer6.pro -o Makefile >/dev/null \
+            && make -j"$(nproc)" >/tmp/designer6-build.log 2>&1 ) \
+            || { echo "WRAPPER BUILD FAILED"; grep -E "error:|fatal error" /tmp/designer6-build.log | head; exit 1; }
 
-        echo "===> Running the designer smoke (Xvfb)..."
+        echo "===> Building ananas-designer..."
+        qmake designer.pro -o Makefile >/dev/null
+        make -j"$(nproc)" >/tmp/designer-build.log 2>&1 \
+            || { echo "DESIGNER BUILD FAILED"; grep -E "error:|fatal error" /tmp/designer-build.log | head -20; exit 1; }
+
         export QT_PLUGIN_PATH=/workspace/'"$REPO_NAME"'/lib
-        export LD_LIBRARY_PATH=/workspace/'"$REPO_NAME"'/lib:/workspace/'"$REPO_NAME"'/lib/designer
-        timeout 120 xvfb-run -a ../../../bin/designer-smoke \
+        export LD_LIBRARY_PATH=/workspace/'"$REPO_NAME"'/lib:/workspace/'"$REPO_NAME"'/lib/designer:/workspace/'"$REPO_NAME"'/src/editor
+
+        echo "===> Running the wrapper smoke (Xvfb)..."
+        timeout 120 xvfb-run -a ../../bin/designer-smoke \
             /workspace/tmp/designer-fixtures/inventory-form-'"$FIXTURE_FORM"'.ui
+
+        echo "===> Running ananas-designer --help (Xvfb)..."
+        out=$(timeout 120 xvfb-run -a ../../bin/ananas-designer --help 2>&1 || true)
+        if echo "$out" | grep -q "Usage: ananas-designer"; then
+            echo "     designer start ok"
+        else
+            echo "DESIGNER START FAILED"; echo "$out" | tail -30; exit 1
+        fi
 
         echo "===> ccache stats:"
         ccache -s | head -8

@@ -59,7 +59,8 @@ aField::aField(const QString &name, const QString &type )
 	fSys = true;
 	Name = name;
 //	Type  = type;
-	aType = type.section(" ",0,0).toUpper().at(0).toLatin1();
+	const QString typeCode = type.section(" ",0,0).toUpper();
+	aType = typeCode.isEmpty() ? ' ' : typeCode.at(0).toLatin1();
 	Width = type.section(" ",1,1).toInt();
 	Dec = type.section(" ",2,2).toInt();
 	switch ( aType ){

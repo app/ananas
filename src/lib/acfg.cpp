@@ -302,7 +302,7 @@ aCfg::init(){
 		return;
 	}
 //CHECK_POINT
-	QDomElement rootnode = xml.documentElement();
+	rootnode = xml.documentElement();
 //CHECK_POINT
 //	QDomElement root = rootnode;
 //CHECK_POINT

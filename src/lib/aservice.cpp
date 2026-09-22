@@ -176,7 +176,8 @@ aService::parts2money(qulonglong rubli,
 		res+=part2string(0,kopeyki/10,kopeyki%10,-1,false,"копеек","копейка","копейки");
 	}
 	res = res.trimmed();
-	res = res.replace(0,1,res.at(0).toUpper());
+	if ( !res.isEmpty() )
+		res = res.replace(0,1,res.at(0).toUpper());
 	return res;
 }
 

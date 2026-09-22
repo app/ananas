@@ -226,7 +226,8 @@ wDBField::getFields()
 	    	{
 //			printf("find %d elem\n",i);
 			o_head = md->findChild(o,md_field,i);
-			if(md->attr(o_head,mda_type).at(0)!=' ')
+			const QString type = md->attr(o_head,mda_type);
+			if(!type.isEmpty() && type.at(0)!=' ')
 			{
 //				printf("mda_type = %s\n",md->attr(o_head,mda_type).toLatin1().constData());
 				lst << md->attr(o_head,mda_name);
@@ -246,7 +247,8 @@ wDBField::getFields()
 //			printf("find %d group\n",i);
 			o_head = md->findChild(o,md_field,i);
 			//--if(md->attr(o,mda_type).left(1)!=' ')
-			if(md->attr(o,mda_type).at(0)!=' ')
+			const QString groupType = md->attr(o,mda_type);
+			if(!groupType.isEmpty() && groupType.at(0)!=' ')
 			{
 				lst << md->attr(o_head,mda_name);
 				dlst << md->attr(o_head,mda_name) + " (group)";

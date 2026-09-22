@@ -130,8 +130,9 @@ aDataField::init( const QString &name, const QString &type )
 	Name = name;
 	fType = type;
 	Type = QVariant::Invalid;
-	if ( !type.isNull() ) {
-		aType = type.section(" ",0,0).toUpper().at(0).toLatin1();
+	if ( !type.isEmpty() ) {
+		const QString typeCode = type.section(" ",0,0).toUpper();
+		aType = typeCode.isEmpty() ? ' ' : typeCode.at(0).toLatin1();
 		Width = type.section(" ",1,1).toInt();
 		Dec = type.section(" ",2,2).toInt();
 		switch ( aType ){

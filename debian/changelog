@@ -1,8 +1,0 @@
-libqdataschema (1.0.0-1) noble; urgency=high
-
-
-  * Initial release of debian package
-  * Rebuilt for Qt5 (Ubuntu 24.04)
-
- -- Ananas Project <project@ananas.su>  Mon, 16 Oct 2017 16:45:05 +0300 
-

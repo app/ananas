@@ -309,3 +309,6 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
     (still empty), asserting on the Qt6 `QStringList` bounds check.
   - Assign the lists before inserting the headers and guard the indexing in
     `ColumnSel()`, `getData()` and `ColWidthChange()`.
+  - The form editor wrote its temporary `inputform_<id>.ui` files into the
+    process working directory; they now go to `QDir::tempPath()` (and the
+    preview file is removed after loading).

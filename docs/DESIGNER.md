@@ -241,3 +241,25 @@ starts (same rule as `PORTING.md` principle 1). Concretely:
     signatures and are runtime no-ops (tab change, item rename/double-click);
     item rename via `editItem()` needs `Qt::ItemIsEditable`. These are
     behavioral, not build, issues and are tracked for Part C/manual smoke.
+
+### Part C — build & packaging (done)
+
+- **2026-09-22** — **Part C: done.**
+  - `src/src.pro` builds `designer` as part of the main tree, so `make` and
+    `smoke-qt6.sh` now compile `ananas-designer` too.
+  - `designer.pro` gets an RPATH to `/usr/lib/ananas/designer` (widget plugin).
+  - `build/ubuntu/rules` installs `ananas-designer.desktop`; the `.deb`
+    already picks up `/usr/bin/ananas-designer`, `/usr/lib/libqtscriptedit.so*`,
+    the designer translations and icon via the subdir `install` rules.
+  - Runtime fixes found by the GUI smoke: `QAction::activated()` ->
+    `triggered()` (in `.ui` `<connections>` and `.cpp`), and the Qt3
+    `Q3Table`/`Q3IconView`/`QTabWidget` signals in `cfgform.ui` ->
+    `cellDoubleClicked(int,int)`, `itemChanged(QListWidgetItem*)`,
+    `currentChanged(int)` with matching slot signatures.
+  - Gates: `ananas-designer` builds; `smoke-designer-qt6.sh` green; the
+    packaged app starts on the inventory scheme (`--rc=/etc/ananas/inventory.rc`
+    under Xvfb), creates the SQLite DB and runs without connect warnings;
+    `smoke-qt6.sh` **7/7**; `port-metrics.sh` Q3 = 0.
+  - Note: `dh_shlibdeps` resolves `libqt6designer6` /
+    `libqt6designercomponents6` from their shlibs, so no manual `Depends`
+    entry is needed.

@@ -53,6 +53,8 @@ PLAIN = (
     ("eClientModule->setText(", "eClientModule->setPlainText("),
     ("eServerModule->text()", "eServerModule->toPlainText()"),
     ("eServerModule->setText(", "eServerModule->setPlainText("),
+    # QAction::activated() -> triggered() in Qt5/Qt6.
+    ("SIGNAL(activated())", "SIGNAL(triggered())"),
 )
 
 # Drop Qt3Support / Q3 includes; the modern include is added by hand.

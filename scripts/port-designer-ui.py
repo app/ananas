@@ -76,6 +76,9 @@ def convert(ui):
     ui = re.sub(r'\s*<include[^>]*>\s*(?:q3|Q3|qworkspace|QWorkspace|Qt3Support)[^<]*</include>',
                 "", ui)
 
+    # QAction::activated() was renamed to triggered() in Qt5/Qt6.
+    ui = ui.replace("<signal>activated()</signal>", "<signal>triggered()</signal>")
+
     for prop in DROP_PROPERTIES:
         ui = re.sub(r'\s*<property name="%s"\s*>.*?</property>' % prop,
                     "", ui, flags=re.DOTALL)

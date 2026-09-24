@@ -1,9 +1,11 @@
 name: snap
 
 # Build the Ananas snap inside the official Snapcraft OCI image, the same way
-# tools/scripts/build-snap.sh does locally. The image is the build environment,
-# so no host Snapcraft / LXD is involved. Publishing to the Store is out of
-# scope: the .snap is uploaded as a GitHub Actions artifact.
+# tools/scripts/build-snap-worktree.sh does locally. The image is the build
+# environment, so no host Snapcraft / LXD is involved.
+#
+# Packages are uploaded as artifacts only from master; pull requests build the
+# snap as a check but publish nothing. See tools/GITHUB-CI.md.
 
 on:
   push:
@@ -13,19 +15,32 @@ on:
       - 'applications/**'
       - 'translations/**'
       - 'snap/**'
-      - 'tools/scripts/build-snap*.sh'
+      - 'build/**'
+      - 'tools/**'
+      - '**/CMakeLists.txt'
+      - 'VERSION'
       - '.snapcraftignore'
-      - '.github/workflows/snap.yml'
+      - '.github/workflows/**'
   pull_request:
     paths:
       - 'snap/**'
+      - 'build/ubuntu/**'
+      - 'debian'
       - 'tools/scripts/build-snap*.sh'
+      - 'tools/scripts/build-deb*.sh'
+      - 'tools/docker/**'
       - '.snapcraftignore'
-      - '.github/workflows/snap.yml'
+      - '**/CMakeLists.txt'
+      - 'VERSION'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: snap-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-amd64:
@@ -34,28 +49,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Compute the version
-        id: version
-        run: |
-          echo "value=$(cat VERSION)+git$(date -u +%Y%m%d).$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
-
       - name: Build the snap
-        run: |
-          docker run --rm -e ANANAS_VERSION="${{ steps.version.outputs.value }}" \
-            -v "$PWD":/project:z ghcr.io/canonical/snapcraft:8_core24 pack
+        run: bash tools/scripts/build-snap-worktree.sh
 
       - name: Show the result
-        run: ls -lh ./*.snap
+        run: ls -lh dist/*.snap
 
       - name: Upload the snap
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
         with:
           name: ananas-snap-amd64
-          path: '*.snap'
+          path: 'dist/*.snap'
           if-no-files-found: error
 
   # Optional: build for arm64 on Launchpad. Enable and provide store/LP
-  # credentials (see docs/snapcraft-packaging.md). Not needed for amd64.
+  # credentials (see tools/GITHUB-CI.md). Not needed for amd64.
   #
   # build-arm64:
   #   name: Build snap (arm64, remote)

@@ -105,10 +105,16 @@ bash tools/scripts/build-snap.sh
 bash tools/scripts/build-snap-worktree.sh
 ```
 
-The snap is written to `dist/` and can be installed in developer mode:
+The snap is written to `dist/`. Install a locally built one with:
 
 ```sh
-sudo snap install --devmode --dangerous ./dist/ananas_*.snap
+sudo snap install --dangerous ./dist/ananas_*.snap
+```
+
+Published builds are installed from the Snap Store (`latest/edge` for now):
+
+```sh
+sudo snap install ananas --edge
 ```
 
 Its version is `<VERSION>+git<YYYYMMDD>.<short-sha>` (for example
@@ -120,10 +126,14 @@ aliases in `snapcraft.yaml`); a local install may need them enabled with
 
 The Ananas binaries use a few absolute paths (`/usr/share/ananas`,
 `/usr/lib/ananas`, `/etc/ananas`); the `layout` section in
-`snap/snapcraft.yaml` maps them back into the snap. A `command-chain` wrapper
-(`snap/local/bin/qt-env`) points the loader and Qt at the bundled libraries and
-plugins. The name `ananas` is already registered in the Snap Store, so
-`name: ananas` is used as-is (do not run `snapcraft register`).
+`snap/snapcraft.yaml` maps them back into the snap, which is strictly confined.
+A `command-chain` wrapper (`snap/local/bin/qt-env`) points the loader and Qt at
+the bundled libraries and plugins. Application data (log, workdir, settings) is
+kept under `~/snap/ananas/common`, driven by the generic `ANANAS_DATA_DIR`
+environment variable; other packaging (deb, portable builds) leaves it unset,
+so `~/.ananas` is used as before. The name `ananas` is already registered in
+the Snap Store, so `name: ananas` is used as-is (do not run `snapcraft
+register`).
 
 ### Choosing a branch
 

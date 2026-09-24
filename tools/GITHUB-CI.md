@@ -67,6 +67,27 @@ The worktree scripts build exactly what is checked out (they do not use
 the `ananas-qt6-builder` image on demand; `build-snap-worktree.sh` pulls the
 official Snapcraft image automatically.
 
+## Releasing to the Snap Store
+
+Releases are manual for now. The build image is Snapcraft 8 for `core24`
+(`ghcr.io/canonical/snapcraft:8_core24`); no Snapcraft 9 image is published yet.
+Channel rules: `grade: devel` can be released to `edge` and `beta` only, while
+`candidate` and `stable` require `grade: stable`. Since a plain
+`snap install ananas` uses `stable`, the final release needs `grade: stable`.
+
+Upload a build to the edge channel from the host (which holds the Store
+credentials):
+
+```sh
+snapcraft upload --release=latest/edge ./dist/ananas_<version>_amd64.snap
+snapcraft status ananas
+```
+
+Users install it with `sudo snap install ananas --edge`. Promote a tested
+revision later with `snapcraft release ananas <revision> beta` and finally
+`snapcraft release ananas <revision> stable`. Build release snaps from the
+committed tree with `tools/scripts/build-snap.sh`.
+
 ## Adding or changing a workflow
 
 1. Keep triggers and path filters in sync with the table above.
@@ -76,7 +97,8 @@ official Snapcraft image automatically.
 
 ## Not implemented
 
-- Publishing to the Snap Store or to a package repository.
+- Publishing from CI (uploads are manual for now) and publishing to package
+  repositories.
 - arm64 builds: `snap.yml` contains a commented `remote-build` job that needs
   Launchpad credentials.
 - Cross-workflow caching of the container images.

@@ -74,6 +74,7 @@ Suggested tracker shape:
 
 - Update `tools/README.md` and/or `README.md` / `README.ru.md` when behaviour or
   workflow changes.
+- When CI workflows change, update `tools/GITHUB-CI.md`.
 - Add or update a skill under `.opencode/skills/` for repeatable procedures.
 
 ### 6. Commit

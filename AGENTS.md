@@ -52,8 +52,3 @@ Do not run `cmake`, `make`, `qmake` or `lrelease` directly on the host.
 - Documentation and, when applicable, skills are updated.
 - `git status` is clean apart from intentionally uncommitted files; the diff has
   been reviewed.
-
-## Language
-
-Conversation is Russian; code, comments, commit messages and documentation are
-English. See the global `~/.config/opencode/AGENTS.md`.

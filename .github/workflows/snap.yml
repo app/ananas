@@ -1,0 +1,76 @@
+name: snap
+
+# Build the Ananas snap inside the official Snapcraft OCI image, the same way
+# tools/scripts/build-snap.sh does locally. The image is the build environment,
+# so no host Snapcraft / LXD is involved. Publishing to the Store is out of
+# scope: the .snap is uploaded as a GitHub Actions artifact.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/**'
+      - 'applications/**'
+      - 'translations/**'
+      - 'snap/**'
+      - 'tools/scripts/build-snap*.sh'
+      - '.snapcraftignore'
+      - '.github/workflows/snap.yml'
+  pull_request:
+    paths:
+      - 'snap/**'
+      - 'tools/scripts/build-snap*.sh'
+      - '.snapcraftignore'
+      - '.github/workflows/snap.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-amd64:
+    name: Build snap (amd64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute the version
+        id: version
+        run: |
+          echo "value=$(cat VERSION)+git$(date -u +%Y%m%d).$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Build the snap
+        run: |
+          docker run --rm -e ANANAS_VERSION="${{ steps.version.outputs.value }}" \
+            -v "$PWD":/project:z ghcr.io/canonical/snapcraft:8_core24 pack
+
+      - name: Show the result
+        run: ls -lh ./*.snap
+
+      - name: Upload the snap
+        uses: actions/upload-artifact@v4
+        with:
+          name: ananas-snap-amd64
+          path: '*.snap'
+          if-no-files-found: error
+
+  # Optional: build for arm64 on Launchpad. Enable and provide store/LP
+  # credentials (see docs/snapcraft-packaging.md). Not needed for amd64.
+  #
+  # build-arm64:
+  #   name: Build snap (arm64, remote)
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'workflow_dispatch'
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Remote build for arm64
+  #       env:
+  #         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+  #       run: |
+  #         docker run --rm -v "$PWD":/project:z -e SNAPCRAFT_STORE_CREDENTIALS \
+  #           ghcr.io/canonical/snapcraft:8_core24 \
+  #           remote-build --build-for=arm64 --launchpad-accept-public-upload
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ananas-snap-arm64
+  #         path: '*.snap'

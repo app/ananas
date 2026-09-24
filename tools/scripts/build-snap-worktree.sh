@@ -28,7 +28,15 @@ echo "===> Building the snap from the working tree (${IMAGE}), version ${ANANAS_
 "$CONTAINER" run --rm -e ANANAS_VERSION="$ANANAS_VERSION" \
     -v "$REPO":/project:z "$IMAGE" pack
 
+# snapcraft writes the .snap next to snapcraft.yaml (the mounted repo root);
+# move it into dist/ so the working tree stays clean.
 mkdir -p "$REPO/dist"
-cp -v "$REPO"/ananas_*.snap "$REPO/dist/"
+shopt -s nullglob
+snaps=("$REPO"/ananas_*.snap)
+if (( ${#snaps[@]} == 0 )); then
+    echo "ERROR: no .snap was produced" >&2
+    exit 1
+fi
+mv -f "${snaps[@]}" "$REPO/dist/"
 
 echo "===> done: $REPO/dist"

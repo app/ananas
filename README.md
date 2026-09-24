@@ -12,6 +12,7 @@ Built with **Qt6** and **CMake** (qmake is no longer used).
 - `src/qdataschema/` — libqdataschema
 - `applications/` — the inventory business scheme
 - `build/` — packaging (Debian/Ubuntu; legacy RPM/Inno/menus)
+- `snap/` — Snapcraft manifest, GUI entries and wrappers
 - `tools/` — build, test and packaging tooling
 
 ## Building and testing

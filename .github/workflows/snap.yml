@@ -47,7 +47,7 @@ jobs:
     name: Build snap (amd64)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build the snap
         run: bash tools/scripts/build-snap-worktree.sh
@@ -57,7 +57,7 @@ jobs:
 
       - name: Upload the snap
         if: github.ref == 'refs/heads/master'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ananas-snap-amd64
           path: 'dist/*.snap'
@@ -71,7 +71,7 @@ jobs:
   #   runs-on: ubuntu-latest
   #   if: github.event_name == 'workflow_dispatch'
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v7
   #     - name: Remote build for arm64
   #       env:
   #         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
@@ -79,7 +79,7 @@ jobs:
   #         docker run --rm -v "$PWD":/project:z -e SNAPCRAFT_STORE_CREDENTIALS \
   #           ghcr.io/canonical/snapcraft:8_core24 \
   #           remote-build --build-for=arm64 --launchpad-accept-public-upload
-  #     - uses: actions/upload-artifact@v4
+  #     - uses: actions/upload-artifact@v7
   #       with:
   #         name: ananas-snap-arm64
   #         path: '*.snap'

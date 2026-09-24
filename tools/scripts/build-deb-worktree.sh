@@ -19,6 +19,11 @@ if [[ -z "$CONTAINER" ]]; then
     exit 1
 fi
 
+if ! "$CONTAINER" image inspect "$IMAGE" >/dev/null 2>&1; then
+    echo "===> Building the Qt6 image..."
+    "$CONTAINER" build -t "$IMAGE" -f "$REPO/tools/docker/Containerfile" "$REPO"
+fi
+
 "$CONTAINER" run --rm \
     -v "$REPO":/repo:z \
     "$IMAGE" \

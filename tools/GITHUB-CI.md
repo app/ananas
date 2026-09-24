@@ -83,6 +83,14 @@ snapcraft upload --release=latest/edge ./dist/ananas_<version>_amd64.snap
 snapcraft status ananas
 ```
 
+The Store keeps its listing metadata (title, summary, description, icon)
+separately from the snap file, and `upload` does not update it. After changing
+any of those, push them with:
+
+```sh
+snapcraft upload-metadata --force ./dist/ananas_<version>_amd64.snap
+```
+
 Users install it with `sudo snap install ananas --edge`. Promote a tested
 revision later with `snapcraft release ananas <revision> beta` and finally
 `snapcraft release ananas <revision> stable`. Build release snaps from the

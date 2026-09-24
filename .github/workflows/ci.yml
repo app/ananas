@@ -1,0 +1,52 @@
+name: ci
+
+# Verification build: compile the whole tree and run the test suite in the
+# container image, so a pull request clearly shows whether it builds. This is
+# not a packaging job — see snap.yml and deb.yml for packages.
+#
+# Triggers, paths and publishing rules are documented in tools/GITHUB-CI.md.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/**'
+      - 'applications/**'
+      - 'translations/**'
+      - 'snap/**'
+      - 'build/**'
+      - 'tools/**'
+      - '**/CMakeLists.txt'
+      - 'VERSION'
+      - '.snapcraftignore'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'applications/**'
+      - 'translations/**'
+      - 'snap/**'
+      - 'build/**'
+      - 'tools/**'
+      - '**/CMakeLists.txt'
+      - 'VERSION'
+      - '.snapcraftignore'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and run the tests
+        run: bash tools/scripts/smoke.sh

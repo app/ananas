@@ -1,0 +1,64 @@
+name: deb
+
+# Build the Debian packages (ananas + libqdataschema) in the Qt6 container
+# image, the same way tools/scripts/build-deb-worktree.sh does locally.
+#
+# Packages are uploaded as artifacts only from master; pull requests build them
+# as a check (when the packaging inputs change) but publish nothing.
+# See tools/GITHUB-CI.md.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/**'
+      - 'applications/**'
+      - 'translations/**'
+      - 'snap/**'
+      - 'build/**'
+      - 'tools/**'
+      - '**/CMakeLists.txt'
+      - 'VERSION'
+      - '.snapcraftignore'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'snap/**'
+      - 'build/ubuntu/**'
+      - 'debian'
+      - 'tools/scripts/build-snap*.sh'
+      - 'tools/scripts/build-deb*.sh'
+      - 'tools/docker/**'
+      - '.snapcraftignore'
+      - '**/CMakeLists.txt'
+      - 'VERSION'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deb-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-amd64:
+    name: Build .deb (amd64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the Debian packages
+        run: bash tools/scripts/build-deb-worktree.sh
+
+      - name: Show the result
+        run: ls -lh dist/*.deb
+
+      - name: Upload the packages
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ananas-deb-amd64
+          path: 'dist/*.deb'
+          if-no-files-found: error

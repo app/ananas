@@ -1,0 +1,13 @@
+.git
+.github
+cmake-build
+dist
+bin
+lib
+tmp
+parts
+stage
+prime
+*.snap
+test.cfg
+test2.cfg

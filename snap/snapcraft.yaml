@@ -1,0 +1,173 @@
+name: ananas
+adopt-info: ananas
+base: core24
+summary: Free accounting automation platform
+description: |
+  Ananas is a free accounting automation platform for Linux. This snap ships
+  the Ananas engine, the administrator and the designer, the bundled
+  "inventory" business scheme (internal SQLite database) and the qdsadm tool
+  from libqdataschema.
+
+  The Ananas binaries use a few absolute paths (/usr/share/ananas,
+  /usr/lib/ananas, /etc/ananas); those are mapped back into the snap with the
+  layout section below.
+grade: devel
+confinement: devmode
+license: GPL-2.0-only
+contact: apaskal@gmail.com
+website: https://github.com/app/ananas
+issues: https://github.com/app/ananas/issues
+
+layout:
+  /usr/share/ananas:
+    bind: $SNAP/usr/share/ananas
+  /usr/lib/ananas:
+    bind: $SNAP/usr/lib/ananas
+  /etc/ananas:
+    bind: $SNAP/etc/ananas
+  /etc/xdg/ananas:
+    bind: $SNAP/etc/xdg/ananas
+  /usr/share/X11/xkb:
+    bind: $SNAP/usr/share/X11/xkb
+
+parts:
+  ananas:
+    plugin: cmake
+    source: .
+    cmake-parameters:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_INSTALL_LIBDIR=lib
+    build-packages:
+      - build-essential
+      - qt6-base-dev
+      - qt6-base-dev-tools
+      - qt6-tools-dev
+      - qt6-tools-dev-tools
+      - qt6-declarative-dev
+      - qt6-l10n-tools
+      - libmysqlclient-dev
+    stage-packages:
+      - libqt6core6t64
+      - libqt6gui6t64
+      - libqt6widgets6t64
+      - libqt6network6t64
+      - libqt6xml6t64
+      - libqt6printsupport6t64
+      - libqt6sql6t64
+      - libqt6qml6
+      - libqt6designer6
+      - libqt6designercomponents6
+      - libqt6sql6-sqlite
+      - libqt6sql6-mysql
+      - libqt6sql6-psql
+      - libmysqlclient21
+      - libpq5
+      - libxkbcommon-x11-0
+      - xkb-data
+      - libgl1
+      - fonts-dejavu-core
+      - qt6-wayland
+      - qt6-gtk-platformtheme
+      - yaru-theme-gtk
+      - gsettings-desktop-schemas
+      - dconf-gsettings-backend
+    override-pull: |
+      craftctl default
+      # ANANAS_VERSION is injected by the build scripts / CI as
+      # "<VERSION>+git<YYYYMMDD>.<short-sha>"; fall back to the plain VERSION.
+      if [ -n "${ANANAS_VERSION:-}" ]; then
+        craftctl set version="$ANANAS_VERSION"
+      else
+        craftctl set version="$(tr -d '\n' < "$CRAFT_PROJECT_DIR/VERSION" 2>/dev/null || echo 0.0.0)"
+      fi
+    override-build: |
+      # Build the translation catalogues first (non-fatal if lrelease is absent).
+      LRELEASE="$(command -v lrelease || true)"
+      [ -n "$LRELEASE" ] || LRELEASE=/usr/lib/qt6/bin/lrelease
+      ( cd "$CRAFT_PART_SRC" && "$LRELEASE" translations/*.ts >/dev/null 2>&1 ) || true
+
+      craftctl default
+
+      # Runtime business scheme, translations, scheme rc files and config.
+      install -d "$CRAFT_PART_INSTALL/usr/share/ananas/applications/inventory"
+      install -d "$CRAFT_PART_INSTALL/usr/share/ananas/translations"
+      install -d "$CRAFT_PART_INSTALL/etc/ananas"
+      install -d "$CRAFT_PART_INSTALL/etc/xdg/ananas"
+
+      cp -f "$CRAFT_PART_SRC"/applications/inventory/inventory.cfg \
+            "$CRAFT_PART_SRC"/applications/inventory/inventory-demo.cfg \
+            "$CRAFT_PART_SRC"/applications/inventory/inventory-demo-data.sql \
+            "$CRAFT_PART_INSTALL/usr/share/ananas/applications/inventory/"
+      cp -f "$CRAFT_PART_SRC"/applications/inventory/templ_* \
+            "$CRAFT_PART_INSTALL/usr/share/ananas/applications/inventory/"
+      cp -f "$CRAFT_PART_SRC"/applications/ananas-cfg.dtd \
+            "$CRAFT_PART_INSTALL/usr/share/ananas/applications/inventory/"
+      cp -f "$CRAFT_PART_SRC"/translations/*.qm \
+            "$CRAFT_PART_INSTALL/usr/share/ananas/translations/"
+      cp -f "$CRAFT_PART_SRC"/build/ubuntu/inventory.rc \
+            "$CRAFT_PART_SRC"/build/ubuntu/inventory-demo.rc \
+            "$CRAFT_PART_INSTALL/etc/ananas/"
+      cp -f "$CRAFT_PART_SRC"/build/ubuntu/ananas.conf \
+            "$CRAFT_PART_INSTALL/etc/xdg/ananas/"
+
+    prime:
+      - -usr/include
+      - -usr/lib/*/cmake
+      - -usr/lib/*/pkgconfig
+      - -usr/share/doc
+      - -usr/share/man
+
+  wrappers:
+    plugin: dump
+    source: snap/local
+
+apps:
+  ananas:
+    command: usr/bin/ananas
+    command-chain: [bin/qt-env]
+    plugs:
+      - desktop
+      - x11
+      - wayland
+      - opengl
+      - home
+      - network
+      - network-bind
+      - audio-playback
+      - cups-control
+      - gsettings
+  ananas-administrator:
+    command: usr/bin/ananas-administrator
+    aliases: [ananas-administrator]
+    command-chain: [bin/qt-env]
+    plugs:
+      - desktop
+      - x11
+      - wayland
+      - opengl
+      - home
+      - network
+      - network-bind
+      - gsettings
+  ananas-designer:
+    command: usr/bin/ananas-designer
+    aliases: [ananas-designer]
+    command-chain: [bin/qt-env]
+    plugs:
+      - desktop
+      - x11
+      - wayland
+      - opengl
+      - home
+      - network
+      - network-bind
+      - gsettings
+  qdsadm:
+    command: usr/bin/qdsadm
+    aliases: [qdsadm]
+    command-chain: [bin/qt-env]
+    plugs:
+      - home
+      - network
+      - network-bind

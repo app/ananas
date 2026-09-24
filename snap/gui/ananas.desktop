@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Ananas
+Name[ru]=Ананас. Оперативный учёт
+Comment=Inventory management and accounting system
+Comment[ru]=Складской и бухгалтерский учёт
+Exec=ananas
+Icon=ananas.png
+Terminal=false
+Categories=Office;Finance;

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Ananas Administrator
+Name[ru]=Администратор Ананаса
+Comment=Manage Ananas users and roles
+Comment[ru]=Управление пользователями и ролями Ананаса
+Exec=ananas-administrator
+Icon=ananas-administrator.png
+Terminal=false
+Categories=Utility;Office;

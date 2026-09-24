@@ -1,0 +1,53 @@
+#!/bin/sh
+# Command-chain helper for all Ananas snap apps.
+#
+# Complements the `layout` mappings: point the dynamic loader and Qt at the
+# bundled libraries and plugins, and fix up the Wayland socket path.
+set -eu
+
+# The snap cannot reach the X session manager; drop the variable so Qt does not
+# print "Session management error: Could not open network socket".
+unset SESSION_MANAGER
+
+case "$(uname -m)" in
+    x86_64)          triplet=x86_64-linux-gnu ;;
+    aarch64|arm64)   triplet=aarch64-linux-gnu ;;
+    armv7l)          triplet=arm-linux-gnueabihf ;;
+    *)               triplet="$(uname -m)-linux-gnu" ;;
+esac
+
+# Prefer X11/XWayland when an X server is reachable. On this Qt 6.4 / GNOME
+# combination the native Wayland path has no window decorations and ignores the
+# system dark theme, while XWayland (server-side decorations + XSETTINGS) does
+# match the desktop. Set QT_QPA_PLATFORM=wayland to opt into native Wayland.
+if [ -z "${QT_QPA_PLATFORM:-}" ] && [ -n "${DISPLAY:-}" ]; then
+    QT_QPA_PLATFORM=xcb
+    export QT_QPA_PLATFORM
+fi
+
+# When native Wayland is used, the snap gets its own XDG_RUNTIME_DIR
+# (…/snap.<name>) while the Wayland socket lives in the user's runtime dir.
+# Point WAYLAND_DISPLAY at the real socket so Qt can connect.
+if [ -n "${WAYLAND_DISPLAY:-}" ] && [ "${WAYLAND_DISPLAY#/}" = "$WAYLAND_DISPLAY" ]; then
+    case "${XDG_RUNTIME_DIR:-}" in
+        */snap.*) host_runtime="${XDG_RUNTIME_DIR%/snap.*}" ;;
+        *)        host_runtime="${XDG_RUNTIME_DIR:-}" ;;
+    esac
+    if [ -n "$host_runtime" ] && [ -S "$host_runtime/$WAYLAND_DISPLAY" ]; then
+        WAYLAND_DISPLAY="$host_runtime/$WAYLAND_DISPLAY"
+        export WAYLAND_DISPLAY
+    fi
+fi
+
+LD_LIBRARY_PATH="$SNAP/usr/lib:$SNAP/usr/lib/ananas/designer:$SNAP/usr/lib/$triplet:$SNAP/usr/lib/$triplet/libproxy${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+QT_PLUGIN_PATH="$SNAP/usr/lib/$triplet/qt6/plugins${QT_PLUGIN_PATH:+:$QT_PLUGIN_PATH}"
+
+# libxkbcommon's compiled-in XKB root does not exist inside the snap.
+if [ -d "$SNAP/usr/share/X11/xkb" ]; then
+    XKB_CONFIG_ROOT="$SNAP/usr/share/X11/xkb"
+    export XKB_CONFIG_ROOT
+fi
+
+export LD_LIBRARY_PATH QT_PLUGIN_PATH
+
+exec "$@"

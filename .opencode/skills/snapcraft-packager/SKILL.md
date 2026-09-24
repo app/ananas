@@ -41,10 +41,19 @@ snap misbehaves.
   the plain `VERSION` when Snapcraft is run by hand. Snapcraft derives the
   package file name from it, so date and revision end up in
   `dist/ananas_<version>_<arch>.snap`.
-- Apps carry `aliases` so commands drop the `ananas.` namespace prefix:
-  `ananas`, `ananas-designer`, `ananas-administrator`, `qdsadm`. Local installs
-  may need `snap alias`; the store auto-grants aliases prefixed by the snap name
-  (`qdsadm` may need review).
+- App commands are namespaced as `<snap>.<app>`: `ananas`,
+  `ananas.ananas-designer`, `ananas.ananas-administrator`, `ananas.qdsadm`.
+  The `aliases` in `snapcraft.yaml` only *request* short names — the Store does
+  **not** grant them automatically (`snap aliases ananas` stays empty), so
+  desktop entries must use the dotted command names. Users can add local ones
+  with `sudo snap alias ananas.ananas-designer ananas-designer` (and likewise).
+- The snap file and the Store *listing* are separate: `title`, `summary`,
+  `description`, `license` and the listing icon live in the listing and are
+  **not** updated by `snapcraft upload`; push them with
+  `snapcraft upload-metadata --force <snap>`.
+- Snapcraft 9 is not usable in the container: `snapcraft-rocks` publishes only
+  `7_core22`, `8_core22` and `8_core24` images (the `core26-9` branch has no
+  published tag). Stay on `8_core24`.
 
 ## Hardcoded paths and the layout map
 
@@ -120,18 +129,33 @@ plugin comes from `libqt6gui6t64`; the SQL driver plugins from the
 - Runtime data (schemes, templates, translations, `*.rc`, `ananas.conf`) is
   staged in the `override-build` of the `ananas` part; translations are built
   with `/usr/lib/qt6/bin/lrelease` (not on `PATH`).
-- GUI entries live in `snap/gui/<app>.desktop` with `snap/gui/<app>.png`; snapd
-  expands `Exec`/`Icon` at install time. The app names (`ananas`,
-  `ananas-designer`, `ananas-administrator`) must match the file names.
+- GUI entries live in `snap/gui/<app>.desktop` (named after the app) with the
+  icon `snap/gui/<app>.png`:
+  - `Exec` must be the snap command `<snap>.<app>` (e.g.
+    `ananas.ananas-designer`), not the bare app name. Otherwise snapd cannot
+    resolve the app and exports the desktop file **without** `Exec` and
+    `X-SnapAppName` (the launcher does nothing and shows a generic icon).
+  - `Icon` must be an absolute path via `${SNAP}`, e.g.
+    `Icon=${SNAP}/meta/gui/ananas-designer.png`; snapd expands `${SNAP}` when it
+    exports the file. A bare `Icon=ananas.png` is left unresolved and shows the
+    generic icon.
 
 ## Pitfalls
 
 - **Executable bit**: `snap/local/bin/qt-env` must be mode 755, and snapcraft
   caches parts. If you change only permissions, run
   `… snapcraft clean wrappers` (or `clean`) before `pack`.
-- **Store icon**: the top-level `icon:` points to `snap/icon.png` (256x256 PNG);
-  `snap/gui/*.png` are the 32x32 desktop-entry icons. Keep both, and keep the
-  SVG source `snap/icon.svg`.
+- **Two icon slots**: the top-level `icon:` (`snap/icon.png`, 256x256) is the
+  **Store listing** icon (shown on `snapcraft.io/<name>`, in `snap info` and the
+  App Center card); `snap/gui/<app>.png` are the **desktop/app-grid** icons
+  referenced by the desktop entries. The listing copy is only refreshed with
+  `snapcraft upload-metadata`. Keep the SVG source `snap/icon.svg`.
+- **Desktop entry not associated**: `Exec` must be `<snap>.<app>` and `Icon`
+  must use `${SNAP}` (see the GUI entries note above); otherwise the launcher
+  breaks and the icon is generic.
+- **`snapcraft lint` needs LXD** in Snapcraft 8: it fails in the OCI image
+  (`unsupported provider 'host'`) and on hosts without LXD. Rely on the linters
+  that `snapcraft pack` runs (`classic`, `library`, `metadata`).
 - **`libpxbackend-1.0.so: cannot open shared object file`**: `libproxy.so.1`
   (via `libQt6Network`) has an absolute RUNPATH to `.../libproxy/`. Keep the
   `libproxy` subdir in `LD_LIBRARY_PATH` in `qt-env`.
@@ -150,9 +174,10 @@ plugin comes from `libqt6gui6t64`; the SQL driver plugins from the
   `layout` and set `XKB_CONFIG_ROOT`; otherwise Qt logs
   `failed to add default include path /usr/share/X11/xkb` and segfaults.
 - **Engine command**: because the app name equals the snap name, launch it as
-  `ananas`, not `ananas.ananas`. The other commands use their aliases
-  (`ananas-designer`, `ananas-administrator`, `qdsadm`); enable them with
-  `snap alias` on local installs.
+  `ananas`, not `ananas.ananas`. The other commands are
+  `ananas.ananas-designer`, `ananas.ananas-administrator` and `ananas.qdsadm`;
+  short aliases only exist after `snap alias` (the Store does not grant them
+  automatically).
 - **`Session management error: Could not open network socket`**: `SESSION_MANAGER`
   points at an unreachable X session manager; the wrapper `unset`s it.
 - **Unused-library lint warnings** (mesa/icu/vulkan/dconf) are expected and
@@ -197,7 +222,18 @@ from CI (`SNAPCRAFT_STORE_CREDENTIALS`) is not wired up yet.
 
 ```sh
 unsquashfs -l dist/ananas_*.snap | grep -E 'usr/bin/(ananas|qdsadm)|usr/lib/ananas|libQt6DesignerComponents|libqsql|libqxcb'
-snap run --shell ananas.ananas   # then: ls /usr/share/ananas /usr/lib/ananas /etc/ananas; echo $HOME
+snap run --shell ananas.qdsadm   # then: ls /usr/share/ananas /usr/lib/ananas /etc/ananas; echo $HOME
+```
+
+After install/refresh, an exported desktop entry should be associated and point
+at an absolute icon:
+
+```sh
+grep -E '^(Exec|Icon|X-SnapAppName)=' \
+    /var/lib/snapd/desktop/applications/ananas_ananas-designer.desktop
+# Exec=/snap/bin/ananas.ananas-designer
+# Icon=/snap/ananas/current/meta/gui/ananas-designer.png
+# X-SnapAppName=ananas-designer
 ```
 
 `snapcraft pack` runs the `classic`, `library` and `metadata` linters; only the

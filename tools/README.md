@@ -32,11 +32,17 @@ ananas/
 │   └── qdataschema/        # libqdataschema (separate .deb)
 ├── applications/           # inventory business scheme
 ├── build/                  # packaging (ubuntu/debian, rpm, inno, menus)
+├── snap/                   # Snapcraft manifest, GUI entries, wrappers
+│   ├── snapcraft.yaml
+│   ├── gui/                # .desktop files and icons
+│   └── local/bin/qt-env    # command-chain wrapper for all apps
 ├── tools/                  # this directory
 │   ├── docker/Containerfile
 │   └── scripts/
 │       ├── build-deb.sh            # .deb from the committed tree
 │       ├── build-deb-worktree.sh   # .deb from the working tree (local testing)
+│       ├── build-snap.sh           # .snap from the committed tree
+│       ├── build-snap-worktree.sh  # .snap from the working tree
 │       ├── smoke.sh                # CMake build + ananas-test (Xvfb)
 │       ├── smoke-designer.sh       # designer wrapper + app start (Xvfb)
 │       └── extract-cfg-form.py     # test fixture for smoke-designer.sh
@@ -49,6 +55,7 @@ ananas/
   Podman is used; force the other one with `CONTAINER=docker bash …`.
 - Network access to `archive.ubuntu.com`, `security.ubuntu.com` and
   `ports.ubuntu.com` (for the Ubuntu 24.04 image)
+- Network access to `ghcr.io` to pull the Snapcraft OCI image for `.snap` builds
 
 ## Building and testing
 
@@ -83,6 +90,41 @@ The packages are written to `dist/`:
 sudo apt install ./dist/libqdataschema_*_amd64.deb ./dist/ananas_*_amd64.deb
 ```
 
+### Snap package
+
+A single snap named `ananas` bundles the engine, the administrator, the
+designer and `qdsadm`. It is built inside the official Snapcraft OCI image
+(`core24`), so no host Snapcraft, LXD or `snapcraft --destructive-mode` is
+needed — the image is the build environment:
+
+```sh
+# From the committed branch (default: master)
+bash tools/scripts/build-snap.sh
+
+# From the current working tree
+bash tools/scripts/build-snap-worktree.sh
+```
+
+The snap is written to `dist/` and can be installed in developer mode:
+
+```sh
+sudo snap install --devmode --dangerous ./dist/ananas_*.snap
+```
+
+Its version is `<VERSION>+git<YYYYMMDD>.<short-sha>` (for example
+`0.9.7+git20260924.517477b`), so the build date and the git revision show up in
+`snap info ananas` and in the package file name. The apps are exposed as
+`ananas`, `ananas-designer`, `ananas-administrator` and `qdsadm` (declared as
+aliases in `snapcraft.yaml`); a local install may need them enabled with
+`sudo snap alias ananas.ananas-designer ananas-designer` and so on.
+
+The Ananas binaries use a few absolute paths (`/usr/share/ananas`,
+`/usr/lib/ananas`, `/etc/ananas`); the `layout` section in
+`snap/snapcraft.yaml` maps them back into the snap. A `command-chain` wrapper
+(`snap/local/bin/qt-env`) points the loader and Qt at the bundled libraries and
+plugins. The name `ananas` is already registered in the Snap Store, so
+`name: ananas` is used as-is (do not run `snapcraft register`).
+
 ### Choosing a branch
 
 `build-deb.sh` builds `master` by default; override with `ANANAS_BRANCH`:
@@ -116,5 +158,5 @@ The image ships `ccache` (on `PATH` ahead of `gcc`/`g++`). The cache directory i
 - The vendored Qt4 Designer fork was replaced by a wrapper over the public Qt6
   Designer API; the legacy fork is kept in the archived `ananas-labs-qt4`
   repository.
-- Distribution packaging beyond Debian/Ubuntu (`build/rpm`, `build/win32`) is
-  not maintained yet.
+- Snap packaging is supported (`snap/snapcraft.yaml`, `tools/scripts/build-snap*.sh`).
+  Other distribution packaging (`build/rpm`, `build/win32`) is not maintained yet.

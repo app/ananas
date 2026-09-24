@@ -12,6 +12,7 @@
 - `src/qdataschema/` — libqdataschema
 - `applications/` — бизнес-схема «Оперативный учёт» (inventory)
 - `build/` — упаковка (Debian/Ubuntu; легаси RPM/Inno/меню)
+- `snap/` — манифест Snapcraft, GUI-записи и обёртки
 - `tools/` — сборка, тесты и упаковка
 
 ## Сборка и тесты

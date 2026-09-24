@@ -1,18 +1,26 @@
 name: ananas
 adopt-info: ananas
 base: core24
-summary: Free accounting automation platform
+title: Ananas
+summary: Free cross-platform accounting automation platform
 description: |
-  Ananas is a free accounting automation platform for Linux. This snap ships
-  the Ananas engine, the administrator and the designer, the bundled
-  "inventory" business scheme (internal SQLite database) and the qdsadm tool
-  from libqdataschema.
+  Ananas is a free, cross-platform accounting automation platform for Linux and
+  Windows, built with Qt. It is both a runtime for business applications
+  ("schemes") and a visual designer used to build and customise them.
 
-  The Ananas binaries use a few absolute paths (/usr/share/ananas,
-  /usr/lib/ananas, /etc/ananas); those are mapped back into the snap with the
-  layout section below.
+  This snap bundles:
+  - the Ananas engine that runs a business scheme;
+  - the administrator, for users, roles and permissions;
+  - the designer, for metadata, forms, journals and reports;
+  - the bundled "inventory" scheme (warehouse and operations accounting),
+    ready to try with an internal SQLite database;
+  - qdsadm, a command-line tool to inspect and synchronise database schemas.
+
+  The engine can use the built-in SQLite database or connect to MySQL or
+  PostgreSQL.
+icon: snap/icon.png
 grade: devel
-confinement: devmode
+confinement: strict
 license: GPL-2.0-only
 contact: apaskal@gmail.com
 website: https://github.com/app/ananas
@@ -128,6 +136,7 @@ apps:
     command-chain: [bin/qt-env]
     plugs:
       - desktop
+      - desktop-legacy
       - x11
       - wayland
       - opengl
@@ -143,6 +152,7 @@ apps:
     command-chain: [bin/qt-env]
     plugs:
       - desktop
+      - desktop-legacy
       - x11
       - wayland
       - opengl
@@ -156,6 +166,7 @@ apps:
     command-chain: [bin/qt-env]
     plugs:
       - desktop
+      - desktop-legacy
       - x11
       - wayland
       - opengl

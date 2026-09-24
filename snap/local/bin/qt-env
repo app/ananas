@@ -48,6 +48,11 @@ if [ -d "$SNAP/usr/share/X11/xkb" ]; then
     export XKB_CONFIG_ROOT
 fi
 
+# Keep the application's data (log, workdir, settings) in the snap's shared
+# user directory instead of the real home (which is hidden for strict snaps).
+ANANAS_DATA_DIR="$SNAP_USER_COMMON"
+export ANANAS_DATA_DIR
+
 export LD_LIBRARY_PATH QT_PLUGIN_PATH
 
 exec "$@"

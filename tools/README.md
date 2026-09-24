@@ -145,6 +145,13 @@ podman build -t ananas-qt6-builder -f tools/docker/Containerfile .
 podman run --rm -it -v "$PWD":/repo:z ananas-qt6-builder bash
 ```
 
+## Continuous integration
+
+GitHub Actions builds and tests the project in containers: the `ci` workflow
+runs the verification build and the test suite, while `snap` and `deb` build the
+packages. Packaging artifacts are published only from `master`. See
+[`GITHUB-CI.md`](GITHUB-CI.md) for the triggers, path filters and artifacts.
+
 ## Build caching
 
 The image ships `ccache` (on `PATH` ahead of `gcc`/`g++`). The cache directory is

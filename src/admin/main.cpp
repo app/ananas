@@ -32,6 +32,7 @@
 #include <qtranslator.h>
 #include <qsplashscreen.h>
 #include "mainform.h"
+#include "acfg.h"
 #include "ananas.h"
 
 //QApplication *application = 0;
@@ -115,6 +116,7 @@ int main( int argc, char ** argv )
 	// Для QSettings
 	a.setOrganizationName("ananas");
 	a.setApplicationName("ananas");
+	aInitDataPaths();
 
 	qApp->addLibraryPath( qApp->applicationDirPath() );
 	if ( parseCommandLine( &a ) ) return 1;

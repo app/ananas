@@ -32,6 +32,7 @@
 //Added by qt3to4:
 #include <QPixmap>
 #include "alog.h"
+#include "acfg.h"
 #include "ananas.h"
 #include "mainform.h"
 #include "dselectdb.h"
@@ -135,6 +136,7 @@ int main( int argc, char ** argv )
     // Для QSettings
 	app.setOrganizationName("ananasgroup");
 	app.setApplicationName("ananas");
+	aInitDataPaths();
 
 	mainform = appWindow;
 	// mainformws = mainform->ws;
@@ -142,7 +144,7 @@ int main( int argc, char ** argv )
 //	application = &app;
 //	dSelectDB dselectdb;
 	QPixmap pixmap;
-	QString configWorkDir = QDir::homePath()+"./ananas";
+	QString configWorkDir = aDataDir()+"/.ananas";
 	QString logLevel =  "0";
 
 	if ( parseCommandLine( &app ) ) return 1;

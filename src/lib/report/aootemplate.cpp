@@ -30,6 +30,7 @@
 
 #include "aootemplate.h"
 #include "alog.h"
+#include "acfg.h"
 
 #include <stdlib.h>
 #include <qfile.h>
@@ -548,7 +549,7 @@ bool
 aOOTemplate::save( const QString & fname )
 {
 
-	QString homeDir = QString("%1").arg(QDir::toNativeSeparators(QDir::homePath()));
+	QString homeDir = QString("%1").arg(QDir::toNativeSeparators(aDataDir()));
 	QFile fContent( QDir::toNativeSeparators(copyName+"/content.xml") );
 	if( !fContent.open( QIODevice::WriteOnly ) )
 	{
@@ -626,7 +627,7 @@ aOOTemplate::setDir(const QString &dir)
 QString
 aOOTemplate::getDir()
 {
-	QString homeDir = QString("%1").arg(QDir::toNativeSeparators(QDir::homePath()));
+	QString homeDir = QString("%1").arg(QDir::toNativeSeparators(aDataDir()));
 #ifdef Q_OS_WIN32
 	if(homeDir.right(1)!="\\") homeDir.append("\\");
 #else

@@ -54,7 +54,17 @@ extern void (*cfg_messageproc)(int , const char *);
 void ANANAS_EXPORT cfg_message(int msgtype, const char *msgfmt,...);
 void ANANAS_EXPORT debug_message(const char *msgfmt,...);
 
-// Expand a leading "~" (or "~/...") to the user's home directory.
+// Base directory for user data (log, workdir, settings). Honours the
+// ANANAS_DATA_DIR environment variable when set, otherwise falls back to the
+// user's home directory. This keeps containerised runs (snap, flatpak, ...)
+// away from the real home without changing the default behaviour elsewhere.
+QString ANANAS_EXPORT aDataDir();
+
+// Redirect the QSettings user scope under aDataDir() when ANANAS_DATA_DIR is
+// set. Call once at start-up, before any QSettings object is created.
+void ANANAS_EXPORT aInitDataPaths();
+
+// Expand a leading "~" (or "~/...") to aDataDir().
 QString ANANAS_EXPORT aExpandHome(const QString &path);
 
 class QObject;

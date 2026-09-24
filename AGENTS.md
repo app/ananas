@@ -38,6 +38,17 @@ Do not run `cmake`, `make`, `qmake` or `lrelease` directly on the host.
   `.opencode/skills/<name>/SKILL.md`.
 - Available skills: `feature-development`, `snapcraft-packager`.
 
+## Branch naming
+
+Work on short-lived topic branches off `master`, named `<type>/<slug>` with the
+same types as the commits (`feat/`, `fix/`, `build/`, `ci/`, `docs/`,
+`refactor/`, `chore/`, `test/`). Use lowercase and hyphens, do not put
+`master`/`main` in the name, and add the issue id when useful
+(`feat/123-snap-package`).
+
+`master` is the default branch. Push workflows run only on `master`; topic
+branches are validated through pull requests. See `tools/GITHUB-CI.md`.
+
 ## Commits
 
 - Conventional Commits, English (`feat:`, `fix:`, `build:`, `docs:`,

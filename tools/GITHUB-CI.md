@@ -26,6 +26,9 @@ packaging inputs only proves that the packages still build. Artifacts are
 uploaded when `github.ref == 'refs/heads/master'` (this covers a push to
 `master` and a manual run started from `master`).
 
+Push triggers are limited to `master`, so topic branches (`<type>/<slug>`, see
+`CONTRIBUTING.md`) run only through pull requests.
+
 ## Path sets
 
 Pull requests run the packaging workflows only when the packaging inputs change:

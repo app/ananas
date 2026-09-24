@@ -32,6 +32,7 @@
 #include	<qdir.h>
 #include	<qdatetime.h>
 #include 	"aservice.h"
+#include	"acfg.h"
 #include	<iostream>
 
 
@@ -153,7 +154,7 @@ aLog::init(const QString &log_name, int show_up, bool echoToConsole)
 		{
 			if (createDotAnanasDir())
 			{
-				log = QDir::homePath()+"/.ananas/ananas.log";
+				log = aDataDir()+"/.ananas/ananas.log";
 			}
 			else
 			{
@@ -210,7 +211,7 @@ aLog::close()
 bool
 aLog::createDotAnanasDir()
 {
-	QDir dir(QDir::homePath()+"/.ananas");
+	QDir dir(aDataDir()+"/.ananas");
 	if (dir.exists()) return true;
 	return dir.mkpath(".");
 }

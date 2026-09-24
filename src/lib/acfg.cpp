@@ -42,17 +42,39 @@
 #include <qstringlist.h>
 #include <QTextStream>
 #include <QDir>
+#include <QByteArray>
+#include <QSettings>
 
 #include "acfg.h"
 #include "alog.h"
 
 QString
+aDataDir()
+{
+	const QByteArray dir = qgetenv("ANANAS_DATA_DIR");
+	if ( !dir.isEmpty() )
+		return QString::fromLocal8Bit(dir.constData());
+	return QDir::homePath();
+}
+
+void
+aInitDataPaths()
+{
+	const QByteArray dir = qgetenv("ANANAS_DATA_DIR");
+	if ( dir.isEmpty() )
+		return;
+	const QString base = QString::fromLocal8Bit(dir.constData()) + "/config";
+	QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, base);
+	QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, base);
+}
+
+QString
 aExpandHome(const QString &path)
 {
 	if ( path.isEmpty() ) return path;
-	if ( path == "~" ) return QDir::homePath();
+	if ( path == "~" ) return aDataDir();
 	if ( path.startsWith("~/") || path.startsWith("~\\") )
-		return QDir::homePath() + path.mid(1);
+		return aDataDir() + path.mid(1);
 	return path;
 }
 

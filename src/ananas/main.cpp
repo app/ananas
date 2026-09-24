@@ -37,6 +37,7 @@
 #include "dlogin.h"
 #include "ananas.h"
 #include "alog.h"
+#include "acfg.h"
 #include "aextensionfactory.h"
 
 //QApplication *application = 0;
@@ -128,6 +129,7 @@ int main( int argc, char ** argv )
 	// Для QSettings
 	a.setOrganizationName("ananas");
         a.setApplicationName("ananas");
+	aInitDataPaths();
 
 	if ( parseCommandLine( &a ) ) return 1;
 	qApp->installTranslator( &tr_app );

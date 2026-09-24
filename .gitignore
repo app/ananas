@@ -15,6 +15,11 @@ moc_*.cpp
 /lib
 /tmp
 /dist
+/.craft
+/parts
+/prime
+/stage
+/*.snap
 translations/*.qm
 src/test/ananas-test
 src/test/test*.cfg

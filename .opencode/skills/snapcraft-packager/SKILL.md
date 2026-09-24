@@ -1,6 +1,10 @@
 ---
 name: snapcraft-packager
-description: Package, build or debug the Ananas snap (snapcraft, .snap, core24, layout, stage-packages, command-chain, tools/scripts/build-snap*.sh). Use when working on snap/snapcraft.yaml, the snap GUI entries, the build container, or a failing snap build.
+description: >-
+  Package, build or debug the Ananas snap (snapcraft, .snap, core24, layout,
+  stage-packages, command-chain, tools/scripts/build-snap*.sh). Use when
+  working on snap/snapcraft.yaml, the snap GUI entries, the build container,
+  or a failing snap build.
 ---
 
 # Snapcraft packager for Ananas

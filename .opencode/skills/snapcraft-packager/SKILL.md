@@ -23,9 +23,12 @@ snap misbehaves.
 ## Key facts
 
 - `name: ananas` is **already registered** in the Snap Store (`snapcraft names`
-  shows it since 2018-07-25, public). Do **not** run `snapcraft register`.
-  Publishing is not part of the current scope.
-- Base `core24`, `confinement: devmode` for now (target is `strict`).
+  shows it since 2018-07-25, public), owned by `andrey.paskal`. Do **not** run
+  `snapcraft register`. Releases are manual to `latest/edge` for now.
+- Base `core24`, `confinement: strict`, `grade: devel`. Channel rules:
+  `grade: devel` can be released to `edge` and `beta` only; `candidate` and
+  `stable` need `grade: stable`. A plain `snap install ananas` uses `stable`,
+  so the final release requires `grade: stable`.
 - The build runs in the official OCI image
   `ghcr.io/canonical/snapcraft:8_core24` (Snapcraft 8.11.x on Ubuntu 24.04).
   There is **no host Snapcraft, no LXD and no `--destructive-mode`**: the image
@@ -78,8 +81,10 @@ podman run --rm -e ANANAS_VERSION="$(cat VERSION)+git$(date -u +%Y%m%d).$(git re
   -v "$PWD":/project:z ghcr.io/canonical/snapcraft:8_core24 pack
 ```
 
-Output: `dist/ananas_<version>_amd64.snap`. Install for a smoke test with
-`sudo snap install --devmode --dangerous ./dist/ananas_*.snap`.
+Output: `dist/ananas_<version>_amd64.snap`. Install a local build with
+`sudo snap install --dangerous ./dist/ananas_*.snap` (confinement is enforced;
+`--devmode` only when debugging confinement). A published build is installed
+with `sudo snap install ananas --edge`.
 
 ## Package lists (noble / Qt 6.4.2)
 
@@ -107,6 +112,11 @@ plugin comes from `libqt6gui6t64`; the SQL driver plugins from the
   `libproxy.so.1` has an absolute `RUNPATH` that Snapcraft does not rewrite.
   The wrapper deliberately does **not** override `HOME` or `XDG_CONFIG_DIRS`:
   doing so breaks GSettings/dconf and the system theme.
+- The wrapper sets `ANANAS_DATA_DIR=$SNAP_USER_COMMON`. The library helpers
+  `aDataDir()` / `aInitDataPaths()` (`src/lib/acfg.cpp`) then place the log,
+  the default workdir (`~` expansion) and the `QSettings` user scope under that
+  directory. Outside a snap the variable is unset and `~/.ananas` is used as
+  before, so deb/Windows builds are unaffected.
 - Runtime data (schemes, templates, translations, `*.rc`, `ananas.conf`) is
   staged in the `override-build` of the `ananas` part; translations are built
   with `/usr/lib/qt6/bin/lrelease` (not on `PATH`).
@@ -119,8 +129,9 @@ plugin comes from `libqt6gui6t64`; the SQL driver plugins from the
 - **Executable bit**: `snap/local/bin/qt-env` must be mode 755, and snapcraft
   caches parts. If you change only permissions, run
   `… snapcraft clean wrappers` (or `clean`) before `pack`.
-- **Icons are 32x32**: fine for devmode, but a 256x256 icon is required before a
-  Store upload.
+- **Store icon**: the top-level `icon:` points to `snap/icon.png` (256x256 PNG);
+  `snap/gui/*.png` are the 32x32 desktop-entry icons. Keep both, and keep the
+  SVG source `snap/icon.svg`.
 - **`libpxbackend-1.0.so: cannot open shared object file`**: `libproxy.so.1`
   (via `libQt6Network`) has an absolute RUNPATH to `.../libproxy/`. Keep the
   `libproxy` subdir in `LD_LIBRARY_PATH` in `qt-env`.
@@ -151,14 +162,33 @@ plugin comes from `libqt6gui6t64`; the SQL driver plugins from the
   of the engine does.
 - **MySQL/PostgreSQL over a host Unix socket** are unavailable under `strict`;
   TCP works. The bundled `inventory` scheme uses internal SQLite.
-- **`~/.ananas` under `strict`**: the app stores its log and default workdir in
-  the hidden `~/.ananas`, which the `home` interface does not expose. It works
-  in devmode (real `HOME`); before switching to `strict`, add a `personal-files`
-  plug for `~/.ananas` or change the code to `QStandardPaths`.
+- **User data under `strict`**: `$HOME` and `~/.config` are not reliably
+  writable, so the app must not depend on `~/.ananas`. The wrapper sets
+  `ANANAS_DATA_DIR=$SNAP_USER_COMMON`; keep it, otherwise the engine cannot
+  write its log, workdir or settings.
+- **AT-SPI/a11y abort under `strict`**: Qt logs
+  `AT-SPI: Error retrieving accessibility bus address` and aborts unless the GUI
+  apps carry the `desktop-legacy` plug (it grants access to `org.a11y.Bus`).
+- **Stale host artifacts**: `build-snap-worktree.sh` stages a clean copy of the
+  tree before mounting it, so `bin/`, `lib/` and `cmake-build/` produced by host
+  builds (with RPATHs like `/repo/lib`) cannot break `cmake --install`.
 - **Build context**: `.snapcraftignore` keeps VCS/build dirs out of the source
   copy. `.gitignore` lists `.craft/`, `parts/`, `prime/`, `stage/`, `*.snap`.
 - `build-snap.sh` uses `git archive`, so files must be committed first; use
   `build-snap-worktree.sh` while iterating.
+
+## Release to the Snap Store (manual)
+
+```sh
+bash tools/scripts/build-snap.sh            # from the committed tree
+snapcraft upload --release=latest/edge dist/ananas_<version>_amd64.snap
+snapcraft status ananas
+```
+
+Then `sudo snap install ananas --edge`. Promote a tested revision later with
+`snapcraft release ananas <revision> beta` and finally `... stable`;
+`candidate`/`stable` require `grade: stable` in `snapcraft.yaml`. Publishing
+from CI (`SNAPCRAFT_STORE_CREDENTIALS`) is not wired up yet.
 
 ## Verification
 

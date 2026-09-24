@@ -1,6 +1,10 @@
 ---
 name: feature-development
-description: Use when starting a new feature or a non-trivial change in the Ananas project — how to plan, implement in the container, verify, document and commit. Triggers: new feature, refactor, large task, plan, temporary plan file, tmp tracker, definition of done.
+description: >-
+  Use when starting a new feature or a non-trivial change in the Ananas
+  project — how to plan, implement in the container, verify, document and
+  commit. Triggers: new feature, refactor, large task, plan, temporary plan
+  file, tmp tracker, definition of done.
 ---
 
 # Feature development in Ananas

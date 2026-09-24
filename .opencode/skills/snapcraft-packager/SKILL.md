@@ -183,6 +183,9 @@ plugin comes from `libqt6gui6t64`; the SQL driver plugins from the
 bash tools/scripts/build-snap.sh            # from the committed tree
 snapcraft upload --release=latest/edge dist/ananas_<version>_amd64.snap
 snapcraft status ananas
+# The Store listing (title/summary/description/icon) is separate from the snap
+# and is NOT updated by `upload`; push it explicitly after changing it:
+snapcraft upload-metadata --force dist/ananas_<version>_amd64.snap
 ```
 
 Then `sudo snap install ananas --edge`. Promote a tested revision later with

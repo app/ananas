@@ -33,6 +33,7 @@ Do not run `cmake`, `make`, `qmake` or `lrelease` directly on the host.
 
 - When behaviour or workflow changes, update `tools/README.md` and/or
   `README.md` / `README.ru.md`.
+- When the CI workflows change, update `tools/GITHUB-CI.md`.
 - Capture repeatable procedures as skills under
   `.opencode/skills/<name>/SKILL.md`.
 - Available skills: `feature-development`, `snapcraft-packager`.
